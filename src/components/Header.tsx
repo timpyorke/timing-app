@@ -1,34 +1,41 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Languages } from 'lucide-react';
+import { useTranslation } from '../i18n/stub';
 import { useCart } from '../context/CartContext';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t, i18n } = useTranslation();
   const { getTotalItems, toggleCart } = useCart();
 
   const isHome = location.pathname === '/';
   const totalItems = getTotalItems();
 
+  const toggleLanguage = () => {
+    const newLanguage = i18n.language === 'th' ? 'en' : 'th';
+    i18n.changeLanguage(newLanguage);
+  };
+
   const getTitle = () => {
     switch (location.pathname) {
       case '/':
-        return 'TIMING';
+        return t('header.timing');
       case '/cart':
-        return 'Cart';
+        return t('header.cart');
       case '/checkout':
-        return 'Checkout';
+        return t('header.checkout');
       case '/order-status':
-        return 'Order Status';
+        return t('header.orderStatus');
       default:
         if (location.pathname.startsWith('/drink/')) {
-          return 'Drink Details';
+          return t('header.drinkDetails');
         }
         if (location.pathname.startsWith('/order-confirmation/')) {
-          return 'Order Confirmed';
+          return t('header.orderConfirmed');
         }
-        return 'TIMING';
+        return t('header.timing');
     }
   };
 
@@ -40,7 +47,7 @@ const Header: React.FC = () => {
             <button
               onClick={() => navigate(-1)}
               className="btn btn-ghost btn-sm p-2 text-white hover:bg-white/10"
-              aria-label="Go back"
+              aria-label={t('navigation.goBack')}
             >
               <ArrowLeft size={20} />
             </button>
@@ -48,20 +55,34 @@ const Header: React.FC = () => {
           <h1 className="text-lg font-bold text-white">{getTitle()}</h1>
         </div>
 
-        {location.pathname !== '/cart' && (
+        <div className="flex items-center space-x-2">
           <button
-            onClick={toggleCart}
-            className="btn btn-ghost btn-sm relative p-2 text-white hover:bg-white/10"
-            aria-label={`Cart with ${totalItems} items`}
+            onClick={toggleLanguage}
+            className="btn btn-ghost btn-sm p-2 text-white hover:bg-white/10"
+            aria-label={`Change language to ${i18n.language === 'th' ? 'English' : 'Thai'}`}
+            title={i18n.language === 'th' ? 'Switch to English' : 'เปลี่ยนเป็นภาษาไทย'}
           >
-            <ShoppingCart size={20} />
-            {totalItems > 0 && (
-              <span className="absolute -top-1 -right-1 bg-secondary text-secondary-content text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
-                {totalItems > 9 ? '9+' : totalItems}
-              </span>
-            )}
+            <Languages size={18} />
+            <span className="text-xs ml-1 font-medium">
+              {i18n.language === 'th' ? 'EN' : 'TH'}
+            </span>
           </button>
-        )}
+          
+          {location.pathname !== '/cart' && (
+            <button
+              onClick={toggleCart}
+              className="btn btn-ghost btn-sm relative p-2 text-white hover:bg-white/10"
+              aria-label={`Cart with ${totalItems} items`}
+            >
+              <ShoppingCart size={20} />
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 bg-secondary text-secondary-content text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                  {totalItems > 9 ? '9+' : totalItems}
+                </span>
+              )}
+            </button>
+          )}
+        </div>
       </div>
     </header>
   );

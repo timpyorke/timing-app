@@ -17,6 +17,26 @@ export const generateId = (): string => {
   return Math.random().toString(36).substr(2, 9);
 };
 
+export const generateUUID = (): string => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
+
+export const getAnonymousUserId = (): string => {
+  const storageKey = 'timing_anonymous_user_id';
+  let userId = localStorage.getItem(storageKey);
+  
+  if (!userId) {
+    userId = generateUUID();
+    localStorage.setItem(storageKey, userId);
+  }
+  
+  return userId;
+};
+
 export const calculateEstimatedTime = (minutes: number): string => {
   const now = new Date();
   const estimated = new Date(now.getTime() + minutes * 60 * 1000);

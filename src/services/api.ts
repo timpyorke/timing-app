@@ -37,9 +37,10 @@ class ApiService {
     }
   }
 
-  async createOrder(items: CartItem[], customer: Customer): Promise<Order> {
+  async createOrder(items: CartItem[], customer: Customer, userId?: string): Promise<Order> {
     try {
       const orderData = {
+        userId,
         items: items.map(item => ({
           drinkId: item.drinkId,
           drinkName: item.drinkName,
@@ -62,7 +63,7 @@ class ApiService {
       });
     } catch (error) {
       console.error('Failed to create order:', error);
-      return this.getMockOrder(items, customer);
+      return this.getMockOrder(items, customer, userId);
     }
   }
 
@@ -160,10 +161,11 @@ class ApiService {
     return drinks.find(drink => drink.id === id) || drinks[0];
   }
 
-  private getMockOrder(items: CartItem[], customer: Customer): Order {
+  private getMockOrder(items: CartItem[], customer: Customer, userId?: string): Order {
     const subtotal = items.reduce((sum, item) => sum + item.totalPrice, 0);
     return {
       id: `ORDER-${Date.now()}`,
+      userId,
       items,
       customer,
       subtotal,

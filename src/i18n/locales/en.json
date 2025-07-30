@@ -1,0 +1,105 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "search": "Search...",
+    "add": "Add",
+    "remove": "Remove",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "total": "Total",
+    "subtotal": "Subtotal",
+    "tax": "Tax",
+    "price": "Price",
+    "quantity": "Quantity"
+  },
+  "navigation": {
+    "menu": "Menu",
+    "cart": "Cart",
+    "orders": "Orders",
+    "goBack": "Go back"
+  },
+  "header": {
+    "timing": "TIMING",
+    "cart": "Cart",
+    "checkout": "Checkout",
+    "orderStatus": "Order Status",
+    "drinkDetails": "Drink Details",
+    "orderConfirmed": "Order Confirmed"
+  },
+  "menu": {
+    "searchPlaceholder": "Search drinks...",
+    "all": "All",
+    "noResults": "No drinks found",
+    "noResultsSubtext": "Try adjusting your search or category filter",
+    "popular": "Popular",
+    "sizes": "sizes",
+    "milkOptions": "milk options",
+    "hotIced": "Hot/Iced",
+    "customize": "Customize",
+    "quickAdd": "Add",
+    "added": "✓ Added!"
+  },
+  "drinkDetails": {
+    "size": "Size",
+    "milk": "Milk",
+    "sweetness": "Sweetness",
+    "temperature": "Temperature",
+    "addOns": "Add-ons",
+    "addToCart": "Add to Cart",
+    "updateCart": "Update Cart"
+  },
+  "cart": {
+    "yourCart": "Your Cart",
+    "emptyCart": "Your cart is empty",
+    "emptyCartSubtext": "Add some delicious drinks to get started!",
+    "startShopping": "Start Shopping",
+    "checkout": "Checkout",
+    "removeItem": "Remove item",
+    "itemsInCart": "{{count}} item in cart",
+    "itemsInCart_plural": "{{count}} items in cart"
+  },
+  "checkout": {
+    "customerInfo": "Customer Information",
+    "name": "Name",
+    "phone": "Phone Number",
+    "email": "Email (Optional)",
+    "orderSummary": "Order Summary",
+    "orderNotes": "Order Notes (Optional)",
+    "orderNotesPlaceholder": "Any special requests or notes...",
+    "placeOrder": "Place Order",
+    "nameRequired": "Name is required",
+    "phoneRequired": "Phone number is required",
+    "phoneInvalid": "Please enter a valid phone number"
+  },
+  "orderConfirmation": {
+    "title": "Order Confirmed!",
+    "subtitle": "Thank you for your order. We'll start preparing your drinks right away.",
+    "orderNumber": "Order #{{orderNumber}}",
+    "estimatedTime": "Estimated preparation time: {{minutes}} minutes",
+    "trackOrder": "Track Your Order",
+    "orderAnother": "Order More Drinks"
+  },
+  "orderStatus": {
+    "title": "Order Status",
+    "noOrders": "No orders found",
+    "noOrdersSubtext": "You haven't placed any orders yet.",
+    "orderNumber": "Order #{{orderNumber}}",
+    "status": {
+      "pending": "Order Received",
+      "preparing": "Preparing",
+      "ready": "Ready for Pickup",
+      "completed": "Completed"
+    },
+    "estimatedTime": "Est. {{minutes}} min",
+    "items": "{{count}} item",
+    "items_plural": "{{count}} items"
+  },
+  "pwa": {
+    "installTitle": "Install TIMING App",
+    "installSubtitle": "Get the full app experience with faster loading and offline access.",
+    "install": "Install",
+    "dismiss": "Not Now"
+  }
+}
