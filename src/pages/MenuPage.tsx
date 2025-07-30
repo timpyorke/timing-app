@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Star, Plus } from 'lucide-react';
+import { useTranslation } from '../i18n/stub';
 import { Drink, DrinkCategory, CartItem } from '../types';
 import { apiService } from '../services/api';
 import { formatPrice, debounce, generateId } from '../utils';
@@ -8,6 +9,7 @@ import { useCart } from '../context/CartContext';
 
 const MenuPage: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { addItem, toggleCart } = useCart();
   const [drinks, setDrinks] = useState<Drink[]>([]);
   const [categories, setCategories] = useState<DrinkCategory[]>([]);
@@ -90,7 +92,7 @@ const MenuPage: React.FC = () => {
     // Show success feedback
     const button = e.currentTarget as HTMLButtonElement;
     const originalText = button.innerHTML;
-    button.innerHTML = '✓ Added!';
+    button.innerHTML = t('menu.added');
     button.disabled = true;
     
     setTimeout(() => {
@@ -122,7 +124,7 @@ const MenuPage: React.FC = () => {
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/50" size={20} />
         <input
           type="text"
-          placeholder="Search drinks..."
+          placeholder={t('menu.searchPlaceholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="input input-bordered input-touch w-full pl-10"
@@ -136,7 +138,7 @@ const MenuPage: React.FC = () => {
             selectedCategory === 'all' ? 'btn-primary' : 'btn-outline'
           }`}
         >
-          All
+          {t('menu.all')}
         </button>
         {categories.map((category) => (
           <button
@@ -153,9 +155,9 @@ const MenuPage: React.FC = () => {
 
       {filteredDrinks.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-base-content/60">No drinks found</p>
+          <p className="text-base-content/60">{t('menu.noResults')}</p>
           <p className="text-sm text-base-content/40 mt-1">
-            Try adjusting your search or category filter
+            {t('menu.noResultsSubtext')}
           </p>
         </div>
       ) : (
@@ -180,7 +182,7 @@ const MenuPage: React.FC = () => {
                   {drink.isPopular && (
                     <div className="badge badge-secondary badge-sm p-3">
                       <Star size={12} className="mr-1" />
-                      Popular
+{t('menu.popular')}
                     </div>
                   )}
                 </div>
@@ -198,13 +200,13 @@ const MenuPage: React.FC = () => {
 
                 <div className="flex flex-wrap gap-1 text-xs mb-3">
                   <span className="badge badge-outline badge-xs p-3">
-                    {drink.sizes.length} sizes
+                    {drink.sizes.length} {t('menu.sizes')}
                   </span>
                   <span className="badge badge-outline badge-xs p-3">
-                    {drink.milkOptions.length} milk options
+                    {drink.milkOptions.length} {t('menu.milkOptions')}
                   </span>
                   {drink.temperatureOptions.includes('Hot') && drink.temperatureOptions.includes('Iced') && (
-                    <span className="badge badge-outline badge-xs p-3">Hot/Iced</span>
+                    <span className="badge badge-outline badge-xs p-3">{t('menu.hotIced')}</span>
                   )}
                 </div>
                 
@@ -216,7 +218,7 @@ const MenuPage: React.FC = () => {
                     }}
                     className="btn btn-outline btn-sm flex-1 mr-2"
                   >
-                    Customize
+{t('menu.customize')}
                   </button>
                   <button
                     onClick={(e) => handleQuickAddToCart(e, drink)}
@@ -224,7 +226,7 @@ const MenuPage: React.FC = () => {
                     aria-label={`Quick add ${drink.name} to cart`}
                   >
                     <Plus size={14} className="mr-1" />
-                    Add
+{t('menu.quickAdd')}
                   </button>
                 </div>
               </div>

@@ -1,19 +1,21 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Home, ShoppingCart, Clock } from 'lucide-react';
+import { useTranslation } from '../i18n/stub';
 import { useCart } from '../context/CartContext';
 
 const BottomNav: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const { getTotalItems } = useCart();
 
   const totalItems = getTotalItems();
 
   const navItems = [
-    { path: '/', icon: Home, label: 'Menu' },
-    { path: '/cart', icon: ShoppingCart, label: 'Cart', badge: totalItems },
-    { path: '/order-status', icon: Clock, label: 'Orders' },
+    { path: '/', icon: Home, label: t('navigation.menu') },
+    { path: '/cart', icon: ShoppingCart, label: t('navigation.cart'), badge: totalItems },
+    { path: '/order-status', icon: Clock, label: t('navigation.orders') },
   ];
 
   return (

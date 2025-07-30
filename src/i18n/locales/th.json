@@ -1,0 +1,105 @@
+{
+  "common": {
+    "loading": "กำลังโหลด...",
+    "search": "ค้นหา...",
+    "add": "เพิ่ม",
+    "remove": "ลบ",
+    "cancel": "ยกเลิก",
+    "confirm": "ยืนยัน",
+    "back": "กลับ",
+    "next": "ถัดไป",
+    "total": "รวมทั้งหมด",
+    "subtotal": "รวมย่อย",
+    "tax": "ภาษี",
+    "price": "ราคา",
+    "quantity": "จำนวน"
+  },
+  "navigation": {
+    "menu": "เมนู",
+    "cart": "ตะกร้า",
+    "orders": "คำสั่งซื้อ",
+    "goBack": "กลับ"
+  },
+  "header": {
+    "timing": "TIMING",
+    "cart": "ตะกร้า",
+    "checkout": "ชำระเงิน",
+    "orderStatus": "สถานะคำสั่งซื้อ",
+    "drinkDetails": "รายละเอียดเครื่องดื่ม",
+    "orderConfirmed": "ยืนยันคำสั่งซื้อแล้ว"
+  },
+  "menu": {
+    "searchPlaceholder": "ค้นหาเครื่องดื่ม...",
+    "all": "ทั้งหมด",
+    "noResults": "ไม่พบเครื่องดื่ม",
+    "noResultsSubtext": "ลองปรับการค้นหาหรือตัวกรองหมวดหมู่",
+    "popular": "ยอดนิยม",
+    "sizes": "ขนาด",
+    "milkOptions": "ตัวเลือกนม",
+    "hotIced": "ร้อน/เย็น",
+    "customize": "ปรับแต่ง",
+    "quickAdd": "เพิ่ม",
+    "added": "✓ เพิ่มแล้ว!"
+  },
+  "drinkDetails": {
+    "size": "ขนาด",
+    "milk": "นม",
+    "sweetness": "ความหวาน",
+    "temperature": "อุณหภูมิ",
+    "addOns": "เพิ่มเติม",
+    "addToCart": "เพิ่มลงตะกร้า",
+    "updateCart": "อัปเดตตะกร้า"
+  },
+  "cart": {
+    "yourCart": "ตะกร้าของคุณ",
+    "emptyCart": "ตะกร้าของคุณว่างเปล่า",
+    "emptyCartSubtext": "เพิ่มเครื่องดื่มอร่อยๆ เพื่อเริ่มต้น!",
+    "startShopping": "เริ่มช็อปปิ้ง",
+    "checkout": "ชำระเงิน",
+    "removeItem": "ลบรายการ",
+    "itemsInCart": "{{count}} รายการในตะกร้า",
+    "itemsInCart_plural": "{{count}} รายการในตะกร้า"
+  },
+  "checkout": {
+    "customerInfo": "ข้อมูลลูกค้า",
+    "name": "ชื่อ",
+    "phone": "หมายเลขโทรศัพท์",
+    "email": "อีเมล (ไม่บังคับ)",
+    "orderSummary": "สรุปคำสั่งซื้อ",
+    "orderNotes": "หมายเหตุคำสั่งซื้อ (ไม่บังคับ)",
+    "orderNotesPlaceholder": "คำขอพิเศษหรือหมายเหตุใดๆ...",
+    "placeOrder": "สั่งซื้อ",
+    "nameRequired": "จำเป็นต้องระบุชื่อ",
+    "phoneRequired": "จำเป็นต้องระบุหมายเลขโทรศัพท์",
+    "phoneInvalid": "กรุณาระบุหมายเลขโทรศัพท์ที่ถูกต้อง"
+  },
+  "orderConfirmation": {
+    "title": "ยืนยันคำสั่งซื้อแล้ว!",
+    "subtitle": "ขอบคุณสำหรับคำสั่งซื้อของคุณ เราจะเริ่มเตรียมเครื่องดื่มของคุณทันที",
+    "orderNumber": "คำสั่งซื้อ #{{orderNumber}}",
+    "estimatedTime": "เวลาเตรียมโดยประมาณ: {{minutes}} นาที",
+    "trackOrder": "ติดตามคำสั่งซื้อของคุณ",
+    "orderAnother": "สั่งเครื่องดื่มเพิ่ม"
+  },
+  "orderStatus": {
+    "title": "สถานะคำสั่งซื้อ",
+    "noOrders": "ไม่พบคำสั่งซื้อ",
+    "noOrdersSubtext": "คุณยังไม่ได้สั่งซื้อใดๆ",
+    "orderNumber": "คำสั่งซื้อ #{{orderNumber}}",
+    "status": {
+      "pending": "ได้รับคำสั่งซื้อแล้ว",
+      "preparing": "กำลังเตรียม",
+      "ready": "พร้อมรับ",
+      "completed": "เสร็จสิ้น"
+    },
+    "estimatedTime": "ประมาณ {{minutes}} นาที",
+    "items": "{{count}} รายการ",
+    "items_plural": "{{count}} รายการ"
+  },
+  "pwa": {
+    "installTitle": "ติดตั้งแอป TIMING",
+    "installSubtitle": "รับประสบการณ์แอปแบบเต็มรูปแบบพร้อมการโหลดที่เร็วขึ้นและการเข้าถึงแบบออฟไลน์",
+    "install": "ติดตั้ง",
+    "dismiss": "ไว้ทีหลัง"
+  }
+}

@@ -19,6 +19,9 @@ npm run typecheck
 
 # Linting
 npm run lint
+
+# Install i18n packages (required for translations)
+npm install react-i18next i18next i18next-browser-languagedetector
 ```
 
 ## Tech Stack
@@ -29,6 +32,7 @@ npm run lint
 - **Build Tool**: Vite
 - **PWA**: Vite PWA Plugin
 - **Icons**: Lucide React
+- **Internationalization**: react-i18next (Thai default, English available)
 
 ## Project Structure
 ```
@@ -54,8 +58,15 @@ src/
 │   └── usePWA.ts       # PWA functionality
 ├── services/           # API and external services
 │   └── api.ts          # Mock API service
+├── i18n/               # Internationalization
+│   ├── index.ts        # i18n configuration
+│   ├── stub.ts         # Temporary stub implementation
+│   └── locales/        # Translation files
+│       ├── en.json     # English translations
+│       └── th.json     # Thai translations (default)
 ├── types/              # TypeScript type definitions
-│   └── index.ts        # All app types
+│   ├── index.ts        # All app types
+│   └── i18next.d.ts    # i18n type declarations
 ├── utils/              # Utility functions
 │   └── index.ts        # Helper functions
 └── App.tsx             # Main app component
@@ -63,6 +74,7 @@ src/
 
 ## Key Features
 - **Mobile-first PWA** with offline capability
+- **Thai language support** with Thai as default language
 - **Menu browsing** with categories and search
 - **Drink customization** (size, milk, sweetness, temperature, add-ons)
 - **Shopping cart** with localStorage persistence
@@ -107,12 +119,18 @@ VITE_API_BASE_URL=http://localhost:3001
 5. Set all header text and icons to white
 6. Created custom SVG mock images for drinks
 7. Removed favorites and QR scanner functionality
+8. **Added Thai language support with Thai as default language**
+9. **Implemented i18n infrastructure with react-i18next**
+10. **Created comprehensive Thai and English translation files**
+11. **Updated all UI components to use translations**
+12. **Added language toggle button in header with Languages icon**
 
 ## Known Issues
 - Uses mock API data (no real backend)
 - Images are SVG placeholders
 - No real payment processing
 - Order status is simulated
+- **i18n packages need to be installed (see I18N_SETUP.md for instructions)**
 
 ## Testing
 - Test on mobile devices for touch interactions

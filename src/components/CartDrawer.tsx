@@ -1,11 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Plus, Minus, Trash2 } from 'lucide-react';
+import { useTranslation } from '../i18n/stub';
 import { useCart } from '../context/CartContext';
 import { formatPrice } from '../utils';
 
 const CartDrawer: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { 
     isOpen, 
     items, 
@@ -27,7 +29,7 @@ const CartDrawer: React.FC = () => {
       <div className="fixed inset-0 bg-black/50 z-50" onClick={toggleCart} />
       <div className="fixed bottom-0 left-0 right-0 bg-base-100 rounded-t-2xl shadow-2xl z-50 max-h-[80vh] flex flex-col">
         <div className="flex items-center justify-between p-4 border-b border-base-300">
-          <h2 className="text-lg font-bold">Cart ({items.length})</h2>
+          <h2 className="text-lg font-bold">{t('cart.yourCart')} ({items.length})</h2>
           <button
             onClick={toggleCart}
             className="btn btn-ghost btn-sm p-2"
@@ -40,8 +42,8 @@ const CartDrawer: React.FC = () => {
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {items.length === 0 ? (
             <div className="text-center py-8 text-base-content/60">
-              <p>Your cart is empty</p>
-              <p className="text-sm mt-1">Add some drinks to get started!</p>
+              <p>{t('cart.emptyCart')}</p>
+              <p className="text-sm mt-1">{t('cart.emptyCartSubtext')}</p>
             </div>
           ) : (
             items.map((item) => (
@@ -100,14 +102,14 @@ const CartDrawer: React.FC = () => {
         {items.length > 0 && (
           <div className="p-4 border-t border-base-300">
             <div className="flex items-center justify-between mb-3">
-              <span className="font-bold">Total:</span>
+              <span className="font-bold">{t('common.total')}:</span>
               <span className="text-lg font-bold text-primary">{formatPrice(getTotalPrice())}</span>
             </div>
             <button
               onClick={handleViewCart}
               className="btn btn-primary btn-touch w-full"
             >
-              View Cart & Checkout
+{t('cart.checkout')}
             </button>
           </div>
         )}
