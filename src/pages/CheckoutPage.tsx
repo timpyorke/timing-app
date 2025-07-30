@@ -6,11 +6,13 @@ import { apiService } from '../services/api';
 import { Customer } from '../types';
 import { formatPrice } from '../utils';
 import { useOrderHistory } from '../hooks/useOrderHistory';
+import { useAnonymousUser } from '../hooks/useAnonymousUser';
 
 const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
   const { items, customer, setCustomer, clearCart, getTotalPrice } = useCart();
   const { addOrder } = useOrderHistory();
+  const { userId } = useAnonymousUser();
   
   const [formData, setFormData] = useState<Customer>({
     name: customer?.name || '',
@@ -54,7 +56,7 @@ const CheckoutPage: React.FC = () => {
     
     try {
       setCustomer(formData);
-      const order = await apiService.createOrder(items, formData);
+      const order = await apiService.createOrder(items, formData, userId);
       
       // Add order to history
       const orderWithItems = {
