@@ -1,0 +1,33 @@
+<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="300" fill="#f0fdf4"/>
+  
+  <!-- Cup -->
+  <path d="M120 80 L280 80 L270 220 L130 220 Z" fill="#ffffff" stroke="#e5e7eb" stroke-width="2"/>
+  
+  <!-- Hojicha base layer -->
+  <path d="M125 85 L275 85 L266 180 L134 180 Z" fill="#d97706" opacity="0.7"/>
+  
+  <!-- Matcha swirl -->
+  <path d="M125 85 L200 85 L195 140 L130 140 Z" fill="#4ade80" opacity="0.8"/>
+  <path d="M200 120 L275 120 L266 180 L200 180 Z" fill="#4ade80" opacity="0.8"/>
+  
+  <!-- Swirl pattern -->
+  <path d="M140 100 Q180 120 220 100 Q260 120 275 100" fill="none" stroke="#22c55e" stroke-width="3" opacity="0.6"/>
+  <path d="M140 130 Q180 150 220 130 Q260 150 275 130" fill="none" stroke="#b45309" stroke-width="3" opacity="0.6"/>
+  
+  <!-- Foam layer -->
+  <ellipse cx="200" cy="85" rx="75" ry="8" fill="#ffffff" opacity="0.9"/>
+  
+  <!-- Cup handle -->
+  <path d="M280 120 Q300 130 300 150 Q300 170 280 180" fill="none" stroke="#e5e7eb" stroke-width="3"/>
+  
+  <!-- Decorative elements -->
+  <circle cx="160" cy="110" r="2" fill="#22c55e" opacity="0.8"/>
+  <circle cx="240" cy="140" r="2" fill="#b45309" opacity="0.8"/>
+  <circle cx="180" cy="150" r="1.5" fill="#22c55e" opacity="0.6"/>
+  <circle cx="220" cy="120" r="1.5" fill="#b45309" opacity="0.6"/>
+  
+  <!-- Label -->
+  <text x="200" y="260" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#166534">Matcha Hojicha Swirl</text>
+</svg>

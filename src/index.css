@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: system-ui, sans-serif;
+  }
+  
+  body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: theme('colors.base-100');
+  }
+}
+
+@layer components {
+  .btn-touch {
+    @apply min-h-12 px-6 py-3 text-lg font-medium;
+  }
+  
+  .card-drink {
+    @apply bg-base-100 shadow-md rounded-lg p-4 cursor-pointer transition-all duration-200 hover:shadow-lg;
+  }
+  
+  .input-touch {
+    @apply min-h-12 text-lg;
+  }
+  
+  .header-solid {
+    background-color: #22c55e !important;
+    opacity: 1 !important;
+    backdrop-filter: none !important;
+    color: white !important;
+  }
+}

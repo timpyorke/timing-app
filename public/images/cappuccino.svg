@@ -1,0 +1,30 @@
+<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="300" fill="#fef7ed"/>
+  
+  <!-- Cup and saucer -->
+  <ellipse cx="200" cy="230" rx="90" ry="15" fill="#e5e7eb"/>
+  <path d="M120 80 L280 80 L270 220 L130 220 Z" fill="#ffffff" stroke="#e5e7eb" stroke-width="2"/>
+  
+  <!-- Coffee liquid -->
+  <path d="M125 85 L275 85 L266 160 L134 160 Z" fill="#92400e" opacity="0.9"/>
+  
+  <!-- Thick foam layer -->
+  <ellipse cx="200" cy="85" rx="75" ry="12" fill="#ffffff"/>
+  <ellipse cx="200" cy="80" rx="70" ry="10" fill="#f9fafb"/>
+  
+  <!-- Cup handle -->
+  <path d="M280 120 Q300 130 300 150 Q300 170 280 180" fill="none" stroke="#e5e7eb" stroke-width="3"/>
+  
+  <!-- Coffee art/pattern -->
+  <path d="M180 85 Q200 95 220 85" fill="none" stroke="#d97706" stroke-width="2" opacity="0.7"/>
+  <circle cx="200" cy="85" r="3" fill="#d97706" opacity="0.7"/>
+  
+  <!-- Steam -->
+  <path d="M180 65 Q185 55 180 45" fill="none" stroke="#d1d5db" stroke-width="2" opacity="0.7"/>
+  <path d="M200 65 Q205 55 200 45" fill="none" stroke="#d1d5db" stroke-width="2" opacity="0.7"/>
+  <path d="M220 65 Q225 55 220 45" fill="none" stroke="#d1d5db" stroke-width="2" opacity="0.7"/>
+  
+  <!-- Label -->
+  <text x="200" y="270" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#92400e">Cappuccino</text>
+</svg>
