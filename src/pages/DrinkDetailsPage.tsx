@@ -127,7 +127,7 @@ const DrinkDetailsPage: React.FC = () => {
         />
         <div className="absolute top-4 right-4 flex space-x-2">
           {drink.isPopular && (
-            <div className="badge badge-secondary p-4">
+            <div className="badge badge-secondary p-3">
               <Star size={12} className="mr-1" />
               Popular
             </div>

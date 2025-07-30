@@ -178,7 +178,7 @@ const MenuPage: React.FC = () => {
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200 rounded-lg pointer-events-none"></div>
                 <div className="absolute top-2 right-2 flex space-x-1">
                   {drink.isPopular && (
-                    <div className="badge badge-secondary badge-sm p-4">
+                    <div className="badge badge-secondary badge-sm p-3">
                       <Star size={12} className="mr-1" />
                       Popular
                     </div>
