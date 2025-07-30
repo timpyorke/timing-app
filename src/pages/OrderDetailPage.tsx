@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, CheckCircle, AlertCircle, XCircle, User, Phone, MapPin } from 'lucide-react';
+import { Clock, CheckCircle, AlertCircle, XCircle, User, Phone, MapPin } from 'lucide-react';
 import { formatDateTime, getOrderStatusColor, getOrderStatusText, formatPrice } from '../utils';
 import { useOrderHistory } from '../hooks/useOrderHistory';
 
