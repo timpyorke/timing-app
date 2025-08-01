@@ -35,7 +35,8 @@ const MenuPage: React.FC = () => {
     fetchMenu();
   }, []);
 
-  const debouncedSearch = debounce((query: string, category: string) => {
+  const debouncedSearch = debounce((...args: unknown[]) => {
+    const [query, category] = args as [string, string];
     let filtered = menuItems;
 
     if (category !== 'all') {
@@ -198,7 +199,7 @@ const MenuPage: React.FC = () => {
                     {menuItem.description}
                   </p>
 
-                  <div className="flex flex-wrap gap-1 text-xs">
+                  {/* <div className="flex flex-wrap gap-1 text-xs">
                     {menuItem.sizes.length > 0 && (
                       <span className="badge badge-outline badge-xs p-1">
                         {menuItem.sizes.length} {t('menu.sizes')}
@@ -212,7 +213,7 @@ const MenuPage: React.FC = () => {
                     {menuItem.temperatureOptions.includes('Hot') && menuItem.temperatureOptions.includes('Iced') && (
                       <span className="badge badge-outline badge-xs p-1">{t('menu.hotIced')}</span>
                     )}
-                  </div>
+                  </div> */}
                 </div>
 
                 {/* Circular Add Button - Bottom Right */}

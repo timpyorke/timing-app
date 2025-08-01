@@ -143,9 +143,9 @@ const CartPage: React.FC = () => {
       <div className="flex space-x-3">
         <button
           onClick={handleContinueShopping}
-          className="btn btn-outline btn-touch flex-1 text-base font-bold"
-        >
-          Continue Shopping
+          className="btn btn-outline btn-touch flex-1 text-xs font-bold"
+        > 
+        Continue Shopping
         </button>
         <button
           onClick={handleCheckout}
