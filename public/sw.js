@@ -1,4 +1,4 @@
-const CACHE_NAME = 'drink-order-v1';
+const CACHE_NAME = 'menu-order-v1';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',

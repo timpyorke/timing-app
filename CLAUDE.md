@@ -1,9 +1,11 @@
-# TIMING - Drink Ordering App
+# TIMING - Ordering App
 
 ## Project Context
-This is a customer-facing drink ordering mobile web app built for TIMING, a tea and coffee shop specializing in matcha and hojicha beverages.
+
+This is a customer-facing menu ordering mobile web app built for TIMING, a tea and coffee shop specializing in matcha and hojicha beverages.
 
 ## Development Commands
+
 ```bash
 # Start development server
 npm run dev
@@ -25,6 +27,7 @@ npm install react-i18next i18next i18next-browser-languagedetector
 ```
 
 ## Tech Stack
+
 - **Frontend**: React 18 + TypeScript
 - **Styling**: Tailwind CSS + daisyUI
 - **Routing**: React Router 6
@@ -35,6 +38,7 @@ npm install react-i18next i18next i18next-browser-languagedetector
 - **Internationalization**: react-i18next (Thai default, English available)
 
 ## Project Structure
+
 ```
 src/
 ├── components/          # Reusable UI components
@@ -44,8 +48,8 @@ src/
 │   ├── Layout.tsx       # Main layout wrapper
 │   └── PWAInstallPrompt.tsx # PWA install prompt
 ├── pages/              # Route components
-│   ├── MenuPage.tsx     # Main menu with drink cards
-│   ├── DrinkDetailsPage.tsx # Drink customization
+│   ├── MenuPage.tsx     # Main menu with menu cards
+│   ├── MenuDetailsPage.tsx # Menu customization
 │   ├── CartPage.tsx     # Shopping cart view
 │   ├── CheckoutPage.tsx # Customer checkout form
 │   ├── OrderConfirmationPage.tsx # Order success
@@ -73,10 +77,11 @@ src/
 ```
 
 ## Key Features
+
 - **Mobile-first PWA** with offline capability
 - **Thai language support** with Thai as default language
 - **Menu browsing** with categories and search
-- **Drink customization** (size, milk, sweetness, temperature, add-ons)
+- **Menu customization** (size, milk, sweetness, temperature, add-ons)
 - **Shopping cart** with localStorage persistence
 - **Quick add to cart** from menu page
 - **Customer checkout** with order confirmation
@@ -84,40 +89,45 @@ src/
 - **PWA install prompt**
 
 ## Design System
+
 - **Primary Color**: #22c55e (Matcha Green)
 - **Secondary Color**: #d97706 (Hojicha Brown)
 - **Background**: #ffffff (Oat Milk White)
 - **Theme**: daisyUI "matcha" custom theme
 
 ## API Endpoints (Mock)
+
 ```
-GET /api/menu           # Get menu categories and drinks
-GET /api/menu/:id       # Get drink details
+GET /api/menu           # Get menu categories and menu
+GET /api/menu/:id       # Get menu details
 POST /api/orders        # Create new order
 GET /api/orders/:id/status # Check order status
 ```
 
 ## Development Notes
+
 - Cart state persists in localStorage
 - Default temperature is "Iced" when available
 - Header has solid green background (no transparency)
 - All text and icons in header are white
-- Mock SVG images for all drinks
+- Mock SVG images for all menu
 - No favorites functionality (removed per requirements)
 - No QR code scanner (removed per requirements)
 
 ## Environment Variables
+
 ```
 VITE_API_BASE_URL=http://localhost:3001
 ```
 
 ## Recent Changes
+
 1. Fixed bottom padding in menu and detail pages
 2. Added prominent "Add to Cart" button in detail page
 3. Implemented quick add functionality from menu cards
 4. Made header background solid (not transparent)
 5. Set all header text and icons to white
-6. Created custom SVG mock images for drinks
+6. Created custom SVG mock images for menu
 7. Removed favorites and QR scanner functionality
 8. **Added Thai language support with Thai as default language**
 9. **Implemented i18n infrastructure with react-i18next**
@@ -126,6 +136,7 @@ VITE_API_BASE_URL=http://localhost:3001
 12. **Added language toggle button in header with Languages icon**
 
 ## Known Issues
+
 - Uses mock API data (no real backend)
 - Images are SVG placeholders
 - No real payment processing
@@ -133,6 +144,7 @@ VITE_API_BASE_URL=http://localhost:3001
 - **i18n packages need to be installed (see I18N_SETUP.md for instructions)**
 
 ## Testing
+
 - Test on mobile devices for touch interactions
 - Verify PWA installation works
 - Check cart persistence across sessions

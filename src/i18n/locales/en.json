@@ -25,13 +25,13 @@
     "cart": "Cart",
     "checkout": "Checkout",
     "orderStatus": "Order Status",
-    "drinkDetails": "Drink Details",
+    "menuDetails": "Menu Details",
     "orderConfirmed": "Order Confirmed"
   },
   "menu": {
-    "searchPlaceholder": "Search drinks...",
+    "searchPlaceholder": "Search menu...",
     "all": "All",
-    "noResults": "No drinks found",
+    "noResults": "No menu found",
     "noResultsSubtext": "Try adjusting your search or category filter",
     "popular": "Popular",
     "sizes": "sizes",
@@ -41,7 +41,7 @@
     "quickAdd": "Add",
     "added": "✓ Added!"
   },
-  "drinkDetails": {
+  "menuDetails": {
     "size": "Size",
     "milk": "Milk",
     "sweetness": "Sweetness",
@@ -53,7 +53,7 @@
   "cart": {
     "yourCart": "Your Cart",
     "emptyCart": "Your cart is empty",
-    "emptyCartSubtext": "Add some delicious drinks to get started!",
+    "emptyCartSubtext": "Add some delicious menu to get started!",
     "startShopping": "Start Shopping",
     "checkout": "Checkout",
     "removeItem": "Remove item",
@@ -75,11 +75,11 @@
   },
   "orderConfirmation": {
     "title": "Order Confirmed!",
-    "subtitle": "Thank you for your order. We'll start preparing your drinks right away.",
+    "subtitle": "Thank you for your order. We'll start preparing your menu right away.",
     "orderNumber": "Order #{{orderNumber}}",
     "estimatedTime": "Estimated preparation time: {{minutes}} minutes",
     "trackOrder": "Track Your Order",
-    "orderAnother": "Order More Drinks"
+    "orderAnother": "Order More Menu"
   },
   "orderStatus": {
     "title": "Order Status",

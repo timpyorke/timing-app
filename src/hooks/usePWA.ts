@@ -5,6 +5,15 @@ interface PWAInstallPrompt {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: string[];
+  readonly userChoice: Promise<{
+    outcome: 'accepted' | 'dismissed';
+    platform: string;
+  }>;
+  prompt(): Promise<void>;
+}
+
 export const usePWA = () => {
   const [installPrompt, setInstallPrompt] = useState<PWAInstallPrompt | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
@@ -21,9 +30,9 @@ export const usePWA = () => {
         });
     }
 
-    const handleBeforeInstallPrompt = (e: any) => {
+    const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
-      setInstallPrompt(e);
+      setInstallPrompt(e as BeforeInstallPromptEvent);
       setIsInstallable(true);
     };
 

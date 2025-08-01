@@ -9,9 +9,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
-        name: 'TIMING - Drink Ordering',
+        name: 'TIMING - Menu Ordering',
         short_name: 'TIMING',
-        description: 'TIMING - Customer-facing drink ordering mobile web app',
+        description: 'TIMING - Customer-facing menu ordering mobile web app',
         theme_color: '#4ade80',
         background_color: '#ffffff',
         display: 'standalone',

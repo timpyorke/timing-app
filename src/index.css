@@ -20,7 +20,7 @@
     @apply min-h-12 px-6 py-3 text-lg font-medium;
   }
   
-  .card-drink {
+  .card-menu {
     @apply bg-base-100 shadow-md rounded-lg p-4 cursor-pointer transition-all duration-200 hover:shadow-lg;
   }
   

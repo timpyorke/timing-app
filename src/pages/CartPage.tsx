@@ -31,7 +31,7 @@ const CartPage: React.FC = () => {
           <div>
             <h2 className="text-xl font-bold text-base-content">Your cart is empty</h2>
             <p className="text-base-content/60 mt-2">
-              Add some delicious TIMING drinks to get started!
+              Add some delicious TIMING menu to get started!
             </p>
           </div>
           <button
@@ -68,7 +68,7 @@ const CartPage: React.FC = () => {
                 alt={item.menuName}
                 className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/images/placeholder-drink.svg';
+                  (e.target as HTMLImageElement).src = '/images/placeholder-menu.svg';
                 }}
               />
               
@@ -143,9 +143,9 @@ const CartPage: React.FC = () => {
       <div className="flex space-x-3">
         <button
           onClick={handleContinueShopping}
-          className="btn btn-outline btn-touch flex-1 text-base font-bold"
-        >
-          Continue Shopping
+          className="btn btn-outline btn-touch flex-1 text-xs font-bold"
+        > 
+        Continue Shopping
         </button>
         <button
           onClick={handleCheckout}

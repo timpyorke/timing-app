@@ -1,10 +1,28 @@
-import { Drink, DrinkCategory, Order, OrderStatusResponse, CartItem, Customer } from '../types';
+import { 
+  Menu, 
+  MenuCategory, 
+  Order, 
+  OrderStatus,
+  OrderStatusResponse, 
+  CartItem, 
+  Customer,
+  FetchRequestOptions,
+  ApiMenuResponse,
+  ApiMenuItemResponse,
+  ApiMenuCategoryResponse,
+  ApiOrderRequest,
+  ApiOrderResponse,
+  ApiOrderStatusResponse,
+  ApiOrdersResponse,
+  ApiOrderHistoryItem,
+  ApiCustomerInfo
+} from '../types';
 import { getAnonymousUserId } from '../utils';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 class ApiService {
-  private async request<T>(endpoint: string, options?: any): Promise<T> {
+  private async request<T>(endpoint: string, options?: FetchRequestOptions): Promise<T> {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       headers: {
         'Content-Type': 'application/json',
@@ -20,25 +38,25 @@ class ApiService {
     return response.json();
   }
 
-  async getMenu(): Promise<{ categories: DrinkCategory[]; drinks: Drink[] }> {
+  async getMenu(): Promise<{ categories: MenuCategory[]; menu: Menu[] }> {
     try {
-      const response = await this.request<any>('/api/menu');
+      const response = await this.request<ApiMenuResponse>('/api/menu');
       // Transform API response to match our interface
       return this.transformMenuResponse(response);
     } catch (error) {
       console.error('Failed to fetch menu:', error);
       // Return empty data instead of mock data
-      return { categories: [], drinks: [] };
+      return { categories: [], menu: [] };
     }
   }
 
-  async getDrinkDetails(id: string): Promise<Drink | null> {
+  async getMenuDetails(id: string): Promise<Menu | null> {
     try {
-      const response = await this.request<any>(`/api/menu/${id}`);
-      // Transform API response to match our Drink interface
-      return this.transformSingleDrinkResponse(response);
+      const response = await this.request<{ data: ApiMenuItemResponse } | ApiMenuItemResponse>(`/api/menu/${id}`);
+      // Transform API response to match our Menu interface
+      return this.transformSingleMenuResponse(response);
     } catch (error) {
-      console.error('Failed to fetch drink details:', error);
+      console.error('Failed to fetch menu item details:', error);
       // Return null instead of mock data
       return null;
     }
@@ -63,7 +81,7 @@ class ApiService {
         return `+66${phone.replace(/^0/, '')}`;
       };
 
-      const customerInfo: any = {
+      const customerInfo: ApiCustomerInfo = {
         name: customer.name,
         email: `${customer.name.toLowerCase().replace(/\s+/g, '.')}@customer.timing.com`,
       };
@@ -74,11 +92,13 @@ class ApiService {
         customerInfo.phone = formattedPhone;
       }
 
-      const orderData: any = {
+      const orderData: ApiOrderRequest = {
         customer_id: userIdToUse, // API expects customer_id field
         customer_info: customerInfo,
         items: items.map(item => ({
           menu_id: parseInt(item.menuId),
+          name: item.menuName,
+          image_url: item.imageUrl,
           quantity: item.quantity,
           price: item.totalPrice / item.quantity,
           customizations: {
@@ -99,7 +119,7 @@ class ApiService {
         total: orderData.total
       });
 
-      const response = await this.request<any>('/api/orders', {
+      const response = await this.request<ApiOrderResponse>('/api/orders', {
         method: 'POST',
         body: JSON.stringify(orderData),
       });
@@ -115,7 +135,7 @@ class ApiService {
 
   async getOrderStatus(orderId: string): Promise<OrderStatusResponse | null> {
     try {
-      const response = await this.request<any>(`/api/orders/${orderId}/status`);
+      const response = await this.request<ApiOrderStatusResponse>(`/api/orders/${orderId}/status`);
       // Transform API response to match our interface
       return this.transformOrderStatusResponse(response);
     } catch (error) {
@@ -127,7 +147,7 @@ class ApiService {
 
   async getOrdersByCustomerId(customerId: string): Promise<Order[]> {
     try {
-      const response = await this.request<any>(`/api/orders/customer/${customerId}`);
+      const response = await this.request<ApiOrdersResponse>(`/api/orders/customer/${customerId}`);
       // Transform API response to match our Order interface
       return this.transformOrdersResponse(response);
     } catch (error) {
@@ -138,20 +158,20 @@ class ApiService {
   }
 
   // Transform methods to convert API responses to our interface format
-  private transformMenuResponse(response: any): { categories: DrinkCategory[]; drinks: Drink[] } {
+  private transformMenuResponse(response: ApiMenuResponse): { categories: MenuCategory[]; menu: Menu[] } {
     // Handle the actual API response format: {success: true, data: [...]}
     const menuData = response?.data || response;
     
     if (menuData && Array.isArray(menuData)) {
-      const drinks: Drink[] = [];
+      const menuItems: Menu[] = [];
       
       // Flatten the category-based structure
-      menuData.forEach((category: any) => {
+      menuData.forEach((category: ApiMenuCategoryResponse) => {
         if (category.items && Array.isArray(category.items)) {
-          category.items.forEach((item: any) => {
+          category.items.forEach((item: ApiMenuItemResponse) => {
             // Transform dynamic sizes from API for each item
             const apiSizes = item.customizations?.sizes || ['Medium', 'Large'];
-            const sizes: import('../types').DrinkSize[] = apiSizes.map((sizeName: string, index: number) => ({
+            const sizes: import('../types').MenuSize[] = apiSizes.map((sizeName: string, index: number) => ({
               id: sizeName.toLowerCase(),
               name: sizeName,
               priceModifier: index * 10 // Small: 0, Medium: 1.5, Large: 3.0
@@ -172,7 +192,7 @@ class ApiService {
             { id: 'extra-syrup', name: 'Extra Syrup', price: 0.0 },
             ];
 
-            drinks.push({
+            menuItems.push({
               id: item.id?.toString(),
               name: item.name,
               description: item.description || `Delicious ${item.name}`,
@@ -191,21 +211,21 @@ class ApiService {
       });
 
       // Create dynamic categories from the API data
-      const apiCategories = [...new Set(menuData.map((cat: any) => cat.category))];
-      const dynamicCategories: DrinkCategory[] = apiCategories.map((catName: string) => ({
+      const apiCategories = [...new Set(menuData.map((cat: ApiMenuCategoryResponse) => cat.category))];
+      const dynamicCategories: MenuCategory[] = apiCategories.map((catName: string) => ({
         id: catName.toLowerCase(),
         name: catName,
         description: `Premium ${catName.toLowerCase()} selections`
       }));
 
-      return { categories: dynamicCategories, drinks };
+      return { categories: dynamicCategories, menu: menuItems };
     }
     
     // Return empty data if API response format is unexpected
-    return { categories: [], drinks: [] };
+    return { categories: [], menu: [] };
   }
 
-  private transformOrderResponse(response: any, items: CartItem[], customer: Customer, userId?: string): Order {
+  private transformOrderResponse(response: ApiOrderResponse, items: CartItem[], customer: Customer, userId?: string): Order {
     const subtotal = items.reduce((sum, item) => sum + item.totalPrice, 0);
     
     return {
@@ -215,7 +235,7 @@ class ApiService {
       customer,
       subtotal,
       total: subtotal,
-      status: response.data?.status || response.status || 'pending',
+      status: (response.data?.status || response.status || 'pending') as OrderStatus,
       estimatedPickupTime: response.data?.estimated_pickup_time || 
                           response.estimated_pickup_time || 
                           new Date(Date.now() + 15 * 60 * 1000).toISOString(),
@@ -225,10 +245,11 @@ class ApiService {
     };
   }
 
-  private transformOrderStatusResponse(response: any): OrderStatusResponse {
+  private transformOrderStatusResponse(response: ApiOrderStatusResponse): OrderStatusResponse {
+    const statusValue = response.data?.status || response.status || 'pending';
     return {
-      id: response.data?.id?.toString() || response.id?.toString(),
-      status: response.data?.status || response.status || 'pending',
+      id: response.data?.id?.toString() || response.id?.toString() || '',
+      status: statusValue as OrderStatus,
       estimatedPickupTime: response.data?.estimated_pickup_time || 
                           response.estimated_pickup_time || 
                           new Date(Date.now() + 10 * 60 * 1000).toISOString(),
@@ -238,7 +259,7 @@ class ApiService {
     };
   }
 
-  private transformOrdersResponse(response: any): Order[] {
+  private transformOrdersResponse(response: ApiOrdersResponse): Order[] {
     // Handle API response format: {success: true, data: [...]}
     const ordersData = response?.data || response;
     
@@ -246,8 +267,9 @@ class ApiService {
       return [];
     }
 
-    return ordersData.map((apiOrder: any) => {
+    return ordersData.map((apiOrder: ApiOrderHistoryItem) => {
       // Transform API order to our Order interface
+      const statusValue = apiOrder.status || 'pending';
       const transformedOrder: Order = {
         id: apiOrder.id?.toString() || `ORDER-${Date.now()}`,
         userId: apiOrder.user_id,
@@ -257,9 +279,9 @@ class ApiService {
           phone: apiOrder.customer_info?.phone || '',
           tableNumber: apiOrder.customer_info?.table_number || apiOrder.customer_info?.tableNumber || ''
         },
-        subtotal: parseFloat(apiOrder.total || '0'),
-        total: parseFloat(apiOrder.total || '0'),
-        status: apiOrder.status || 'pending',
+        subtotal: parseFloat(apiOrder.total?.toString() || '0'),
+        total: parseFloat(apiOrder.total?.toString() || '0'),
+        status: statusValue as OrderStatus,
         estimatedPickupTime: apiOrder.estimated_pickup_time || 
                             apiOrder.estimatedPickupTime ||
                             new Date(Date.now() + 15 * 60 * 1000).toISOString(),
@@ -270,17 +292,17 @@ class ApiService {
     });
   }
 
-  private transformOrderItems(apiItems: any[]): CartItem[] {
+  private transformOrderItems(apiItems: ApiOrderHistoryItem['items']): CartItem[] {
     if (!Array.isArray(apiItems)) {
       return [];
     }
 
-    return apiItems.map((apiItem: any, index: number) => {
+    return apiItems.map((apiItem, index: number) => {
       const item: CartItem = {
         id: `item-${index}`,
-        menuId: apiItem.menu_id?.toString() || apiItem.drinkId?.toString() || '1',
-        menuName: apiItem.name || apiItem.menuName || 'Unknown Drink',
-        imageUrl: apiItem.image_url || `/images/${(apiItem.name || 'default').toLowerCase().replace(/\s+/g, '-')}.svg`,
+        menuId: apiItem.menu_id?.toString() || '1',
+        menuName: apiItem.name || apiItem.menuName || apiItem.menu_name || `Menu #${apiItem.menu_id || 'Unknown'}`,
+        imageUrl: apiItem.image_url || apiItem.imageUrl || `/images/${(apiItem.name || apiItem.menuName || apiItem.menu_name || 'placeholder-menu').toLowerCase().replace(/\s+/g, '-')}.svg`,
         size: {
           id: apiItem.customizations?.size?.toLowerCase().replace(/\s+/g, '-') || 'medium',
           name: apiItem.customizations?.size || 'Medium',
@@ -302,24 +324,24 @@ class ApiService {
     });
   }
 
-  private transformSingleDrinkResponse(response: any): Drink | null {
+  private transformSingleMenuResponse(response: { data: ApiMenuItemResponse } | ApiMenuItemResponse): Menu | null {
     // Handle API response format: {success: true, data: {...}}
-    const drinkData = response?.data || response;
+    const menuData = 'data' in response ? response.data : response;
     
-    if (!drinkData || !drinkData.id) {
+    if (!menuData || !menuData.id) {
       return null;
     }
 
     // Transform dynamic sizes from API
-    const apiSizes = drinkData.customizations?.sizes || ['Medium', 'Large'];
-    const sizes: import('../types').DrinkSize[] = apiSizes.map((sizeName: string, index: number) => ({
+    const apiSizes = menuData.customizations?.sizes || ['Medium', 'Large'];
+    const sizes: import('../types').MenuSize[] = apiSizes.map((sizeName: string, index: number) => ({
       id: sizeName.toLowerCase(),
       name: sizeName,
       priceModifier: index * 10 // Small: 0, Medium: 1.5, Large: 3.0
     }));
 
     // Transform dynamic add-ons/extras from API
-    const apiExtras = drinkData.customizations?.extras || drinkData.customizations?.syrups || [];
+    const apiExtras = menuData.customizations?.extras || menuData.customizations?.syrups || [];
     const addOns = apiExtras.map((extra: string) => ({
       id: extra.toLowerCase().replace(/\s+/g, '-'),
       name: extra,
@@ -334,32 +356,32 @@ class ApiService {
     ];
 
     // Transform dynamic milk options from API
-    const apiMilkOptions = drinkData.customizations?.milk || [];
+    const apiMilkOptions = menuData.customizations?.milk || [];
 
     // Handle sweetness levels (API might provide this in future)
-    const sweetnessLevels = drinkData.customizations?.sweetness || ['No Sugar', '25%', '50%', '75%', '100%'];
+    const sweetnessLevels = menuData.customizations?.sweetness || ['No Sugar', '25%', '50%', '75%', '100%'];
 
-    // Handle temperature options (check if drink supports iced)
-    const supportsIced = drinkData.customizations?.ice !== false && 
-                         drinkData.category?.toLowerCase() !== 'hot-only';
+    // Handle temperature options (check if menu supports iced)
+    const supportsIced = menuData.customizations?.ice !== false && 
+                         menuData.category?.toLowerCase() !== 'hot-only';
     const temperatureOptions = supportsIced ? ['Iced', 'Hot'] : ['Iced'];
 
-    const drink: Drink = {
-      id: drinkData.id?.toString(),
-      name: drinkData.name,
-      description: drinkData.description || `Delicious ${drinkData.name}`,
-      image: drinkData.image_url || `/images/${drinkData.name.toLowerCase().replace(/\s+/g, '-')}.svg`,
-      category: drinkData.category?.toLowerCase() || 'specialty',
-      basePrice: parseFloat(drinkData.base_price?.toString() || '4.50'),
+    const menu: Menu = {
+      id: menuData.id?.toString(),
+      name: menuData.name,
+      description: menuData.description || `Delicious ${menuData.name}`,
+      image: menuData.image_url || `/images/${menuData.name.toLowerCase().replace(/\s+/g, '-')}.svg`,
+      category: menuData.category?.toLowerCase() || 'specialty',
+      basePrice: parseFloat(menuData.base_price?.toString() || '4.50'),
       sizes,
       milkOptions: apiMilkOptions,
       sweetnessLevels,
       temperatureOptions,
       addOns: addOns.length > 0 ? addOns : fallbackAddOns,
-      isPopular: drinkData.popular || false,
+      isPopular: menuData.popular || false,
     };
 
-    return drink;
+    return menu;
   }
 }
 

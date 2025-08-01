@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { User, Phone, MapPin } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { apiService } from '../services/api';
-import { Customer } from '../types';
+import { Customer, OrderConfirmationLocationState } from '../types';
 import { formatPrice } from '../utils';
 import { useOrderHistory } from '../hooks/useOrderHistory';
 import { useAnonymousUser } from '../hooks/useAnonymousUser';
@@ -72,7 +72,12 @@ const CheckoutPage: React.FC = () => {
       addOrder(orderWithItems);
       
       clearCart();
-      navigate(`/order-confirmation/${order.id}`);
+      navigate(`/order-confirmation/${order.id}`, { 
+        state: { 
+          customer: formData,
+          orderData: orderWithItems 
+        } as OrderConfirmationLocationState
+      });
     } catch (error) {
       console.error('Failed to create order:', error);
       alert('Failed to place order. Please try again.');
@@ -141,7 +146,7 @@ const CheckoutPage: React.FC = () => {
                 className={`input input-bordered input-touch w-full ${
                   errors.name ? 'input-error' : ''
                 }`}
-                placeholder="Enter your full name"
+                placeholder="Enter your name"
                 disabled={loading}
               />
               {errors.name && (
@@ -162,7 +167,7 @@ const CheckoutPage: React.FC = () => {
                   className={`input input-bordered input-touch w-full pl-10 ${
                     errors.phone ? 'input-error' : ''
                   }`}
-                  placeholder="(555) 123-4567"
+                  placeholder="089-123-4567"
                   disabled={loading}
                 />
               </div>

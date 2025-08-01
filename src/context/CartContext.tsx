@@ -92,7 +92,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [state, dispatch] = useReducer(cartReducer, initialState);
 
   useEffect(() => {
-    const savedCart = localStorage.getItem('drinkOrderCart');
+    const savedCart = localStorage.getItem('menuOrderCart');
     if (savedCart) {
       try {
         const parsedCart = JSON.parse(savedCart);
@@ -104,7 +104,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('drinkOrderCart', JSON.stringify(state));
+    localStorage.setItem('menuOrderCart', JSON.stringify(state));
   }, [state]);
 
   const addItem = (item: CartItem) => {

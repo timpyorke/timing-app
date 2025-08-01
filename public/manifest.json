@@ -1,14 +1,17 @@
 {
-  "name": "TIMING - Drink Ordering",
+  "name": "TIMING - Menu Ordering",
   "short_name": "TIMING",
-  "description": "TIMING - Customer-facing drink ordering mobile web app",
+  "description": "TIMING - Customer-facing menu ordering mobile web app",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4ade80",
   "orientation": "portrait-primary",
   "scope": "/",
-  "categories": ["food", "lifestyle"],
+  "categories": [
+    "food",
+    "lifestyle"
+  ],
   "icons": [
     {
       "src": "/pwa-64x64.png",
@@ -31,16 +34,26 @@
     {
       "name": "View Menu",
       "short_name": "Menu",
-      "description": "Browse our drink menu",
+      "description": "Browse our menu menu",
       "url": "/",
-      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "/pwa-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "Track Order",
       "short_name": "Track",
       "description": "Check your order status",
       "url": "/order-status",
-      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "/pwa-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

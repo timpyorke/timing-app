@@ -1,32 +1,32 @@
-export interface DrinkCategory {
+export interface MenuCategory {
   id: string;
   name: string;
   description?: string;
 }
 
-export interface DrinkAddOn {
+export interface MenuAddOn {
   id: string;
   name: string;
   price: number;
 }
 
-export interface Drink {
+export interface Menu {
   id: string;
   name: string;
   description: string;
   image: string;
   category: string;
   basePrice: number;
-  sizes: DrinkSize[];
+  sizes: MenuSize[];
   milkOptions: string[];
   sweetnessLevels: string[];
   temperatureOptions: string[];
-  addOns: DrinkAddOn[];
+  addOns: MenuAddOn[];
   isPopular?: boolean;
   isFavorite?: boolean;
 }
 
-export interface DrinkSize {
+export interface MenuSize {
   id: string;
   name: string;
   priceModifier: number;
@@ -37,11 +37,11 @@ export interface CartItem {
   menuId: string;
   menuName: string;
   imageUrl: string;
-  size: DrinkSize;
+  size: MenuSize;
   milk: string;
   sweetness: string;
   temperature: string;
-  addOns: DrinkAddOn[];
+  addOns: MenuAddOn[];
   quantity: number;
   totalPrice: number;
 }
@@ -74,4 +74,141 @@ export interface OrderStatusResponse {
     name: string;
     quantity: number;
   }[];
+}
+
+export interface OrderConfirmationLocationState {
+  customer: Customer;
+  orderData: Order;
+}
+
+// API Response interfaces
+export interface FetchRequestOptions {
+  method?: string;
+  headers?: Record<string, string>;
+  body?: string;
+}
+
+export interface ApiMenuItemCustomizations {
+  sizes?: string[];
+  milk?: string[];
+  sweetness?: string[];
+  ice?: boolean;
+  extras?: string[];
+  syrups?: string[];
+}
+
+export interface ApiMenuItemResponse {
+  id: string | number;
+  name: string;
+  description?: string;
+  image_url?: string;
+  base_price: string | number;
+  category?: string;
+  popular?: boolean;
+  customizations?: ApiMenuItemCustomizations;
+}
+
+export interface ApiMenuCategoryResponse {
+  category: string;
+  items: ApiMenuItemResponse[];
+}
+
+export interface ApiMenuResponse {
+  data?: ApiMenuCategoryResponse[];
+  success?: boolean;
+}
+
+export interface ApiCustomerInfo {
+  name: string;
+  email: string;
+  phone?: string;
+}
+
+export interface ApiOrderItemCustomizations {
+  size: string;
+  milk: string;
+  sweetness: string;
+  temperature: string;
+  extras: string[];
+}
+
+export interface ApiOrderItem {
+  menu_id: number;
+  name: string;
+  image_url: string;
+  quantity: number;
+  price: number;
+  customizations: ApiOrderItemCustomizations;
+}
+
+export interface ApiOrderRequest {
+  customer_id: string;
+  customer_info: ApiCustomerInfo;
+  items: ApiOrderItem[];
+  total: number;
+}
+
+export interface ApiOrderResponse {
+  data?: {
+    id: string | number;
+    status: string;
+    estimated_pickup_time: string;
+    created_at: string;
+  };
+  id?: string | number;
+  status?: string;
+  estimated_pickup_time?: string;
+  created_at?: string;
+}
+
+export interface ApiOrderStatusResponse {
+  data?: {
+    id: string | number;
+    status: string;
+    estimated_pickup_time: string;
+    items: Array<{ name: string; quantity: number }>;
+  };
+  id?: string | number;
+  status?: string;
+  estimated_pickup_time?: string;
+  items?: Array<{ name: string; quantity: number }>;
+}
+
+export interface ApiOrdersResponse {
+  data?: ApiOrderHistoryItem[];
+  success?: boolean;
+}
+
+export interface ApiOrderHistoryItem {
+  id: string | number;
+  user_id?: string;
+  customer_info?: {
+    name?: string;
+    phone?: string;
+    table_number?: string;
+    tableNumber?: string;
+  };
+  items?: Array<{
+    menu_id?: string | number;
+    name?: string;
+    menuName?: string;
+    menu_name?: string;
+    image_url?: string;
+    imageUrl?: string;
+    quantity?: string | number;
+    price?: string | number;
+    customizations?: {
+      size?: string;
+      milk?: string;
+      sweetness?: string;
+      temperature?: string;
+      extras?: string[];
+    };
+  }>;
+  total?: string | number;
+  status?: string;
+  estimated_pickup_time?: string;
+  estimatedPickupTime?: string;
+  created_at?: string;
+  createdAt?: string;
 }

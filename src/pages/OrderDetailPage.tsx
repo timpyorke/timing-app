@@ -201,7 +201,7 @@ const OrderDetailPage: React.FC = () => {
                 alt={item.menuName}
                 className="w-16 h-16 rounded-lg object-cover"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/images/placeholder-drink.svg';
+                  (e.target as HTMLImageElement).src = '/images/placeholder-menu.svg';
                 }}
               />
               <div className="flex-1">
@@ -281,7 +281,7 @@ const OrderDetailPage: React.FC = () => {
             <CheckCircle size={20} />
             <div>
               <p className="font-medium">Order completed!</p>
-              <p className="text-sm">Thank you for your order. Enjoy your drinks!</p>
+              <p className="text-sm">Thank you for your order. Enjoy your menu!</p>
             </div>
           </div>
         )}

@@ -4,7 +4,7 @@ export const useFavorites = () => {
   const [favorites, setFavorites] = useState<string[]>([]);
 
   useEffect(() => {
-    const savedFavorites = localStorage.getItem('drinkOrderFavorites');
+    const savedFavorites = localStorage.getItem('menuOrderFavorites');
     if (savedFavorites) {
       try {
         setFavorites(JSON.parse(savedFavorites));
@@ -15,32 +15,32 @@ export const useFavorites = () => {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('drinkOrderFavorites', JSON.stringify(favorites));
+    localStorage.setItem('menuOrderFavorites', JSON.stringify(favorites));
   }, [favorites]);
 
-  const addFavorite = (drinkId: string) => {
+  const addFavorite = (menuId: string) => {
     setFavorites(prev => {
-      if (!prev.includes(drinkId)) {
-        return [...prev, drinkId];
+      if (!prev.includes(menuId)) {
+        return [...prev, menuId];
       }
       return prev;
     });
   };
 
-  const removeFavorite = (drinkId: string) => {
-    setFavorites(prev => prev.filter(id => id !== drinkId));
+  const removeFavorite = (menuId: string) => {
+    setFavorites(prev => prev.filter(id => id !== menuId));
   };
 
-  const toggleFavorite = (drinkId: string) => {
-    if (favorites.includes(drinkId)) {
-      removeFavorite(drinkId);
+  const toggleFavorite = (menuId: string) => {
+    if (favorites.includes(menuId)) {
+      removeFavorite(menuId);
     } else {
-      addFavorite(drinkId);
+      addFavorite(menuId);
     }
   };
 
-  const isFavorite = (drinkId: string) => {
-    return favorites.includes(drinkId);
+  const isFavorite = (menuId: string) => {
+    return favorites.includes(menuId);
   };
 
   return {

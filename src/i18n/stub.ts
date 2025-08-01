@@ -3,6 +3,9 @@ import React from 'react';
 import enTranslations from './locales/en.json';
 import thTranslations from './locales/th.json';
 
+type TranslationValue = string | Record<string, unknown>;
+type TranslationOptions = Record<string, string | number>;
+
 const translations = {
   en: enTranslations,
   th: thTranslations,
@@ -18,19 +21,23 @@ const notifyListeners = () => {
   listeners.forEach(listener => listener());
 };
 
-const t = (key: string, options?: any): string => {
+const t = (key: string, options?: TranslationOptions): string => {
   const keys = key.split('.');
-  let value: any = translations[currentLanguage as keyof typeof translations];
+  let value: TranslationValue = translations[currentLanguage as keyof typeof translations];
   
   for (const k of keys) {
-    value = value?.[k];
+    if (typeof value === 'object' && value !== null && k in value) {
+      value = (value as Record<string, unknown>)[k] as TranslationValue;
+    } else {
+      return key; // Return key if path doesn't exist
+    }
   }
   
   if (typeof value === 'string') {
     // Simple interpolation for {{key}} patterns
     if (options) {
       return value.replace(/\{\{(\w+)\}\}/g, (match, key) => {
-        return options[key] !== undefined ? options[key] : match;
+        return options[key] !== undefined ? String(options[key]) : match;
       });
     }
     return value;
