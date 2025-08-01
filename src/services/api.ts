@@ -1,4 +1,4 @@
-import { Drink, DrinkCategory, Order, OrderStatusResponse, CartItem, Customer } from '../types';
+import { Menu, MenuCategory, Order, OrderStatusResponse, CartItem, Customer } from '../types';
 import { getAnonymousUserId } from '../utils';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
@@ -20,7 +20,7 @@ class ApiService {
     return response.json();
   }
 
-  async getMenu(): Promise<{ categories: DrinkCategory[]; drinks: Drink[] }> {
+  async getMenu(): Promise<{ categories: MenuCategory[]; menu: Menu[] }> {
     try {
       const response = await this.request<any>('/api/menu');
       // Transform API response to match our interface
@@ -28,17 +28,17 @@ class ApiService {
     } catch (error) {
       console.error('Failed to fetch menu:', error);
       // Return empty data instead of mock data
-      return { categories: [], drinks: [] };
+      return { categories: [], menu: [] };
     }
   }
 
-  async getDrinkDetails(id: string): Promise<Drink | null> {
+  async getMenuDetails(id: string): Promise<Menu | null> {
     try {
       const response = await this.request<any>(`/api/menu/${id}`);
-      // Transform API response to match our Drink interface
-      return this.transformSingleDrinkResponse(response);
+      // Transform API response to match our Menu interface
+      return this.transformSingleMenuResponse(response);
     } catch (error) {
-      console.error('Failed to fetch drink details:', error);
+      console.error('Failed to fetch menu item details:', error);
       // Return null instead of mock data
       return null;
     }
@@ -79,6 +79,8 @@ class ApiService {
         customer_info: customerInfo,
         items: items.map(item => ({
           menu_id: parseInt(item.menuId),
+          name: item.menuName,
+          image_url: item.imageUrl,
           quantity: item.quantity,
           price: item.totalPrice / item.quantity,
           customizations: {
@@ -138,12 +140,12 @@ class ApiService {
   }
 
   // Transform methods to convert API responses to our interface format
-  private transformMenuResponse(response: any): { categories: DrinkCategory[]; drinks: Drink[] } {
+  private transformMenuResponse(response: any): { categories: MenuCategory[]; menu: Menu[] } {
     // Handle the actual API response format: {success: true, data: [...]}
     const menuData = response?.data || response;
     
     if (menuData && Array.isArray(menuData)) {
-      const drinks: Drink[] = [];
+      const menuItems: Menu[] = [];
       
       // Flatten the category-based structure
       menuData.forEach((category: any) => {
@@ -151,7 +153,7 @@ class ApiService {
           category.items.forEach((item: any) => {
             // Transform dynamic sizes from API for each item
             const apiSizes = item.customizations?.sizes || ['Medium', 'Large'];
-            const sizes: import('../types').DrinkSize[] = apiSizes.map((sizeName: string, index: number) => ({
+            const sizes: import('../types').MenuSize[] = apiSizes.map((sizeName: string, index: number) => ({
               id: sizeName.toLowerCase(),
               name: sizeName,
               priceModifier: index * 10 // Small: 0, Medium: 1.5, Large: 3.0
@@ -172,7 +174,7 @@ class ApiService {
             { id: 'extra-syrup', name: 'Extra Syrup', price: 0.0 },
             ];
 
-            drinks.push({
+            menuItems.push({
               id: item.id?.toString(),
               name: item.name,
               description: item.description || `Delicious ${item.name}`,
@@ -192,17 +194,17 @@ class ApiService {
 
       // Create dynamic categories from the API data
       const apiCategories = [...new Set(menuData.map((cat: any) => cat.category))];
-      const dynamicCategories: DrinkCategory[] = apiCategories.map((catName: string) => ({
+      const dynamicCategories: MenuCategory[] = apiCategories.map((catName: string) => ({
         id: catName.toLowerCase(),
         name: catName,
         description: `Premium ${catName.toLowerCase()} selections`
       }));
 
-      return { categories: dynamicCategories, drinks };
+      return { categories: dynamicCategories, menu: menuItems };
     }
     
     // Return empty data if API response format is unexpected
-    return { categories: [], drinks: [] };
+    return { categories: [], menu: [] };
   }
 
   private transformOrderResponse(response: any, items: CartItem[], customer: Customer, userId?: string): Order {
@@ -278,9 +280,9 @@ class ApiService {
     return apiItems.map((apiItem: any, index: number) => {
       const item: CartItem = {
         id: `item-${index}`,
-        menuId: apiItem.menu_id?.toString() || apiItem.drinkId?.toString() || '1',
-        menuName: apiItem.name || apiItem.menuName || 'Unknown Drink',
-        imageUrl: apiItem.image_url || `/images/${(apiItem.name || 'default').toLowerCase().replace(/\s+/g, '-')}.svg`,
+        menuId: apiItem.menu_id?.toString() ||  '1',
+        menuName: apiItem.name || apiItem.menuName || apiItem.menu_name || `Menu #${apiItem.menu_id || 'Unknown'}`,
+        imageUrl: apiItem.image_url || apiItem.imageUrl || `/images/${(apiItem.name || apiItem.menuName || apiItem.menu_name || 'placeholder-menu').toLowerCase().replace(/\s+/g, '-')}.svg`,
         size: {
           id: apiItem.customizations?.size?.toLowerCase().replace(/\s+/g, '-') || 'medium',
           name: apiItem.customizations?.size || 'Medium',
@@ -302,24 +304,24 @@ class ApiService {
     });
   }
 
-  private transformSingleDrinkResponse(response: any): Drink | null {
+  private transformSingleMenuResponse(response: any): Menu | null {
     // Handle API response format: {success: true, data: {...}}
-    const drinkData = response?.data || response;
+    const menuData = response?.data || response;
     
-    if (!drinkData || !drinkData.id) {
+    if (!menuData || !menuData.id) {
       return null;
     }
 
     // Transform dynamic sizes from API
-    const apiSizes = drinkData.customizations?.sizes || ['Medium', 'Large'];
-    const sizes: import('../types').DrinkSize[] = apiSizes.map((sizeName: string, index: number) => ({
+    const apiSizes = menuData.customizations?.sizes || ['Medium', 'Large'];
+    const sizes: import('../types').MenuSize[] = apiSizes.map((sizeName: string, index: number) => ({
       id: sizeName.toLowerCase(),
       name: sizeName,
       priceModifier: index * 10 // Small: 0, Medium: 1.5, Large: 3.0
     }));
 
     // Transform dynamic add-ons/extras from API
-    const apiExtras = drinkData.customizations?.extras || drinkData.customizations?.syrups || [];
+    const apiExtras = menuData.customizations?.extras || menuData.customizations?.syrups || [];
     const addOns = apiExtras.map((extra: string) => ({
       id: extra.toLowerCase().replace(/\s+/g, '-'),
       name: extra,
@@ -334,32 +336,32 @@ class ApiService {
     ];
 
     // Transform dynamic milk options from API
-    const apiMilkOptions = drinkData.customizations?.milk || [];
+    const apiMilkOptions = menuData.customizations?.milk || [];
 
     // Handle sweetness levels (API might provide this in future)
-    const sweetnessLevels = drinkData.customizations?.sweetness || ['No Sugar', '25%', '50%', '75%', '100%'];
+    const sweetnessLevels = menuData.customizations?.sweetness || ['No Sugar', '25%', '50%', '75%', '100%'];
 
-    // Handle temperature options (check if drink supports iced)
-    const supportsIced = drinkData.customizations?.ice !== false && 
-                         drinkData.category?.toLowerCase() !== 'hot-only';
+    // Handle temperature options (check if menu supports iced)
+    const supportsIced = menuData.customizations?.ice !== false && 
+                         menuData.category?.toLowerCase() !== 'hot-only';
     const temperatureOptions = supportsIced ? ['Iced', 'Hot'] : ['Iced'];
 
-    const drink: Drink = {
-      id: drinkData.id?.toString(),
-      name: drinkData.name,
-      description: drinkData.description || `Delicious ${drinkData.name}`,
-      image: drinkData.image_url || `/images/${drinkData.name.toLowerCase().replace(/\s+/g, '-')}.svg`,
-      category: drinkData.category?.toLowerCase() || 'specialty',
-      basePrice: parseFloat(drinkData.base_price?.toString() || '4.50'),
+    const menu: Menu = {
+      id: menuData.id?.toString(),
+      name: menuData.name,
+      description: menuData.description || `Delicious ${menuData.name}`,
+      image: menuData.image_url || `/images/${menuData.name.toLowerCase().replace(/\s+/g, '-')}.svg`,
+      category: menuData.category?.toLowerCase() || 'specialty',
+      basePrice: parseFloat(menuData.base_price?.toString() || '4.50'),
       sizes,
       milkOptions: apiMilkOptions,
       sweetnessLevels,
       temperatureOptions,
       addOns: addOns.length > 0 ? addOns : fallbackAddOns,
-      isPopular: drinkData.popular || false,
+      isPopular: menuData.popular || false,
     };
 
-    return drink;
+    return menu;
   }
 }
 

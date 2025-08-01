@@ -1,32 +1,32 @@
-export interface DrinkCategory {
+export interface MenuCategory {
   id: string;
   name: string;
   description?: string;
 }
 
-export interface DrinkAddOn {
+export interface MenuAddOn {
   id: string;
   name: string;
   price: number;
 }
 
-export interface Drink {
+export interface Menu {
   id: string;
   name: string;
   description: string;
   image: string;
   category: string;
   basePrice: number;
-  sizes: DrinkSize[];
+  sizes: MenuSize[];
   milkOptions: string[];
   sweetnessLevels: string[];
   temperatureOptions: string[];
-  addOns: DrinkAddOn[];
+  addOns: MenuAddOn[];
   isPopular?: boolean;
   isFavorite?: boolean;
 }
 
-export interface DrinkSize {
+export interface MenuSize {
   id: string;
   name: string;
   priceModifier: number;
@@ -37,11 +37,11 @@ export interface CartItem {
   menuId: string;
   menuName: string;
   imageUrl: string;
-  size: DrinkSize;
+  size: MenuSize;
   milk: string;
   sweetness: string;
   temperature: string;
-  addOns: DrinkAddOn[];
+  addOns: MenuAddOn[];
   quantity: number;
   totalPrice: number;
 }
@@ -74,4 +74,9 @@ export interface OrderStatusResponse {
     name: string;
     quantity: number;
   }[];
+}
+
+export interface OrderConfirmationLocationState {
+  customer: Customer;
+  orderData: Order;
 }

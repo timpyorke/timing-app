@@ -25,7 +25,7 @@
     "cart": "ตะกร้า",
     "checkout": "ชำระเงิน",
     "orderStatus": "สถานะคำสั่งซื้อ",
-    "drinkDetails": "รายละเอียดเครื่องดื่ม",
+    "menuDetails": "รายละเอียดเครื่องดื่ม",
     "orderConfirmed": "ยืนยันคำสั่งซื้อแล้ว"
   },
   "menu": {
@@ -41,7 +41,7 @@
     "quickAdd": "เพิ่ม",
     "added": "✓ เพิ่มแล้ว!"
   },
-  "drinkDetails": {
+  "menuDetails": {
     "size": "ขนาด",
     "milk": "นม",
     "sweetness": "ความหวาน",

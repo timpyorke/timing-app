@@ -157,7 +157,7 @@ const CustomerOrdersPage: React.FC = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/50" size={16} />
             <input
               type="text"
-              placeholder="Search orders, customer name, or drinks..."
+              placeholder="Search orders, customer name, or menu..."
               className="input input-bordered w-full pl-10"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -262,7 +262,7 @@ const CustomerOrdersPage: React.FC = () => {
                       alt={item.menuName}
                       className="w-10 h-10 rounded-md object-cover"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/images/placeholder-drink.svg';
+                        (e.target as HTMLImageElement).src = '/images/placeholder-menu.svg';
                       }}
                     />
                     <div>

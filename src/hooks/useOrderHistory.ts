@@ -23,10 +23,10 @@ export const useOrderHistory = () => {
       
       // Cache the API orders in localStorage if any found
       if (apiOrders.length > 0) {
-        localStorage.setItem('drinkOrderHistory', JSON.stringify(apiOrders));
+        localStorage.setItem('menuOrderHistory', JSON.stringify(apiOrders));
       } else {
         // Try to load from localStorage if no API orders
-        const savedOrders = localStorage.getItem('drinkOrderHistory');
+        const savedOrders = localStorage.getItem('menuOrderHistory');
         if (savedOrders) {
           const parsedOrders = JSON.parse(savedOrders);
           console.log('Loaded orders from localStorage:', parsedOrders);
@@ -41,7 +41,7 @@ export const useOrderHistory = () => {
       setError('Failed to load orders');
       
       // Fallback to localStorage only
-      const savedOrders = localStorage.getItem('drinkOrderHistory');
+      const savedOrders = localStorage.getItem('menuOrderHistory');
       if (savedOrders) {
         try {
           const parsedOrders = JSON.parse(savedOrders);
@@ -65,7 +65,7 @@ export const useOrderHistory = () => {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('drinkOrderHistory', JSON.stringify(orders));
+    localStorage.setItem('menuOrderHistory', JSON.stringify(orders));
   }, [orders]);
 
   const addOrder = (order: Order) => {
@@ -78,7 +78,7 @@ export const useOrderHistory = () => {
 
   const clearHistory = () => {
     setOrders([]);
-    localStorage.removeItem('drinkOrderHistory');
+    localStorage.removeItem('menuOrderHistory');
   };
 
   const updateOrderStatus = (orderId: string, status: string, estimatedPickupTime?: string) => {

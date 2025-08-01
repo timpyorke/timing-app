@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Plus, Minus, ShoppingCart, Star } from 'lucide-react';
-import { Drink, DrinkSize, DrinkAddOn, CartItem } from '../types';
+import { Menu, MenuSize, MenuAddOn, CartItem } from '../types';
 import { apiService } from '../services/api';
 import { useCart } from '../context/CartContext';
 import { formatPrice, generateId } from '../utils';
@@ -11,54 +11,54 @@ const MenuDetailsPage: React.FC = () => {
   const navigate = useNavigate();
   const { addItem, toggleCart } = useCart();
 
-  const [drink, setDrink] = useState<Drink | null>(null);
+  const [menuItem, setMenuItem] = useState<Menu | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedSize, setSelectedSize] = useState<DrinkSize | null>(null);
+  const [selectedSize, setSelectedSize] = useState<MenuSize | null>(null);
   const [selectedMilk, setSelectedMilk] = useState('');
   const [selectedSweetness, setSelectedSweetness] = useState('');
   const [selectedTemperature, setSelectedTemperature] = useState('');
-  const [selectedAddOns, setSelectedAddOns] = useState<DrinkAddOn[]>([]);
+  const [selectedAddOns, setSelectedAddOns] = useState<MenuAddOn[]>([]);
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
-    const fetchDrink = async () => {
+    const fetchMenuItem = async () => {
       if (!id) return;
       
       try {
-        const drinkData = await apiService.getDrinkDetails(id);
+        const menuItemData = await apiService.getMenuDetails(id);
         
-        if (drinkData) {
-          setDrink(drinkData);
-          setSelectedSize(drinkData.sizes[0]);
-          setSelectedMilk(drinkData.milkOptions?.[0] || '');
-          setSelectedSweetness(drinkData.sweetnessLevels[0]);
+        if (menuItemData) {
+          setMenuItem(menuItemData);
+          setSelectedSize(menuItemData.sizes[0]);
+          setSelectedMilk(menuItemData.milkOptions?.[0] || '');
+          setSelectedSweetness(menuItemData.sweetnessLevels[0]);
           // Default to 'Iced' if available, otherwise first option
-          const defaultTemp = drinkData.temperatureOptions.includes('Iced') ? 'Iced' : drinkData.temperatureOptions[0];
+          const defaultTemp = menuItemData.temperatureOptions.includes('Iced') ? 'Iced' : menuItemData.temperatureOptions[0];
           setSelectedTemperature(defaultTemp);
         } else {
-          console.error('Drink not found');
-          setDrink(null);
+          console.error('Menu item not found');
+          setMenuItem(null);
         }
       } catch (error) {
-        console.error('Failed to fetch drink details:', error);
-        setDrink(null);
+        console.error('Failed to fetch menu item details:', error);
+        setMenuItem(null);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchDrink();
+    fetchMenuItem();
   }, [id]);
 
   const calculateTotalPrice = (): number => {
-    if (!drink || !selectedSize) return 0;
+    if (!menuItem || !selectedSize) return 0;
     
-    const basePrice = drink.basePrice + selectedSize.priceModifier;
+    const basePrice = menuItem.basePrice + selectedSize.priceModifier;
     const addOnsPrice = selectedAddOns.reduce((sum, addOn) => sum + addOn.price, 0);
     return (basePrice + addOnsPrice) * quantity;
   };
 
-  const handleAddOnToggle = (addOn: DrinkAddOn) => {
+  const handleAddOnToggle = (addOn: MenuAddOn) => {
     setSelectedAddOns(prev => {
       const exists = prev.find(item => item.id === addOn.id);
       if (exists) {
@@ -70,13 +70,13 @@ const MenuDetailsPage: React.FC = () => {
   };
 
   const handleAddToCart = () => {
-    if (!drink || !selectedSize) return;
+    if (!menuItem || !selectedSize) return;
 
     const cartItem: CartItem = {
       id: generateId(),
-      menuId: drink.id,
-      menuName: drink.name,
-      imageUrl: drink.image,
+      menuId: menuItem.id,
+      menuName: menuItem.name,
+      imageUrl: menuItem.image,
       size: selectedSize,
       milk: selectedMilk,
       sweetness: selectedSweetness,
@@ -104,11 +104,11 @@ const MenuDetailsPage: React.FC = () => {
     );
   }
 
-  if (!drink) {
+  if (!menuItem) {
     return (
       <div className="container mx-auto px-4 py-6">
         <div className="text-center py-12">
-          <p className="text-base-content/60">Drink not found</p>
+          <p className="text-base-content/60">Menu item not found</p>
           <button
             onClick={() => navigate('/')}
             className="btn btn-primary mt-4"
@@ -124,15 +124,15 @@ const MenuDetailsPage: React.FC = () => {
     <div className="container mx-auto px-4 py-6 pb-24 space-y-6">
       <div className="relative">
         <img
-          src={drink.image}
-          alt={drink.name}
+          src={menuItem.image}
+          alt={menuItem.name}
           className="w-full h-64 object-cover rounded-2xl"
           onError={(e) => {
-            (e.target as HTMLImageElement).src = '/images/placeholder-drink.svg';
+            (e.target as HTMLImageElement).src = '/images/placeholder-menu.svg';
           }}
         />
         <div className="absolute top-4 right-4 flex space-x-2">
-          {drink.isPopular && (
+          {menuItem.isPopular && (
             <div className="badge badge-secondary p-3">
               <Star size={12} className="mr-1" />
               Popular
@@ -143,16 +143,16 @@ const MenuDetailsPage: React.FC = () => {
 
       <div className="space-y-4">
         <div>
-          <h1 className="text-2xl font-bold text-base-content">{drink.name}</h1>
-          <p className="text-base-content/70 mt-2">{drink.description}</p>
-          <p className="text-2xl font-bold text-primary mt-2">{formatPrice(drink.basePrice)}</p>
+          <h1 className="text-2xl font-bold text-base-content">{menuItem.name}</h1>
+          <p className="text-base-content/70 mt-2">{menuItem.description}</p>
+          <p className="text-2xl font-bold text-primary mt-2">{formatPrice(menuItem.basePrice)}</p>
         </div>
 
         <div className="space-y-6">
           <div>
             <h3 className="font-semibold mb-3">Size</h3>
             <div className="grid grid-cols-1 gap-2">
-              {drink.sizes.map((size) => (
+              {menuItem.sizes.map((size) => (
                 <label key={size.id} className="cursor-pointer">
                   <input
                     type="radio"
@@ -173,11 +173,11 @@ const MenuDetailsPage: React.FC = () => {
             </div>
           </div>
 
-          {drink.milkOptions && drink.milkOptions.length > 0 && (
+          {menuItem.milkOptions && menuItem.milkOptions.length > 0 && (
             <div>
               <h3 className="font-semibold mb-3">Milk</h3>
               <div className="grid grid-cols-2 gap-2">
-                {drink.milkOptions.map((milk) => (
+                {menuItem.milkOptions.map((milk) => (
                   <button
                     key={milk}
                     onClick={() => setSelectedMilk(milk)}
@@ -195,7 +195,7 @@ const MenuDetailsPage: React.FC = () => {
           <div>
             <h3 className="font-semibold mb-3">Sweetness</h3>
             <div className="grid grid-cols-3 gap-2">
-              {drink.sweetnessLevels.map((sweetness) => (
+              {menuItem.sweetnessLevels.map((sweetness) => (
                 <button
                   key={sweetness}
                   onClick={() => setSelectedSweetness(sweetness)}
@@ -212,7 +212,7 @@ const MenuDetailsPage: React.FC = () => {
           <div>
             <h3 className="font-semibold mb-3">Temperature</h3>
             <div className="grid grid-cols-2 gap-2">
-              {drink.temperatureOptions.map((temp) => (
+              {menuItem.temperatureOptions.map((temp) => (
                 <button
                   key={temp}
                   onClick={() => setSelectedTemperature(temp)}
@@ -230,7 +230,7 @@ const MenuDetailsPage: React.FC = () => {
           <div>
             <h3 className="font-semibold mb-3">Add-ons</h3>
             <div className="space-y-2">
-              {drink.addOns.map((addOn) => (
+              {menuItem.addOns.map((addOn) => (
                 <label key={addOn.id} className="cursor-pointer flex items-center justify-between p-2 rounded-lg hover:bg-base-200">
                   <div className="flex items-center">
                     <input

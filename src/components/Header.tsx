@@ -31,8 +31,8 @@ const Header: React.FC = () => {
       case '/my-orders':
         return 'My Orders';
       default:
-        if (location.pathname.startsWith('/drink/')) {
-          return t('header.drinkDetails');
+        if (location.pathname.startsWith('/menu/')) {
+          return t('header.menuDetails');
         }
         if (location.pathname.startsWith('/order-confirmation/')) {
           return t('header.orderConfirmed');

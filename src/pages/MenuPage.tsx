@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Star, Plus } from 'lucide-react';
 import { useTranslation } from '../i18n/stub';
-import { Drink, DrinkCategory, CartItem } from '../types';
+import { Menu, MenuCategory, CartItem } from '../types';
 import { apiService } from '../services/api';
 import { formatPrice, debounce, generateId } from '../utils';
 import { useCart } from '../context/CartContext';
@@ -11,9 +11,9 @@ const MenuPage: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { addItem, toggleCart } = useCart();
-  const [drinks, setDrinks] = useState<Drink[]>([]);
-  const [categories, setCategories] = useState<DrinkCategory[]>([]);
-  const [filteredDrinks, setFilteredDrinks] = useState<Drink[]>([]);
+  const [menuItems, setMenuItems] = useState<Menu[]>([]);
+  const [categories, setCategories] = useState<MenuCategory[]>([]);
+  const [filteredMenuItems, setFilteredMenuItems] = useState<Menu[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
@@ -22,9 +22,9 @@ const MenuPage: React.FC = () => {
     const fetchMenu = async () => {
       try {
         const menuData = await apiService.getMenu();
-        setDrinks(menuData.drinks);
+        setMenuItems(menuData.menu);
         setCategories(menuData.categories);
-        setFilteredDrinks(menuData.drinks);
+        setFilteredMenuItems(menuData.menu);
       } catch (error) {
         console.error('Failed to fetch menu:', error);
       } finally {
@@ -36,55 +36,55 @@ const MenuPage: React.FC = () => {
   }, []);
 
   const debouncedSearch = debounce((query: string, category: string) => {
-    let filtered = drinks;
+    let filtered = menuItems;
 
     if (category !== 'all') {
-      filtered = filtered.filter(drink => drink.category === category);
+      filtered = filtered.filter(menuItem => menuItem.category === category);
     }
 
     if (query.trim()) {
-      filtered = filtered.filter(drink =>
-        drink.name.toLowerCase().includes(query.toLowerCase()) ||
-        drink.description.toLowerCase().includes(query.toLowerCase())
+      filtered = filtered.filter(menuItem =>
+        menuItem.name.toLowerCase().includes(query.toLowerCase()) ||
+        menuItem.description.toLowerCase().includes(query.toLowerCase())
       );
     }
 
-    setFilteredDrinks(filtered);
+    setFilteredMenuItems(filtered);
   }, 300);
 
   useEffect(() => {
     debouncedSearch(searchQuery, selectedCategory);
-  }, [searchQuery, selectedCategory, drinks]);
+  }, [searchQuery, selectedCategory, menuItems]);
 
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId);
   };
 
-  const handleDrinkClick = (drinkId: string) => {
-    navigate(`/drink/${drinkId}`);
+  const handleMenuItemClick = (menuItemId: string) => {
+    navigate(`/menu/${menuItemId}`);
   };
 
-  const handleQuickAddToCart = (e: React.MouseEvent, drink: Drink) => {
-    e.stopPropagation(); // Prevent navigating to drink details
+  const handleQuickAddToCart = (e: React.MouseEvent, menuItem: Menu) => {
+    e.stopPropagation(); // Prevent navigating to menu item details
     
     // Use default options for quick add
-    const defaultSize = drink.sizes[0];
-    const defaultMilk = drink.milkOptions[0];
-    const defaultSweetness = drink.sweetnessLevels[0];
-    const defaultTemperature = drink.temperatureOptions.includes('Iced') ? 'Iced' : drink.temperatureOptions[0];
+    const defaultSize = menuItem.sizes[0];
+    const defaultMilk = menuItem.milkOptions[0];
+    const defaultSweetness = menuItem.sweetnessLevels[0];
+    const defaultTemperature = menuItem.temperatureOptions.includes('Iced') ? 'Iced' : menuItem.temperatureOptions[0];
     
     const cartItem: CartItem = {
       id: generateId(),
-      menuId: drink.id,
-      menuName: drink.name,
-      imageUrl: drink.image,
+      menuId: menuItem.id,
+      menuName: menuItem.name,
+      imageUrl: menuItem.image,
       size: defaultSize,
       milk: defaultMilk,
       sweetness: defaultSweetness,
       temperature: defaultTemperature,
       addOns: [],
       quantity: 1,
-      totalPrice: drink.basePrice + defaultSize.priceModifier,
+      totalPrice: menuItem.basePrice + defaultSize.priceModifier,
     };
 
     addItem(cartItem);
@@ -153,7 +153,7 @@ const MenuPage: React.FC = () => {
         ))}
       </div>
 
-      {filteredDrinks.length === 0 ? (
+      {filteredMenuItems.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-base-content/60">{t('menu.noResults')}</p>
           <p className="text-sm text-base-content/40 mt-1">
@@ -162,62 +162,66 @@ const MenuPage: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-4">
-          {filteredDrinks.map((drink) => (
+          {filteredMenuItems.map((menuItem) => (
             <div
-              key={drink.id}
-              onClick={() => handleDrinkClick(drink.id)}
-              className="card-drink group cursor-pointer hover:shadow-xl transition-all duration-200 relative border border-black rounded-lg hover:border-black"
+              key={menuItem.id}
+              onClick={() => handleMenuItemClick(menuItem.id)}
+              className="card-menu group cursor-pointer hover:shadow-xl transition-all duration-200 relative border border-black rounded-lg hover:border-black"
             >
-              <div className="flex items-center gap-4 p-4">
+              <div className="flex items-start gap-3 p-2">
                 {/* Image on the left */}
                 <div className="relative flex-shrink-0">
                   <img
-                    src={drink.image}
-                    alt={drink.name}
-                    className="w-20 h-20 object-cover rounded-lg group-hover:scale-105 transition-transform duration-200"
+                    src={menuItem.image}
+                    alt={menuItem.name}
+                    className="w-16 h-16 object-cover rounded-lg group-hover:scale-105 transition-transform duration-200"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/images/placeholder-drink.svg';
+                      (e.target as HTMLImageElement).src = '/images/placeholder-menu.svg';
                     }}
                   />
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200 rounded-lg pointer-events-none"></div>
-                  {drink.isPopular && (
+                  {menuItem.isPopular && (
                     <div className="absolute -top-1 -right-1 badge badge-secondary badge-xs p-1">
                       <Star size={8} />
                     </div>
                   )}
                 </div>
 
-                {/* Details on the right */}
-                <div className="flex-1 min-w-0 pr-12">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold text-lg text-base-content truncate">{drink.name}</h3>
-                    <span className="text-lg font-bold text-primary ml-2">{formatPrice(drink.basePrice)}</span>
+                {/* Details */}
+                <div className="flex-1 min-w-0 pr-1">
+                  <div className="flex justify-between items-start mb-1">
+                    <h3 className="font-bold text-base text-base-content truncate">{menuItem.name}</h3>
+                    <span className="text-lg font-bold text-primary ml-2">{formatPrice(menuItem.basePrice)}</span>
                   </div>
                   
-                  <p className="text-sm text-base-content/70 line-clamp-2 mb-3">
-                    {drink.description}
+                  <p className="text-xs text-base-content/70 line-clamp-2 mb-2">
+                    {menuItem.description}
                   </p>
 
                   <div className="flex flex-wrap gap-1 text-xs">
-                    <span className="badge badge-outline badge-xs p-2">
-                      {drink.sizes.length} {t('menu.sizes')}
-                    </span>
-                    <span className="badge badge-outline badge-xs p-2">
-                      {drink.milkOptions.length} {t('menu.milkOptions')}
-                    </span>
-                    {drink.temperatureOptions.includes('Hot') && drink.temperatureOptions.includes('Iced') && (
-                      <span className="badge badge-outline badge-xs p-2">{t('menu.hotIced')}</span>
+                    {menuItem.sizes.length > 0 && (
+                      <span className="badge badge-outline badge-xs p-1">
+                        {menuItem.sizes.length} {t('menu.sizes')}
+                      </span>
+                    )}
+                    {menuItem.milkOptions.length > 0 && (
+                      <span className="badge badge-outline badge-xs p-1">
+                        {menuItem.milkOptions.length} {t('menu.milkOptions')}
+                      </span>
+                    )}
+                    {menuItem.temperatureOptions.includes('Hot') && menuItem.temperatureOptions.includes('Iced') && (
+                      <span className="badge badge-outline badge-xs p-1">{t('menu.hotIced')}</span>
                     )}
                   </div>
                 </div>
 
                 {/* Circular Add Button - Bottom Right */}
                 <button
-                  onClick={(e) => handleQuickAddToCart(e, drink)}
-                  className="absolute bottom-4 right-4 btn btn-circle btn-primary btn-sm hover:btn-primary-focus transition-all duration-200"
-                  aria-label={`Quick add ${drink.name} to cart`}
+                  onClick={(e) => handleQuickAddToCart(e, menuItem)}
+                  className="absolute bottom-2 right-2 btn btn-circle btn-primary btn-sm hover:btn-primary-focus transition-all duration-200"
+                  aria-label={`Quick add ${menuItem.name} to cart`}
                 >
-                  <Plus size={16} />
+                  <Plus size={14} />
                 </button>
               </div>
             </div>

@@ -1,19 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { CheckCircle, Clock, User, Phone, MapPin } from 'lucide-react';
-import { Order } from '../types';
+import { Order, Customer, OrderConfirmationLocationState } from '../types';
 import { apiService } from '../services/api';
 import { formatDateTime } from '../utils';
 
 const OrderConfirmationPage: React.FC = () => {
   const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [order, setOrder] = useState<Order | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
+  
+  // Get customer info from navigation state with proper typing
+  const locationState = location.state as OrderConfirmationLocationState | undefined;
+  const customerFromState: Customer | undefined = locationState?.customer;
+  const orderFromState: Order | undefined = locationState?.orderData;
 
   useEffect(() => {
     const fetchOrder = async () => {
       if (!orderId) return;
+      
+      // If we have complete order data from navigation state, use it
+      if (orderFromState && customerFromState) {
+        setOrder(orderFromState);
+        setLoading(false);
+        return;
+      }
       
       try {
         const orderData = await apiService.getOrderStatus(orderId);
@@ -24,8 +37,8 @@ const OrderConfirmationPage: React.FC = () => {
             items: orderData.items.map((item, index) => ({
               id: `item-${index}`,
               menuId: '1',
-              menuName: item.name,
-              imageUrl: '/images/default-drink.svg',
+              menuName: item.name || `Menu Item ${index + 1}`,
+              imageUrl: `/images/${(item.name || 'placeholder-menu').toLowerCase().replace(/\s+/g, '-')}.svg`,
               size: { id: 'medium', name: 'Medium', priceModifier: 0 },
               milk: 'Regular Milk',
               sweetness: '50%',
@@ -34,7 +47,10 @@ const OrderConfirmationPage: React.FC = () => {
               quantity: item.quantity,
               totalPrice: 0
             })),
-            customer: { name: 'Customer', phone: '-' },
+            customer: customerFromState || {
+              name: 'Customer', 
+              phone: '-'
+            } as Customer,
             subtotal: 0,
             total: 0,
             status: orderData.status,
@@ -55,7 +71,7 @@ const OrderConfirmationPage: React.FC = () => {
     };
 
     fetchOrder();
-  }, [orderId]);
+  }, [orderId, customerFromState, orderFromState]);
 
   const handleTrackOrder = () => {
     navigate('/order-status', { state: { orderId } });
@@ -100,7 +116,7 @@ const OrderConfirmationPage: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold text-base-content">Order Confirmed!</h1>
           <p className="text-base-content/70 mt-2">
-            Thank you for choosing TIMING! We're preparing your drinks now.
+            Thank you for choosing TIMING! We're preparing your menu now.
           </p>
         </div>
       </div>
