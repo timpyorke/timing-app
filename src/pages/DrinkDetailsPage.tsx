@@ -26,16 +26,22 @@ const DrinkDetailsPage: React.FC = () => {
       
       try {
         const drinkData = await apiService.getDrinkDetails(id);
-        setDrink(drinkData);
         
-        setSelectedSize(drinkData.sizes[0]);
-        setSelectedMilk(drinkData.milkOptions[0]);
-        setSelectedSweetness(drinkData.sweetnessLevels[0]);
-        // Default to 'Iced' if available, otherwise first option
-        const defaultTemp = drinkData.temperatureOptions.includes('Iced') ? 'Iced' : drinkData.temperatureOptions[0];
-        setSelectedTemperature(defaultTemp);
+        if (drinkData) {
+          setDrink(drinkData);
+          setSelectedSize(drinkData.sizes[0]);
+          setSelectedMilk(drinkData.milkOptions[0]);
+          setSelectedSweetness(drinkData.sweetnessLevels[0]);
+          // Default to 'Iced' if available, otherwise first option
+          const defaultTemp = drinkData.temperatureOptions.includes('Iced') ? 'Iced' : drinkData.temperatureOptions[0];
+          setSelectedTemperature(defaultTemp);
+        } else {
+          console.error('Drink not found');
+          setDrink(null);
+        }
       } catch (error) {
         console.error('Failed to fetch drink details:', error);
+        setDrink(null);
       } finally {
         setLoading(false);
       }

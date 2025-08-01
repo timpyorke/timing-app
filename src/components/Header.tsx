@@ -28,12 +28,17 @@ const Header: React.FC = () => {
         return t('header.checkout');
       case '/order-status':
         return t('header.orderStatus');
+      case '/my-orders':
+        return 'My Orders';
       default:
         if (location.pathname.startsWith('/drink/')) {
           return t('header.drinkDetails');
         }
         if (location.pathname.startsWith('/order-confirmation/')) {
           return t('header.orderConfirmed');
+        }
+        if (location.pathname.startsWith('/order-detail/')) {
+          return 'Order Details';
         }
         return t('header.timing');
     }

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User ID Demo - Timing App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .user-id-display {
+            background: #e6f7ff;
+            border: 1px solid #91d5ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        .button {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #16a34a;
+        }
+        .demo-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .log {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-line;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🆔 User ID Functionality Demo</h1>
+        <p>This demonstrates how the Timing app generates and persists temporary user IDs for order tracking.</p>
+        
+        <div class="demo-section">
+            <h3>Current User ID:</h3>
+            <div class="user-id-display" id="currentUserId">Loading...</div>
+            <button class="button" onclick="refreshUserId()">Refresh Display</button>
+            <button class="button" onclick="clearUserId()">Clear User ID</button>
+            <button class="button" onclick="generateNewUserId()">Generate New</button>
+        </div>
+
+        <div class="demo-section">
+            <h3>User ID Properties:</h3>
+            <ul id="userIdProperties"></ul>
+        </div>
+
+        <div class="demo-section">
+            <h3>Persistence Test:</h3>
+            <p>The user ID should persist across browser sessions. Try:</p>
+            <ol>
+                <li>Note the current User ID</li>
+                <li>Refresh this page</li>
+                <li>Check if the same User ID appears</li>
+            </ol>
+        </div>
+
+        <div class="demo-section">
+            <h3>Action Log:</h3>
+            <div class="log" id="actionLog"></div>
+        </div>
+    </div>
+
+    <script>
+        // Simulate the user ID functions from the app
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        function getAnonymousUserId() {
+            const storageKey = 'timing_anonymous_user_id';
+            let userId = localStorage.getItem(storageKey);
+            
+            if (!userId) {
+                userId = generateUUID();
+                localStorage.setItem(storageKey, userId);
+                logAction(`Generated new user ID: ${userId}`);
+            } else {
+                logAction(`Retrieved existing user ID: ${userId}`);
+            }
+            
+            return userId;
+        }
+
+        function logAction(message) {
+            const log = document.getElementById('actionLog');
+            const timestamp = new Date().toLocaleTimeString();
+            log.textContent += `[${timestamp}] ${message}\n`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function refreshUserId() {
+            const userId = getAnonymousUserId();
+            document.getElementById('currentUserId').textContent = userId;
+            updateProperties(userId);
+        }
+
+        function clearUserId() {
+            localStorage.removeItem('timing_anonymous_user_id');
+            logAction('Cleared user ID from localStorage');
+            document.getElementById('currentUserId').textContent = 'No user ID (cleared)';
+            document.getElementById('userIdProperties').innerHTML = '<li>No user ID present</li>';
+        }
+
+        function generateNewUserId() {
+            localStorage.removeItem('timing_anonymous_user_id');
+            refreshUserId();
+        }
+
+        function updateProperties(userId) {
+            const properties = document.getElementById('userIdProperties');
+            const createdTime = new Date().toLocaleString();
+            
+            properties.innerHTML = `
+                <li>Format: UUID v4</li>
+                <li>Length: ${userId.length} characters</li>
+                <li>Storage: localStorage</li>
+                <li>Key: timing_anonymous_user_id</li>
+                <li>Persists: Across browser sessions</li>
+                <li>Last updated: ${createdTime}</li>
+                <li>Purpose: Order tracking and user analytics</li>
+            `;
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            logAction('Page loaded - initializing user ID demo');
+            refreshUserId();
+        });
+    </script>
+</body>
+</html>

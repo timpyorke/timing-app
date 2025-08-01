@@ -17,19 +17,38 @@ const OrderConfirmationPage: React.FC = () => {
       
       try {
         const orderData = await apiService.getOrderStatus(orderId);
-        const mockOrder: Order = {
-          id: orderData.id,
-          items: [],
-          customer: { name: 'Customer', phone: '555-0123' },
-          subtotal: 0,
-          total: 0,
-          status: orderData.status,
-          estimatedPickupTime: orderData.estimatedPickupTime,
-          createdAt: new Date().toISOString(),
-        };
-        setOrder(mockOrder);
+        
+        if (orderData) {
+          const orderFromStatus: Order = {
+            id: orderData.id,
+            items: orderData.items.map((item, index) => ({
+              id: `item-${index}`,
+              drinkId: '1',
+              drinkName: item.name,
+              drinkImage: '/images/default-drink.svg',
+              size: { id: 'medium', name: 'Medium', priceModifier: 0 },
+              milk: 'Regular Milk',
+              sweetness: '50%',
+              temperature: 'Hot',
+              addOns: [],
+              quantity: item.quantity,
+              totalPrice: 0
+            })),
+            customer: { name: 'Customer', phone: '555-0123' },
+            subtotal: 0,
+            total: 0,
+            status: orderData.status,
+            estimatedPickupTime: orderData.estimatedPickupTime,
+            createdAt: new Date().toISOString(),
+          };
+          setOrder(orderFromStatus);
+        } else {
+          console.log('Order status not found');
+          setOrder(null);
+        }
       } catch (error) {
         console.error('Failed to fetch order:', error);
+        setOrder(null);
       } finally {
         setLoading(false);
       }

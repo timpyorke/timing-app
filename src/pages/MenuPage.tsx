@@ -161,74 +161,64 @@ const MenuPage: React.FC = () => {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-4">
           {filteredDrinks.map((drink) => (
             <div
               key={drink.id}
               onClick={() => handleDrinkClick(drink.id)}
-              className="card-drink group cursor-pointer hover:shadow-xl transition-shadow duration-200"
+              className="card-drink group cursor-pointer hover:shadow-xl transition-all duration-200 relative border border-black rounded-lg hover:border-black"
             >
-              <div className="relative">
-                <img
-                  src={drink.image}
-                  alt={drink.name}
-                  className="w-full h-40 object-cover rounded-lg mb-3 group-hover:scale-105 transition-transform duration-200"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/images/placeholder-drink.svg';
-                  }}
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200 rounded-lg pointer-events-none"></div>
-                <div className="absolute top-2 right-2 flex space-x-1">
+              <div className="flex items-center gap-4 p-4">
+                {/* Image on the left */}
+                <div className="relative flex-shrink-0">
+                  <img
+                    src={drink.image}
+                    alt={drink.name}
+                    className="w-20 h-20 object-cover rounded-lg group-hover:scale-105 transition-transform duration-200"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = '/images/placeholder-drink.svg';
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200 rounded-lg pointer-events-none"></div>
                   {drink.isPopular && (
-                    <div className="badge badge-secondary badge-sm p-3">
-                      <Star size={12} className="mr-1" />
-{t('menu.popular')}
+                    <div className="absolute -top-1 -right-1 badge badge-secondary badge-xs p-1">
+                      <Star size={8} />
                     </div>
                   )}
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <div className="flex justify-between items-start">
-                  <h3 className="font-bold text-lg text-base-content">{drink.name}</h3>
-                  <span className="text-lg font-bold text-primary">{formatPrice(drink.basePrice)}</span>
-                </div>
-                
-                <p className="text-sm text-base-content/70 line-clamp-2">
-                  {drink.description}
-                </p>
+                {/* Details on the right */}
+                <div className="flex-1 min-w-0 pr-12">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-bold text-lg text-base-content truncate">{drink.name}</h3>
+                    <span className="text-lg font-bold text-primary ml-2">{formatPrice(drink.basePrice)}</span>
+                  </div>
+                  
+                  <p className="text-sm text-base-content/70 line-clamp-2 mb-3">
+                    {drink.description}
+                  </p>
 
-                <div className="flex flex-wrap gap-1 text-xs mb-3">
-                  <span className="badge badge-outline badge-xs p-3">
-                    {drink.sizes.length} {t('menu.sizes')}
-                  </span>
-                  <span className="badge badge-outline badge-xs p-3">
-                    {drink.milkOptions.length} {t('menu.milkOptions')}
-                  </span>
-                  {drink.temperatureOptions.includes('Hot') && drink.temperatureOptions.includes('Iced') && (
-                    <span className="badge badge-outline badge-xs p-3">{t('menu.hotIced')}</span>
-                  )}
+                  <div className="flex flex-wrap gap-1 text-xs">
+                    <span className="badge badge-outline badge-xs p-2">
+                      {drink.sizes.length} {t('menu.sizes')}
+                    </span>
+                    <span className="badge badge-outline badge-xs p-2">
+                      {drink.milkOptions.length} {t('menu.milkOptions')}
+                    </span>
+                    {drink.temperatureOptions.includes('Hot') && drink.temperatureOptions.includes('Iced') && (
+                      <span className="badge badge-outline badge-xs p-2">{t('menu.hotIced')}</span>
+                    )}
+                  </div>
                 </div>
-                
-                <div className="flex items-center justify-between mt-3">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDrinkClick(drink.id);
-                    }}
-                    className="btn btn-outline btn-sm flex-1 mr-2"
-                  >
-{t('menu.customize')}
-                  </button>
-                  <button
-                    onClick={(e) => handleQuickAddToCart(e, drink)}
-                    className="btn btn-primary btn-sm flex-1"
-                    aria-label={`Quick add ${drink.name} to cart`}
-                  >
-                    <Plus size={14} className="mr-1" />
-{t('menu.quickAdd')}
-                  </button>
-                </div>
+
+                {/* Circular Add Button - Bottom Right */}
+                <button
+                  onClick={(e) => handleQuickAddToCart(e, drink)}
+                  className="absolute bottom-4 right-4 btn btn-circle btn-primary btn-sm hover:btn-primary-focus transition-all duration-200"
+                  aria-label={`Quick add ${drink.name} to cart`}
+                >
+                  <Plus size={16} />
+                </button>
               </div>
             </div>
           ))}

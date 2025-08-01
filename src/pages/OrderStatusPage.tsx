@@ -1,12 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, CheckCircle, AlertCircle, XCircle, History } from 'lucide-react';
+import { Clock, CheckCircle, AlertCircle, XCircle, History as HistoryIcon, Search, RefreshCw } from 'lucide-react';
 import { formatDateTime, getOrderStatusColor, getOrderStatusText, formatPrice } from '../utils';
 import { useOrderHistory } from '../hooks/useOrderHistory';
 
 const OrderStatusPage: React.FC = () => {
   const navigate = useNavigate();
-  const { orders } = useOrderHistory();
+  const { orders, isLoading, error, refreshOrders } = useOrderHistory();
   
   console.log('Orders received in OrderStatusPage:', orders, 'Length:', orders.length);
 
@@ -36,17 +36,55 @@ const OrderStatusPage: React.FC = () => {
     <div className="container mx-auto px-4 py-6 pb-20 space-y-6">
       <div className="flex justify-between items-center">
         <div className="flex items-center">
-          <History className="mr-2" size={24} />
+          <HistoryIcon className="mr-2" size={24} />
           <h1 className="font-bold text-xl">Order History</h1>
+          {isLoading && (
+            <span className="loading loading-spinner loading-sm ml-2"></span>
+          )}
         </div>
-        {orders.length > 0 && (
-          <span className="text-sm text-base-content/60">{orders.length} orders</span>
-        )}
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={refreshOrders}
+            disabled={isLoading}
+            className="btn btn-sm btn-ghost"
+            title="Refresh orders"
+          >
+            <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
+          </button>
+          {orders.length > 0 && (
+            <button
+              onClick={() => navigate('/my-orders')}
+              className="btn btn-sm btn-primary"
+              title="Advanced order search and filters"
+            >
+              <Search size={16} />
+              Advanced
+            </button>
+          )}
+          {orders.length > 0 && (
+            <span className="text-sm text-base-content/60">{orders.length} orders</span>
+          )}
+        </div>
       </div>
 
-      {orders.length === 0 ? (
+      {error && (
+        <div className="alert alert-warning">
+          <AlertCircle size={20} />
+          <div>
+            <p className="font-medium">Unable to load orders from server</p>
+            <p className="text-sm">Showing cached data. Check your connection and try refreshing.</p>
+          </div>
+        </div>
+      )}
+
+      {isLoading && orders.length === 0 ? (
         <div className="bg-base-200 rounded-lg p-8 text-center">
-          <History className="mx-auto mb-4 text-base-content/30" size={48} />
+          <span className="loading loading-spinner loading-lg"></span>
+          <p className="mt-4 text-base-content/60">Loading your orders...</p>
+        </div>
+      ) : orders.length === 0 ? (
+        <div className="bg-base-200 rounded-lg p-8 text-center">
+          <HistoryIcon className="mx-auto mb-4 text-base-content/30" size={48} />
           <h3 className="font-semibold text-lg mb-2">No Orders Yet</h3>
           <p className="text-base-content/60 mb-4">
             Your order history will appear here after you place an order.

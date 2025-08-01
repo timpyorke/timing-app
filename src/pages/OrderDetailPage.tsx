@@ -1,15 +1,56 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Clock, CheckCircle, AlertCircle, XCircle, User, Phone, MapPin } from 'lucide-react';
+import { Clock, CheckCircle, AlertCircle, XCircle, User, Phone, MapPin, RefreshCw } from 'lucide-react';
 import { formatDateTime, getOrderStatusColor, getOrderStatusText, formatPrice } from '../utils';
 import { useOrderHistory } from '../hooks/useOrderHistory';
+import { apiService } from '../services/api';
+import { OrderStatusResponse } from '../types';
 
 const OrderDetailPage: React.FC = () => {
   const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
-  const { orders } = useOrderHistory();
+  const { orders, updateOrderStatus } = useOrderHistory();
+  const [liveStatus, setLiveStatus] = useState<OrderStatusResponse | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const order = orders.find(o => o.id === orderId);
+
+  // Fetch live order status
+  const fetchLiveStatus = async () => {
+    if (!orderId) return;
+    
+    setIsRefreshing(true);
+    try {
+      const status = await apiService.getOrderStatus(orderId);
+      
+      if (status) {
+        setLiveStatus(status);
+        // Update local order status if different
+        if (order && status.status !== order.status) {
+          updateOrderStatus(orderId, status.status, status.estimatedPickupTime);
+        }
+      } else {
+        console.log('No live status available for order:', orderId);
+        setLiveStatus(null);
+      }
+    } catch (error) {
+      console.error('Failed to fetch live order status:', error);
+      setLiveStatus(null);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLiveStatus();
+    // Set up polling for live updates every 30 seconds
+    const interval = setInterval(fetchLiveStatus, 30000);
+    return () => clearInterval(interval);
+  }, [orderId]);
+
+  // Use live status if available, otherwise fall back to local order
+  const currentStatus = liveStatus?.status || order?.status;
+  const currentEstimatedTime = liveStatus?.estimatedPickupTime || order?.estimatedPickupTime;
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -63,9 +104,18 @@ const OrderDetailPage: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-6 pb-20 space-y-6">
-      {/* Header with back button */}
-      <div className="flex items-center space-x-3">
+      {/* Header with back button and refresh */}
+      <div className="flex justify-between items-center">
         <h1 className="font-bold text-xl">Order #{order.id}</h1>
+        <button 
+          onClick={fetchLiveStatus}
+          disabled={isRefreshing}
+          className={`btn btn-sm btn-ghost ${isRefreshing ? 'loading' : ''}`}
+          title="Refresh order status"
+        >
+          {!isRefreshing && <RefreshCw size={16} />}
+          {isRefreshing ? 'Refreshing...' : 'Refresh'}
+        </button>
       </div>
 
       {/* Order Status Card */}
@@ -73,10 +123,13 @@ const OrderDetailPage: React.FC = () => {
         <div className="flex items-center justify-between mb-4">
           <div>
             <div className="flex items-center space-x-2 mb-2">
-              {getStatusIcon(order.status)}
-              <span className={`badge ${getOrderStatusColor(order.status)}`}>
-                {getOrderStatusText(order.status)}
+              {getStatusIcon(currentStatus || 'pending')}
+              <span className={`badge ${getOrderStatusColor(currentStatus || 'pending')}`}>
+                {getOrderStatusText(currentStatus || 'pending')}
               </span>
+              {liveStatus && (
+                <span className="badge badge-sm badge-success">Live</span>
+              )}
             </div>
             <p className="text-sm text-base-content/60">
               Ordered on {formatDateTime(order.createdAt)}
@@ -90,21 +143,21 @@ const OrderDetailPage: React.FC = () => {
         <div className="mb-4">
           <div className="flex justify-between text-sm mb-2">
             <span>Progress</span>
-            <span>{getStatusProgress(order.status)}%</span>
+            <span>{getStatusProgress(currentStatus || 'pending')}%</span>
           </div>
           <progress 
             className="progress progress-primary w-full" 
-            value={getStatusProgress(order.status)} 
+            value={getStatusProgress(currentStatus || 'pending')} 
             max="100"
           ></progress>
         </div>
 
-        {order.status !== 'completed' && order.status !== 'cancelled' && order.estimatedPickupTime && (
+        {currentStatus !== 'completed' && currentStatus !== 'cancelled' && currentEstimatedTime && (
           <div className="bg-primary/10 border border-primary/20 rounded-lg p-3">
             <div className="flex items-center text-primary">
               <Clock className="mr-2" size={16} />
               <span className="font-medium">
-                Estimated pickup: {formatDateTime(order.estimatedPickupTime)}
+                Estimated pickup: {formatDateTime(currentEstimatedTime)}
               </span>
             </div>
           </div>
@@ -193,7 +246,7 @@ const OrderDetailPage: React.FC = () => {
 
       {/* Status-specific alerts */}
       <div className="grid grid-cols-1 gap-4">
-        {order.status === 'ready' && (
+        {currentStatus === 'ready' && (
           <div className="alert alert-success">
             <CheckCircle size={20} />
             <div>
@@ -203,7 +256,7 @@ const OrderDetailPage: React.FC = () => {
           </div>
         )}
         
-        {order.status === 'preparing' && (
+        {currentStatus === 'preparing' && (
           <div className="alert alert-info">
             <AlertCircle size={20} />
             <div>
@@ -213,7 +266,7 @@ const OrderDetailPage: React.FC = () => {
           </div>
         )}
 
-        {order.status === 'completed' && (
+        {currentStatus === 'completed' && (
           <div className="alert alert-success">
             <CheckCircle size={20} />
             <div>
@@ -223,12 +276,24 @@ const OrderDetailPage: React.FC = () => {
           </div>
         )}
 
-        {order.status === 'cancelled' && (
+        {currentStatus === 'cancelled' && (
           <div className="alert alert-error">
             <XCircle size={20} />
             <div>
               <p className="font-medium">Order cancelled</p>
               <p className="text-sm">This order has been cancelled. Please contact us if you have any questions.</p>
+            </div>
+          </div>
+        )}
+
+        {liveStatus && (
+          <div className="alert alert-info">
+            <div className="flex items-center">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></div>
+              <div>
+                <p className="font-medium">Live Status Updates</p>
+                <p className="text-sm">Status updates automatically every 30 seconds</p>
+              </div>
             </div>
           </div>
         )}
