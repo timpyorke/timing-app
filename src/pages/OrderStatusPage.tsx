@@ -121,24 +121,36 @@ const OrderStatusPage: React.FC = () => {
               
               <div className="mb-3">
                 <h4 className="font-medium text-sm mb-2">Order Items:</h4>
-                <div className="space-y-1">
+                <div className="space-y-2">
                   {order.items.map((item, itemIndex) => (
-                    <div key={itemIndex} className="text-sm text-base-content/70 flex justify-between">
-                      <div>
-                        <span className="font-medium">{item.drinkName}</span>
-                        <span className="text-xs text-base-content/50 ml-1">
-                          ({item.size.name})
-                          {item.temperature && ` • ${item.temperature}`}
-                          {item.milk && ` • ${item.milk}`}
-                          {item.sweetness && ` • ${item.sweetness}`}
-                          {item.addOns && item.addOns.length > 0 && 
-                            ` • +${item.addOns.map(addon => addon.name).join(', ')}`
+                    <div key={itemIndex} className="flex items-start space-x-3">
+                      <img
+                        src={item.imageUrl}
+                        alt={item.menuName}
+                        className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/images/placeholder-drink.svg';
+                        }}
+                      />
+                      <div className="flex-1 flex justify-between items-start">
+                        <div className="flex-1">
+                          <p className="font-medium text-base-content">{item.menuName}</p>
+                          <p className="text-xs text-base-content/60">
+                            {item.size.name}
+                            {item.temperature && ` • ${item.temperature}`}
+                            {item.milk && ` • ${item.milk}`}
+                            {item.sweetness && ` • ${item.sweetness}`}
+                          </p>
+                          {item.addOns && item.addOns.length > 0 &&
+                            <p className="text-xs text-base-content/60">
+                              + {item.addOns.map(addon => addon.name).join(', ')}
+                            </p>
                           }
-                        </span>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-xs">×{item.quantity}</span>
-                        <div className="font-medium">{formatPrice(item.totalPrice)}</div>
+                        </div>
+                        <div className="text-right ml-2">
+                          <p className="font-medium">{formatPrice(item.totalPrice)}</p>
+                          <p className="text-sm text-base-content/60">×{item.quantity}</p>
+                        </div>
                       </div>
                     </div>
                   ))}

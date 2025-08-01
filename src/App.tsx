@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { CartProvider } from './context/CartContext';
 import Layout from './components/Layout';
 import MenuPage from './pages/MenuPage';
-import DrinkDetailsPage from './pages/DrinkDetailsPage';
+import MenuDetailsPage from './pages/MenuDetailsPage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import OrderConfirmationPage from './pages/OrderConfirmationPage';
@@ -25,7 +25,7 @@ function App() {
         <Layout>
           <Routes>
             <Route path="/" element={<MenuPage />} />
-            <Route path="/drink/:id" element={<DrinkDetailsPage />} />
+            <Route path="/drink/:id" element={<MenuDetailsPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/order-confirmation/:orderId" element={<OrderConfirmationPage />} />

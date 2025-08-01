@@ -6,7 +6,7 @@ import { apiService } from '../services/api';
 import { useCart } from '../context/CartContext';
 import { formatPrice, generateId } from '../utils';
 
-const DrinkDetailsPage: React.FC = () => {
+const MenuDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addItem, toggleCart } = useCart();
@@ -30,7 +30,7 @@ const DrinkDetailsPage: React.FC = () => {
         if (drinkData) {
           setDrink(drinkData);
           setSelectedSize(drinkData.sizes[0]);
-          setSelectedMilk(drinkData.milkOptions[0]);
+          setSelectedMilk(drinkData.milkOptions?.[0] || '');
           setSelectedSweetness(drinkData.sweetnessLevels[0]);
           // Default to 'Iced' if available, otherwise first option
           const defaultTemp = drinkData.temperatureOptions.includes('Iced') ? 'Iced' : drinkData.temperatureOptions[0];
@@ -74,9 +74,9 @@ const DrinkDetailsPage: React.FC = () => {
 
     const cartItem: CartItem = {
       id: generateId(),
-      drinkId: drink.id,
-      drinkName: drink.name,
-      drinkImage: drink.image,
+      menuId: drink.id,
+      menuName: drink.name,
+      imageUrl: drink.image,
       size: selectedSize,
       milk: selectedMilk,
       sweetness: selectedSweetness,
@@ -173,22 +173,24 @@ const DrinkDetailsPage: React.FC = () => {
             </div>
           </div>
 
-          <div>
-            <h3 className="font-semibold mb-3">Milk</h3>
-            <div className="grid grid-cols-2 gap-2">
-              {drink.milkOptions.map((milk) => (
-                <button
-                  key={milk}
-                  onClick={() => setSelectedMilk(milk)}
-                  className={`btn btn-outline btn-sm ${
-                    selectedMilk === milk ? 'btn-active' : ''
-                  }`}
-                >
-                  {milk}
-                </button>
-              ))}
+          {drink.milkOptions && drink.milkOptions.length > 0 && (
+            <div>
+              <h3 className="font-semibold mb-3">Milk</h3>
+              <div className="grid grid-cols-2 gap-2">
+                {drink.milkOptions.map((milk) => (
+                  <button
+                    key={milk}
+                    onClick={() => setSelectedMilk(milk)}
+                    className={`btn btn-outline btn-sm ${
+                      selectedMilk === milk ? 'btn-active' : ''
+                    }`}
+                  >
+                    {milk}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           <div>
             <h3 className="font-semibold mb-3">Sweetness</h3>
@@ -321,4 +323,4 @@ const DrinkDetailsPage: React.FC = () => {
   );
 };
 
-export default DrinkDetailsPage;
+export default MenuDetailsPage;

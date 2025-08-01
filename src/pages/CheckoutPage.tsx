@@ -25,16 +25,18 @@ const CheckoutPage: React.FC = () => {
 
   const validateForm = (): boolean => {
     const newErrors: Partial<Customer> = {};
-    
+    const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
     }
-    
-    // Phone number is optional, but if provided, validate format
-    if (formData.phone.trim() && !/^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) {
+
+    if (totalItems > 4 && !formData.phone.trim()) {
+      newErrors.phone = 'Phone number is required for orders 5++ items';
+    } else if (formData.phone.trim() && !/^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) {
       newErrors.phone = 'Please enter a valid 10-digit phone number';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -103,7 +105,7 @@ const CheckoutPage: React.FC = () => {
           {items.map((item) => (
             <div key={item.id} className="flex justify-between items-center text-sm">
               <div>
-                <span className="font-medium">{item.drinkName}</span>
+                <span className="font-medium">{item.menuName}</span>
                 <span className="text-base-content/60 ml-2">
                   ({item.size.name}) × {item.quantity}
                 </span>
@@ -149,7 +151,7 @@ const CheckoutPage: React.FC = () => {
 
             <div>
               <label className="label">
-                <span className="label-text font-medium">Phone Number (Optional)</span>
+                <span className="label-text font-medium">Phone Number {items.reduce((sum, item) => sum + item.quantity, 0) > 4 ? '*' : '(Optional)'}</span>
               </label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/50" size={18} />

@@ -49,8 +49,8 @@ const CartDrawer: React.FC = () => {
             items.map((item) => (
               <div key={item.id} className="flex items-center space-x-3 bg-base-200 rounded-lg p-3">
                 <img
-                  src={item.drinkImage}
-                  alt={item.drinkName}
+                  src={item.imageUrl}
+                  alt={item.menuName}
                   className="w-12 h-12 rounded-lg object-cover"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = '/images/placeholder-drink.svg';
@@ -58,7 +58,7 @@ const CartDrawer: React.FC = () => {
                 />
                 
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-sm truncate">{item.drinkName}</h3>
+                  <h3 className="font-medium text-sm truncate">{item.menuName}</h3>
                   <p className="text-xs text-base-content/60">
                     {item.size.name} • {item.milk} • {item.sweetness} • {item.temperature}
                   </p>

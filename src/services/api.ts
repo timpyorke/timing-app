@@ -78,7 +78,7 @@ class ApiService {
         customer_id: userIdToUse, // API expects customer_id field
         customer_info: customerInfo,
         items: items.map(item => ({
-          menu_id: parseInt(item.drinkId),
+          menu_id: parseInt(item.menuId),
           quantity: item.quantity,
           price: item.totalPrice / item.quantity,
           customizations: {
@@ -278,9 +278,9 @@ class ApiService {
     return apiItems.map((apiItem: any, index: number) => {
       const item: CartItem = {
         id: `item-${index}`,
-        drinkId: apiItem.menu_id?.toString() || apiItem.drinkId?.toString() || '1',
-        drinkName: apiItem.name || apiItem.drinkName || 'Unknown Drink',
-        drinkImage: apiItem.image_url || `/images/${(apiItem.name || 'default').toLowerCase().replace(/\s+/g, '-')}.svg`,
+        menuId: apiItem.menu_id?.toString() || apiItem.drinkId?.toString() || '1',
+        menuName: apiItem.name || apiItem.menuName || 'Unknown Drink',
+        imageUrl: apiItem.image_url || `/images/${(apiItem.name || 'default').toLowerCase().replace(/\s+/g, '-')}.svg`,
         size: {
           id: apiItem.customizations?.size?.toLowerCase().replace(/\s+/g, '-') || 'medium',
           name: apiItem.customizations?.size || 'Medium',
@@ -334,7 +334,7 @@ class ApiService {
     ];
 
     // Transform dynamic milk options from API
-    const apiMilkOptions = drinkData.customizations?.milk || ['Regular', 'Oat'];
+    const apiMilkOptions = drinkData.customizations?.milk || [];
 
     // Handle sweetness levels (API might provide this in future)
     const sweetnessLevels = drinkData.customizations?.sweetness || ['No Sugar', '25%', '50%', '75%', '100%'];

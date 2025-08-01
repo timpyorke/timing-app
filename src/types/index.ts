@@ -34,9 +34,9 @@ export interface DrinkSize {
 
 export interface CartItem {
   id: string;
-  drinkId: string;
-  drinkName: string;
-  drinkImage: string;
+  menuId: string;
+  menuName: string;
+  imageUrl: string;
   size: DrinkSize;
   milk: string;
   sweetness: string;
