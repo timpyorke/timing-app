@@ -217,6 +217,7 @@ const DrinkDetailsPage: React.FC = () => {
                   className={`btn btn-outline btn-sm ${
                     selectedTemperature === temp ? 'btn-active' : ''
                   }`}
+                  disabled={temp === 'Hot'}
                 >
                   {temp}
                 </button>
