@@ -279,7 +279,7 @@ class ApiService {
       const item: CartItem = {
         id: `item-${index}`,
         menuId: apiItem.menu_id?.toString() || apiItem.drinkId?.toString() || '1',
-        menuName: apiItem.name || apiItem.drinkName || 'Unknown Drink',
+        menuName: apiItem.name || apiItem.menuName || 'Unknown Drink',
         imageUrl: apiItem.image_url || `/images/${(apiItem.name || 'default').toLowerCase().replace(/\s+/g, '-')}.svg`,
         size: {
           id: apiItem.customizations?.size?.toLowerCase().replace(/\s+/g, '-') || 'medium',
@@ -334,7 +334,7 @@ class ApiService {
     ];
 
     // Transform dynamic milk options from API
-    const apiMilkOptions = drinkData.customizations?.milk || ['Regular', 'Oat'];
+    const apiMilkOptions = drinkData.customizations?.milk || [];
 
     // Handle sweetness levels (API might provide this in future)
     const sweetnessLevels = drinkData.customizations?.sweetness || ['No Sugar', '25%', '50%', '75%', '100%'];

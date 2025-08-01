@@ -125,8 +125,8 @@ const OrderStatusPage: React.FC = () => {
                   {order.items.map((item, itemIndex) => (
                     <div key={itemIndex} className="flex items-start space-x-3">
                       <img
-                        src={item.drinkImage}
-                        alt={item.drinkName}
+                        src={item.imageUrl}
+                        alt={item.menuName}
                         className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = '/images/placeholder-drink.svg';
@@ -134,7 +134,7 @@ const OrderStatusPage: React.FC = () => {
                       />
                       <div className="flex-1 flex justify-between items-start">
                         <div className="flex-1">
-                          <p className="font-medium text-base-content">{item.drinkName}</p>
+                          <p className="font-medium text-base-content">{item.menuName}</p>
                           <p className="text-xs text-base-content/60">
                             {item.size.name}
                             {item.temperature && ` • ${item.temperature}`}
