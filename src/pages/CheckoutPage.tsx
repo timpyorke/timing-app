@@ -31,8 +31,8 @@ const CheckoutPage: React.FC = () => {
       newErrors.name = 'Name is required';
     }
 
-    if (totalItems > 5 && !formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required for orders with more than 5 items';
+    if (totalItems > 4 && !formData.phone.trim()) {
+      newErrors.phone = 'Phone number is required for orders 5++ items';
     } else if (formData.phone.trim() && !/^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) {
       newErrors.phone = 'Please enter a valid 10-digit phone number';
     }
@@ -151,7 +151,7 @@ const CheckoutPage: React.FC = () => {
 
             <div>
               <label className="label">
-                <span className="label-text font-medium">Phone Number {items.reduce((sum, item) => sum + item.quantity, 0) > 5 ? '*' : '(Optional)'}</span>
+                <span className="label-text font-medium">Phone Number {items.reduce((sum, item) => sum + item.quantity, 0) > 4 ? '*' : '(Optional)'}</span>
               </label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/50" size={18} />
