@@ -105,7 +105,7 @@ const CheckoutPage: React.FC = () => {
           {items.map((item) => (
             <div key={item.id} className="flex justify-between items-center text-sm">
               <div>
-                <span className="font-medium">{item.drinkName}</span>
+                <span className="font-medium">{item.menuName}</span>
                 <span className="text-base-content/60 ml-2">
                   ({item.size.name}) × {item.quantity}
                 </span>

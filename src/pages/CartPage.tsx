@@ -64,8 +64,8 @@ const CartPage: React.FC = () => {
           <div key={item.id} className="bg-base-200 rounded-lg p-4">
             <div className="flex items-start space-x-4">
               <img
-                src={item.drinkImage}
-                alt={item.drinkName}
+                src={item.imageUrl}
+                alt={item.menuName}
                 className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/images/placeholder-drink.svg';
@@ -73,7 +73,7 @@ const CartPage: React.FC = () => {
               />
               
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-lg">{item.drinkName}</h3>
+                <h3 className="font-bold text-lg">{item.menuName}</h3>
                 
                 <div className="space-y-1 text-sm text-base-content/70">
                   <p>Size: {item.size.name}</p>
