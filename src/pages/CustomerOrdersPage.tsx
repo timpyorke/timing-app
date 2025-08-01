@@ -87,7 +87,7 @@ const CustomerOrdersPage: React.FC = () => {
     .filter(order => {
       const matchesSearch = order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            order.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           order.items.some(item => item.drinkName.toLowerCase().includes(searchTerm.toLowerCase()));
+                           order.items.some(item => item.menuName.toLowerCase().includes(searchTerm.toLowerCase()));
       const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
       return matchesSearch && matchesStatus;
     })
@@ -258,15 +258,15 @@ const CustomerOrdersPage: React.FC = () => {
                 {order.items.map((item, itemIndex) => (
                   <div key={itemIndex} className="flex items-center space-x-3">
                     <img 
-                      src={item.drinkImage}
-                      alt={item.drinkName}
+                      src={item.imageUrl}
+                      alt={item.menuName}
                       className="w-10 h-10 rounded-md object-cover"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = '/images/placeholder-drink.svg';
                       }}
                     />
                     <div>
-                      <span className="font-medium">{item.drinkName}</span>
+                      <span className="font-medium">{item.menuName}</span>
                       <span className="text-sm text-base-content/60 ml-2">×{item.quantity}</span>
                     </div>
                   </div>
