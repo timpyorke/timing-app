@@ -195,45 +195,55 @@ const OrderDetailPage: React.FC = () => {
         <h2 className="font-bold text-lg mb-3">Order Items</h2>
         <div className="space-y-3">
           {order.items.map((item, index) => (
-            <div key={index} className="border-b border-base-300 pb-3 last:border-b-0 last:pb-0">
-              <div className="flex justify-between items-start mb-2">
-                <div className="flex-1">
-                  <h3 className="font-medium">{item.drinkName}</h3>
-                  <p className="text-sm text-base-content/60">Size: {item.size.name}</p>
+            <div key={index} className="flex items-start space-x-4 border-b border-base-300 pb-3 last:border-b-0 last:pb-0">
+              <img 
+                src={item.drinkImage}
+                alt={item.drinkName}
+                className="w-16 h-16 rounded-lg object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/placeholder-drink.svg';
+                }}
+              />
+              <div className="flex-1">
+                <div className="flex justify-between items-start mb-2">
+                  <div className="flex-1">
+                    <h3 className="font-medium">{item.drinkName}</h3>
+                    <p className="text-sm text-base-content/60">Size: {item.size.name}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium">{formatPrice(item.totalPrice)}</p>
+                    <p className="text-sm text-base-content/60">×{item.quantity}</p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-medium">{formatPrice(item.totalPrice)}</p>
-                  <p className="text-sm text-base-content/60">×{item.quantity}</p>
+                <div className="text-sm text-base-content/70 space-y-1">
+                  {item.temperature && (
+                    <div className="flex justify-between">
+                      <span>Temperature:</span>
+                      <span>{item.temperature}</span>
+                    </div>
+                  )}
+                  {item.milk && (
+                    <div className="flex justify-between">
+                      <span>Milk:</span>
+                      <span>{item.milk}</span>
+                    </div>
+                  )}
+                  {item.sweetness && (
+                    <div className="flex justify-between">
+                      <span>Sweetness:</span>
+                      <span>{item.sweetness}</span>
+                    </div>
+                  )}
+                  {item.addOns && item.addOns.length > 0 && (
+                    <div className="flex justify-between">
+                      <span>Add-ons:</span>
+                      <span>{item.addOns.map(addon => addon.name).join(', ')}</span>
+                    </div>
+                  )}
                 </div>
-              </div>
-              <div className="text-sm text-base-content/70 space-y-1">
-                {item.temperature && (
-                  <div className="flex justify-between">
-                    <span>Temperature:</span>
-                    <span>{item.temperature}</span>
-                  </div>
-                )}
-                {item.milk && (
-                  <div className="flex justify-between">
-                    <span>Milk:</span>
-                    <span>{item.milk}</span>
-                  </div>
-                )}
-                {item.sweetness && (
-                  <div className="flex justify-between">
-                    <span>Sweetness:</span>
-                    <span>{item.sweetness}</span>
-                  </div>
-                )}
-                {item.addOns && item.addOns.length > 0 && (
-                  <div className="flex justify-between">
-                    <span>Add-ons:</span>
-                    <span>{item.addOns.map(addon => addon.name).join(', ')}</span>
-                  </div>
-                )}
               </div>
             </div>
-          ))}
+          ))}}
         </div>
         
         <div className="border-t border-base-300 pt-3 mt-3">

@@ -41,7 +41,7 @@ const OrderConfirmationPage: React.FC = () => {
             estimatedPickupTime: orderData.estimatedPickupTime,
             createdAt: new Date().toISOString(),
           };
-          setOrder(orderFromStatus);
+          setOrder(orderFromStatus)
         } else {
           console.log('Order status not found');
           setOrder(null);
@@ -148,8 +148,6 @@ const OrderConfirmationPage: React.FC = () => {
       <div className="bg-warning/10 border border-warning/20 rounded-lg p-4">
         <h3 className="font-bold text-warning mb-2">Important Information</h3>
         <ul className="text-sm space-y-1">
-          <li>• Please pay at the counter when you pick up your order</li>
-          <li>• You'll receive an SMS when your order is ready</li>
           <li>• Orders are held for 15 minutes after ready time</li>
           <li>• Show your order number to the staff</li>
         </ul>
