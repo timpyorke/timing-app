@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Order } from '../types';
+import { Order, OrderStatus } from '../types';
 import { apiService } from '../services/api';
 import { getAnonymousUserId } from '../utils';
 
@@ -81,12 +81,12 @@ export const useOrderHistory = () => {
     localStorage.removeItem('menuOrderHistory');
   };
 
-  const updateOrderStatus = (orderId: string, status: string, estimatedPickupTime?: string) => {
+  const updateOrderStatus = (orderId: string, status: OrderStatus, estimatedPickupTime?: string) => {
     setOrders(prev => prev.map(order => 
       order.id === orderId 
         ? { 
             ...order, 
-            status: status as any,
+            status,
             estimatedPickupTime: estimatedPickupTime || order.estimatedPickupTime
           }
         : order

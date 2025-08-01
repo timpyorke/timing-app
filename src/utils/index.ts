@@ -1,3 +1,5 @@
+import { OrderStatus } from '../types';
+
 export const formatPrice = (price: number): string => {
   return `฿${price.toFixed(2)}`;
 };
@@ -43,7 +45,7 @@ export const calculateEstimatedTime = (minutes: number): string => {
   return formatDateTime(estimated.toISOString());
 };
 
-export const getOrderStatusColor = (status: string): string => {
+export const getOrderStatusColor = (status: OrderStatus): string => {
   switch (status) {
     case 'pending':
       return 'badge-warning';
@@ -62,7 +64,7 @@ export const getOrderStatusColor = (status: string): string => {
   }
 };
 
-export const getOrderStatusText = (status: string): string => {
+export const getOrderStatusText = (status: OrderStatus): string => {
   switch (status) {
     case 'pending':
       return 'Order Received';
@@ -81,7 +83,7 @@ export const getOrderStatusText = (status: string): string => {
   }
 };
 
-export const debounce = <T extends (...args: any[]) => void>(
+export const debounce = <T extends (...args: unknown[]) => void>(
   func: T,
   delay: number
 ): ((...args: Parameters<T>) => void) => {

@@ -1,10 +1,28 @@
-import { Menu, MenuCategory, Order, OrderStatusResponse, CartItem, Customer } from '../types';
+import { 
+  Menu, 
+  MenuCategory, 
+  Order, 
+  OrderStatus,
+  OrderStatusResponse, 
+  CartItem, 
+  Customer,
+  FetchRequestOptions,
+  ApiMenuResponse,
+  ApiMenuItemResponse,
+  ApiMenuCategoryResponse,
+  ApiOrderRequest,
+  ApiOrderResponse,
+  ApiOrderStatusResponse,
+  ApiOrdersResponse,
+  ApiOrderHistoryItem,
+  ApiCustomerInfo
+} from '../types';
 import { getAnonymousUserId } from '../utils';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 class ApiService {
-  private async request<T>(endpoint: string, options?: any): Promise<T> {
+  private async request<T>(endpoint: string, options?: FetchRequestOptions): Promise<T> {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       headers: {
         'Content-Type': 'application/json',
@@ -22,7 +40,7 @@ class ApiService {
 
   async getMenu(): Promise<{ categories: MenuCategory[]; menu: Menu[] }> {
     try {
-      const response = await this.request<any>('/api/menu');
+      const response = await this.request<ApiMenuResponse>('/api/menu');
       // Transform API response to match our interface
       return this.transformMenuResponse(response);
     } catch (error) {
@@ -34,7 +52,7 @@ class ApiService {
 
   async getMenuDetails(id: string): Promise<Menu | null> {
     try {
-      const response = await this.request<any>(`/api/menu/${id}`);
+      const response = await this.request<{ data: ApiMenuItemResponse } | ApiMenuItemResponse>(`/api/menu/${id}`);
       // Transform API response to match our Menu interface
       return this.transformSingleMenuResponse(response);
     } catch (error) {
@@ -63,7 +81,7 @@ class ApiService {
         return `+66${phone.replace(/^0/, '')}`;
       };
 
-      const customerInfo: any = {
+      const customerInfo: ApiCustomerInfo = {
         name: customer.name,
         email: `${customer.name.toLowerCase().replace(/\s+/g, '.')}@customer.timing.com`,
       };
@@ -74,7 +92,7 @@ class ApiService {
         customerInfo.phone = formattedPhone;
       }
 
-      const orderData: any = {
+      const orderData: ApiOrderRequest = {
         customer_id: userIdToUse, // API expects customer_id field
         customer_info: customerInfo,
         items: items.map(item => ({
@@ -101,7 +119,7 @@ class ApiService {
         total: orderData.total
       });
 
-      const response = await this.request<any>('/api/orders', {
+      const response = await this.request<ApiOrderResponse>('/api/orders', {
         method: 'POST',
         body: JSON.stringify(orderData),
       });
@@ -117,7 +135,7 @@ class ApiService {
 
   async getOrderStatus(orderId: string): Promise<OrderStatusResponse | null> {
     try {
-      const response = await this.request<any>(`/api/orders/${orderId}/status`);
+      const response = await this.request<ApiOrderStatusResponse>(`/api/orders/${orderId}/status`);
       // Transform API response to match our interface
       return this.transformOrderStatusResponse(response);
     } catch (error) {
@@ -129,7 +147,7 @@ class ApiService {
 
   async getOrdersByCustomerId(customerId: string): Promise<Order[]> {
     try {
-      const response = await this.request<any>(`/api/orders/customer/${customerId}`);
+      const response = await this.request<ApiOrdersResponse>(`/api/orders/customer/${customerId}`);
       // Transform API response to match our Order interface
       return this.transformOrdersResponse(response);
     } catch (error) {
@@ -140,7 +158,7 @@ class ApiService {
   }
 
   // Transform methods to convert API responses to our interface format
-  private transformMenuResponse(response: any): { categories: MenuCategory[]; menu: Menu[] } {
+  private transformMenuResponse(response: ApiMenuResponse): { categories: MenuCategory[]; menu: Menu[] } {
     // Handle the actual API response format: {success: true, data: [...]}
     const menuData = response?.data || response;
     
@@ -148,9 +166,9 @@ class ApiService {
       const menuItems: Menu[] = [];
       
       // Flatten the category-based structure
-      menuData.forEach((category: any) => {
+      menuData.forEach((category: ApiMenuCategoryResponse) => {
         if (category.items && Array.isArray(category.items)) {
-          category.items.forEach((item: any) => {
+          category.items.forEach((item: ApiMenuItemResponse) => {
             // Transform dynamic sizes from API for each item
             const apiSizes = item.customizations?.sizes || ['Medium', 'Large'];
             const sizes: import('../types').MenuSize[] = apiSizes.map((sizeName: string, index: number) => ({
@@ -193,7 +211,7 @@ class ApiService {
       });
 
       // Create dynamic categories from the API data
-      const apiCategories = [...new Set(menuData.map((cat: any) => cat.category))];
+      const apiCategories = [...new Set(menuData.map((cat: ApiMenuCategoryResponse) => cat.category))];
       const dynamicCategories: MenuCategory[] = apiCategories.map((catName: string) => ({
         id: catName.toLowerCase(),
         name: catName,
@@ -207,7 +225,7 @@ class ApiService {
     return { categories: [], menu: [] };
   }
 
-  private transformOrderResponse(response: any, items: CartItem[], customer: Customer, userId?: string): Order {
+  private transformOrderResponse(response: ApiOrderResponse, items: CartItem[], customer: Customer, userId?: string): Order {
     const subtotal = items.reduce((sum, item) => sum + item.totalPrice, 0);
     
     return {
@@ -217,7 +235,7 @@ class ApiService {
       customer,
       subtotal,
       total: subtotal,
-      status: response.data?.status || response.status || 'pending',
+      status: (response.data?.status || response.status || 'pending') as OrderStatus,
       estimatedPickupTime: response.data?.estimated_pickup_time || 
                           response.estimated_pickup_time || 
                           new Date(Date.now() + 15 * 60 * 1000).toISOString(),
@@ -227,10 +245,11 @@ class ApiService {
     };
   }
 
-  private transformOrderStatusResponse(response: any): OrderStatusResponse {
+  private transformOrderStatusResponse(response: ApiOrderStatusResponse): OrderStatusResponse {
+    const statusValue = response.data?.status || response.status || 'pending';
     return {
-      id: response.data?.id?.toString() || response.id?.toString(),
-      status: response.data?.status || response.status || 'pending',
+      id: response.data?.id?.toString() || response.id?.toString() || '',
+      status: statusValue as OrderStatus,
       estimatedPickupTime: response.data?.estimated_pickup_time || 
                           response.estimated_pickup_time || 
                           new Date(Date.now() + 10 * 60 * 1000).toISOString(),
@@ -240,7 +259,7 @@ class ApiService {
     };
   }
 
-  private transformOrdersResponse(response: any): Order[] {
+  private transformOrdersResponse(response: ApiOrdersResponse): Order[] {
     // Handle API response format: {success: true, data: [...]}
     const ordersData = response?.data || response;
     
@@ -248,8 +267,9 @@ class ApiService {
       return [];
     }
 
-    return ordersData.map((apiOrder: any) => {
+    return ordersData.map((apiOrder: ApiOrderHistoryItem) => {
       // Transform API order to our Order interface
+      const statusValue = apiOrder.status || 'pending';
       const transformedOrder: Order = {
         id: apiOrder.id?.toString() || `ORDER-${Date.now()}`,
         userId: apiOrder.user_id,
@@ -259,9 +279,9 @@ class ApiService {
           phone: apiOrder.customer_info?.phone || '',
           tableNumber: apiOrder.customer_info?.table_number || apiOrder.customer_info?.tableNumber || ''
         },
-        subtotal: parseFloat(apiOrder.total || '0'),
-        total: parseFloat(apiOrder.total || '0'),
-        status: apiOrder.status || 'pending',
+        subtotal: parseFloat(apiOrder.total?.toString() || '0'),
+        total: parseFloat(apiOrder.total?.toString() || '0'),
+        status: statusValue as OrderStatus,
         estimatedPickupTime: apiOrder.estimated_pickup_time || 
                             apiOrder.estimatedPickupTime ||
                             new Date(Date.now() + 15 * 60 * 1000).toISOString(),
@@ -272,15 +292,15 @@ class ApiService {
     });
   }
 
-  private transformOrderItems(apiItems: any[]): CartItem[] {
+  private transformOrderItems(apiItems: ApiOrderHistoryItem['items']): CartItem[] {
     if (!Array.isArray(apiItems)) {
       return [];
     }
 
-    return apiItems.map((apiItem: any, index: number) => {
+    return apiItems.map((apiItem, index: number) => {
       const item: CartItem = {
         id: `item-${index}`,
-        menuId: apiItem.menu_id?.toString() ||  '1',
+        menuId: apiItem.menu_id?.toString() || '1',
         menuName: apiItem.name || apiItem.menuName || apiItem.menu_name || `Menu #${apiItem.menu_id || 'Unknown'}`,
         imageUrl: apiItem.image_url || apiItem.imageUrl || `/images/${(apiItem.name || apiItem.menuName || apiItem.menu_name || 'placeholder-menu').toLowerCase().replace(/\s+/g, '-')}.svg`,
         size: {
@@ -304,9 +324,9 @@ class ApiService {
     });
   }
 
-  private transformSingleMenuResponse(response: any): Menu | null {
+  private transformSingleMenuResponse(response: { data: ApiMenuItemResponse } | ApiMenuItemResponse): Menu | null {
     // Handle API response format: {success: true, data: {...}}
-    const menuData = response?.data || response;
+    const menuData = 'data' in response ? response.data : response;
     
     if (!menuData || !menuData.id) {
       return null;
