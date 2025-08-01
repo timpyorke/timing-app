@@ -150,11 +150,11 @@ class ApiService {
         if (category.items && Array.isArray(category.items)) {
           category.items.forEach((item: any) => {
             // Transform dynamic sizes from API for each item
-            const apiSizes = item.customizations?.sizes || ['Small', 'Medium', 'Large'];
+            const apiSizes = item.customizations?.sizes || ['Medium', 'Large'];
             const sizes: import('../types').DrinkSize[] = apiSizes.map((sizeName: string, index: number) => ({
               id: sizeName.toLowerCase(),
               name: sizeName,
-              priceModifier: index * 1.5 // Small: 0, Medium: 1.5, Large: 3.0
+              priceModifier: index * 10 // Small: 0, Medium: 1.5, Large: 3.0
             }));
 
             // Transform dynamic add-ons/extras from API for each item
@@ -167,9 +167,9 @@ class ApiService {
 
             // Fallback add-ons if none provided by API
             const fallbackAddOns = [
-              { id: 'extra-shot', name: 'Extra Shot', price: 1.0 },
-              { id: 'whipped-cream', name: 'Whipped Cream', price: 0.5 },
-              { id: 'extra-syrup', name: 'Extra Syrup', price: 0.5 },
+            { id: 'extra-shot', name: 'Extra Shot', price: 15.0 },
+            { id: 'whipped-cream', name: 'Whipped Cream', price: 15.0 },
+            { id: 'extra-syrup', name: 'Extra Syrup', price: 0.0 },
             ];
 
             drinks.push({
@@ -180,9 +180,9 @@ class ApiService {
               category: category.category?.toLowerCase() || 'specialty',
               basePrice: parseFloat(item.base_price?.toString() || '4.50'),
               sizes,
-              milkOptions: item.customizations?.milk || ['Regular', 'Oat', 'Almond', 'Soy'],
+              milkOptions: item.customizations?.milk || ['Regular', 'Oat',],
               sweetnessLevels: item.customizations?.sweetness || ['No Sugar', '25%', '50%', '75%', '100%'],
-              temperatureOptions: item.customizations?.ice !== false ? ['Iced', 'Hot'] : ['Hot'],
+              temperatureOptions: item.customizations?.ice !== false ? ['Iced', 'Hot'] : ['Iced'],
               addOns: addOns.length > 0 ? addOns : fallbackAddOns,
               isPopular: item.popular || false,
             });
@@ -311,11 +311,11 @@ class ApiService {
     }
 
     // Transform dynamic sizes from API
-    const apiSizes = drinkData.customizations?.sizes || ['Small', 'Medium', 'Large'];
+    const apiSizes = drinkData.customizations?.sizes || ['Medium', 'Large'];
     const sizes: import('../types').DrinkSize[] = apiSizes.map((sizeName: string, index: number) => ({
       id: sizeName.toLowerCase(),
       name: sizeName,
-      priceModifier: index * 1.5 // Small: 0, Medium: 1.5, Large: 3.0
+      priceModifier: index * 10 // Small: 0, Medium: 1.5, Large: 3.0
     }));
 
     // Transform dynamic add-ons/extras from API
@@ -328,13 +328,13 @@ class ApiService {
 
     // Fallback add-ons if none provided by API
     const fallbackAddOns = [
-      { id: 'extra-shot', name: 'Extra Shot', price: 1.0 },
-      { id: 'whipped-cream', name: 'Whipped Cream', price: 0.5 },
-      { id: 'extra-syrup', name: 'Extra Syrup', price: 0.5 },
+      { id: 'extra-shot', name: 'Extra Shot', price: 15.0 },
+      { id: 'whipped-cream', name: 'Whipped Cream', price: 15.0 },
+      { id: 'extra-syrup', name: 'Extra Syrup', price: 0.0 },
     ];
 
     // Transform dynamic milk options from API
-    const apiMilkOptions = drinkData.customizations?.milk || ['Regular', 'Oat', 'Almond', 'Soy'];
+    const apiMilkOptions = drinkData.customizations?.milk || ['Regular', 'Oat'];
 
     // Handle sweetness levels (API might provide this in future)
     const sweetnessLevels = drinkData.customizations?.sweetness || ['No Sugar', '25%', '50%', '75%', '100%'];
@@ -342,7 +342,7 @@ class ApiService {
     // Handle temperature options (check if drink supports iced)
     const supportsIced = drinkData.customizations?.ice !== false && 
                          drinkData.category?.toLowerCase() !== 'hot-only';
-    const temperatureOptions = supportsIced ? ['Iced', 'Hot'] : ['Hot'];
+    const temperatureOptions = supportsIced ? ['Iced', 'Hot'] : ['Iced'];
 
     const drink: Drink = {
       id: drinkData.id?.toString(),
