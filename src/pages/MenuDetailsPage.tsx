@@ -74,9 +74,9 @@ const MenuDetailsPage: React.FC = () => {
 
     const cartItem: CartItem = {
       id: generateId(),
-      drinkId: drink.id,
-      drinkName: drink.name,
-      drinkImage: drink.image,
+      menuId: drink.id,
+      menuName: drink.name,
+      imageUrl: drink.image,
       size: selectedSize,
       milk: selectedMilk,
       sweetness: selectedSweetness,
