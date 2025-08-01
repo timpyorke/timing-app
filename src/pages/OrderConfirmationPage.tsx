@@ -23,9 +23,9 @@ const OrderConfirmationPage: React.FC = () => {
             id: orderData.id,
             items: orderData.items.map((item, index) => ({
               id: `item-${index}`,
-              drinkId: '1',
-              drinkName: item.name,
-              drinkImage: '/images/default-drink.svg',
+              menuId: '1',
+              menuName: item.name,
+              imageUrl: '/images/default-drink.svg',
               size: { id: 'medium', name: 'Medium', priceModifier: 0 },
               milk: 'Regular Milk',
               sweetness: '50%',
@@ -34,7 +34,7 @@ const OrderConfirmationPage: React.FC = () => {
               quantity: item.quantity,
               totalPrice: 0
             })),
-            customer: { name: 'Customer', phone: '555-0123' },
+            customer: { name: 'Customer', phone: '-' },
             subtotal: 0,
             total: 0,
             status: orderData.status,

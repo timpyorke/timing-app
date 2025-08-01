@@ -35,7 +35,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
     case 'ADD_ITEM': {
       const existingItemIndex = state.items.findIndex(
         item => 
-          item.drinkId === action.payload.drinkId &&
+          item.menuId === action.payload.menuId &&
           item.size.id === action.payload.size.id &&
           item.milk === action.payload.milk &&
           item.sweetness === action.payload.sweetness &&

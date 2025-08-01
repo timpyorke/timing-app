@@ -254,19 +254,23 @@ const CustomerOrdersPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="mb-3">
-                <div className="flex flex-wrap gap-2">
-                  {order.items.slice(0, 3).map((item, itemIndex) => (
-                    <span key={itemIndex} className="badge badge-outline badge-sm">
-                      {item.quantity}× {item.drinkName}
-                    </span>
-                  ))}
-                  {order.items.length > 3 && (
-                    <span className="badge badge-outline badge-sm">
-                      +{order.items.length - 3} more
-                    </span>
-                  )}
-                </div>
+              <div className="space-y-3">
+                {order.items.map((item, itemIndex) => (
+                  <div key={itemIndex} className="flex items-center space-x-3">
+                    <img 
+                      src={item.drinkImage}
+                      alt={item.drinkName}
+                      className="w-10 h-10 rounded-md object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/images/placeholder-drink.svg';
+                      }}
+                    />
+                    <div>
+                      <span className="font-medium">{item.drinkName}</span>
+                      <span className="text-sm text-base-content/60 ml-2">×{item.quantity}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
 
               {order.status !== 'completed' && order.status !== 'cancelled' && order.estimatedPickupTime && (

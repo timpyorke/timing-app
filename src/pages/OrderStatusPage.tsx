@@ -125,7 +125,7 @@ const OrderStatusPage: React.FC = () => {
                   {order.items.map((item, itemIndex) => (
                     <div key={itemIndex} className="text-sm text-base-content/70 flex justify-between">
                       <div>
-                        <span className="font-medium">{item.drinkName}</span>
+                        <span className="font-medium">{item.menuName}</span>
                         <span className="text-xs text-base-content/50 ml-1">
                           ({item.size.name})
                           {item.temperature && ` • ${item.temperature}`}

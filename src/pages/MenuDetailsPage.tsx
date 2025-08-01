@@ -6,7 +6,7 @@ import { apiService } from '../services/api';
 import { useCart } from '../context/CartContext';
 import { formatPrice, generateId } from '../utils';
 
-const DrinkDetailsPage: React.FC = () => {
+const MenuDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addItem, toggleCart } = useCart();
@@ -74,9 +74,9 @@ const DrinkDetailsPage: React.FC = () => {
 
     const cartItem: CartItem = {
       id: generateId(),
-      drinkId: drink.id,
-      drinkName: drink.name,
-      drinkImage: drink.image,
+      menuId: drink.id,
+      menuName: drink.name,
+      imageUrl: drink.image,
       size: selectedSize,
       milk: selectedMilk,
       sweetness: selectedSweetness,
@@ -321,4 +321,4 @@ const DrinkDetailsPage: React.FC = () => {
   );
 };
 
-export default DrinkDetailsPage;
+export default MenuDetailsPage;
