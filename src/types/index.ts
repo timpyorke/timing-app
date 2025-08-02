@@ -10,6 +10,12 @@ export interface MenuAddOn {
   price: number;
 }
 
+export interface MilkOption {
+  id: string;
+  name: string;
+  price: number;
+}
+
 export interface Menu {
   id: string;
   name: string;
@@ -18,12 +24,11 @@ export interface Menu {
   category: string;
   basePrice: number;
   sizes: MenuSize[];
-  milkOptions: string[];
+  milkOptions: MilkOption[];
   sweetnessLevels: string[];
   temperatureOptions: string[];
   addOns: MenuAddOn[];
   isPopular?: boolean;
-  isFavorite?: boolean;
 }
 
 export interface MenuSize {
@@ -38,7 +43,7 @@ export interface CartItem {
   menuName: string;
   imageUrl: string;
   size: MenuSize;
-  milk: string;
+  milk: MilkOption;
   sweetness: string;
   temperature: string;
   addOns: MenuAddOn[];

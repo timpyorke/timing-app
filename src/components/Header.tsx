@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, ShoppingCart, Languages } from 'lucide-react';
 import { useTranslation } from '../i18n/stub';
-import { useCart } from '../context/CartContext';
+import { useCart } from '../hooks/useCart';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();

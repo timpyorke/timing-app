@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Minus, Trash2, ShoppingBag } from 'lucide-react';
-import { useCart } from '../context/CartContext';
+import { useCart } from '../hooks/useCart';
 import { formatPrice } from '../utils';
 
 const CartPage: React.FC = () => {
@@ -77,7 +77,7 @@ const CartPage: React.FC = () => {
                 
                 <div className="space-y-1 text-sm text-base-content/70">
                   <p>Size: {item.size.name}</p>
-                  <p>Milk: {item.milk}</p>
+                  <p>Milk: {item.milk.name}</p>
                   <p>Sweetness: {item.sweetness}</p>
                   <p>Temperature: {item.temperature}</p>
                   {item.addOns.length > 0 && (
