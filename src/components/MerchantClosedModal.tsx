@@ -1,20 +1,16 @@
 import React from 'react';
-import { RefreshCw, Clock, AlertCircle } from 'lucide-react';
+import { Clock, AlertCircle } from 'lucide-react';
 
 interface MerchantClosedModalProps {
   isOpen: boolean;
   title: string;
   message: string;
-  onRefresh: () => void;
-  isRefreshing: boolean;
 }
 
 const MerchantClosedModal: React.FC<MerchantClosedModalProps> = ({
   isOpen,
   title,
-  message,
-  onRefresh,
-  isRefreshing
+  message
 }) => {
   if (!isOpen) return null;
 
@@ -48,7 +44,7 @@ const MerchantClosedModal: React.FC<MerchantClosedModalProps> = ({
         </div>
 
         {/* Additional Info */}
-        <div className="bg-base-200 rounded-lg p-4 mb-6">
+        <div className="bg-base-200 rounded-lg p-4">
           <h3 className="font-semibold text-sm mb-2 text-base-content">
             What you can do:
           </h3>
@@ -57,25 +53,6 @@ const MerchantClosedModal: React.FC<MerchantClosedModalProps> = ({
             <li>• Follow our social media for updates</li>
             <li>• Contact us for more information</li>
           </ul>
-        </div>
-
-        {/* Refresh Button */}
-        <button
-          onClick={onRefresh}
-          disabled={isRefreshing}
-          className={`btn btn-primary w-full text-sm font-medium ${
-            isRefreshing ? 'loading' : ''
-          }`}
-        >
-          {!isRefreshing && <RefreshCw size={16} className="mr-2" />}
-          {isRefreshing ? 'Checking Status...' : 'Check Status Again'}
-        </button>
-
-        {/* Footer */}
-        <div className="mt-4 text-center">
-          <p className="text-xs text-base-content/50">
-            Status updates automatically every 30 minutes
-          </p>
         </div>
       </div>
     </div>

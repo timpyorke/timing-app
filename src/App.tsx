@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { CartProvider } from './context/CartContext';
 import Layout from './components/Layout';
 import MenuPage from './pages/MenuPage';
@@ -15,23 +15,13 @@ import { useMerchantStatus } from './hooks/useMerchantStatus';
 import { getAnonymousUserId } from './utils';
 
 function App() {
-  const { merchantStatus, isLoading, forceRefresh } = useMerchantStatus();
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { merchantStatus, isLoading } = useMerchantStatus();
 
   // Initialize anonymous user ID on app startup
   useEffect(() => {
     const userId = getAnonymousUserId();
     console.log('App initialized with user ID:', userId);
   }, []);
-
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    try {
-      await forceRefresh();
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
 
   return (
     <CartProvider>
@@ -54,8 +44,6 @@ function App() {
           isOpen={!isLoading && merchantStatus.isClose}
           title={merchantStatus.closeTitle}
           message={merchantStatus.closeMessage}
-          onRefresh={handleRefresh}
-          isRefreshing={isRefreshing}
         />
       </Router>
     </CartProvider>
