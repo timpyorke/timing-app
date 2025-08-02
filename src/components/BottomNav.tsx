@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, ShoppingCart, Clock } from 'lucide-react';
+import { Home, ShoppingCart, Clock, Phone } from 'lucide-react';
 import { useTranslation } from '../i18n/stub';
 
 const BottomNav: React.FC = () => {
@@ -12,6 +12,7 @@ const BottomNav: React.FC = () => {
     { path: '/', icon: Home, label: t('navigation.menu') },
     { path: '/cart', icon: ShoppingCart, label: t('navigation.cart') },
     { path: '/order-status', icon: Clock, label: t('navigation.orders') },
+    { path: '/contact', icon: Phone, label: t('navigation.contact') },
   ];
 
   return (

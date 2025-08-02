@@ -18,6 +18,7 @@
     "menu": "เมนู",
     "cart": "ตะกร้า",
     "orders": "คำสั่งซื้อ",
+    "contact": "ติดต่อ",
     "goBack": "กลับ"
   },
   "header": {
@@ -26,7 +27,8 @@
     "checkout": "ชำระเงิน",
     "orderStatus": "สถานะคำสั่งซื้อ",
     "menuDetails": "รายละเอียดเครื่องดื่ม",
-    "orderConfirmed": "ยืนยันคำสั่งซื้อแล้ว"
+    "orderConfirmed": "ยืนยันคำสั่งซื้อแล้ว",
+    "contact": "ติดต่อเรา"
   },
   "menu": {
     "searchPlaceholder": "ค้นหาเครื่องดื่ม...",
@@ -95,6 +97,17 @@
     "estimatedTime": "ประมาณ {{minutes}} นาที",
     "items": "{{count}} รายการ",
     "items_plural": "{{count}} รายการ"
+  },
+  "contact": {
+    "title": "ติดต่อเรา",
+    "subtitle": "เราพร้อมให้บริการคุณ",
+    "phone": "โทรศัพท์",
+    "phoneDescription": "โทรหาเราได้ที่",
+    "hours": "เวลาทำการ",
+    "weekdays": "จันทร์ - ศุกร์",
+    "weekends": "เสาร์ - อาทิตย์",
+    "location": "ที่ตั้ง",
+    "address": "Sunkid Studio"
   },
   "pwa": {
     "installTitle": "ติดตั้งแอป TIMING",
