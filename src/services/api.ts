@@ -103,7 +103,7 @@ class ApiService {
           price: item.totalPrice / item.quantity,
           customizations: {
             size: item.size.name,
-            milk: item.milk,
+            milk: item.milk.name,
             sweetness: item.sweetness,
             temperature: item.temperature,
             extras: item.addOns.map(addon => addon.name),
@@ -169,16 +169,54 @@ class ApiService {
       menuData.forEach((category: ApiMenuCategoryResponse) => {
         if (category.items && Array.isArray(category.items)) {
           category.items.forEach((item: ApiMenuItemResponse) => {
+            // Normalize customizations keys to lowercase
+            interface NormalizedCustomizations {
+              sizes?: string[];
+              size?: string[];
+              milk?: string[];
+              sweetness?: string[];
+              sweet?: string[];
+              extras?: string[];
+              syrups?: string[];
+              [key: string]: string[] | boolean | undefined;
+            }
+            
+            const normalizedCustomizations: NormalizedCustomizations = {};
+            if (item.customizations) {
+              Object.keys(item.customizations).forEach(key => {
+                normalizedCustomizations[key.toLowerCase()] = item.customizations![key as keyof typeof item.customizations];
+              });
+            }
+
             // Transform dynamic sizes from API for each item
-            const apiSizes = item.customizations?.sizes || ['Medium', 'Large'];
-            const sizes: import('../types').MenuSize[] = apiSizes.map((sizeName: string, index: number) => ({
-              id: sizeName.toLowerCase(),
-              name: sizeName,
-              priceModifier: index * 10 // Small: 0, Medium: 1.5, Large: 3.0
-            }));
+            const apiSizes = Array.isArray(normalizedCustomizations.sizes) ? normalizedCustomizations.sizes : 
+                            Array.isArray(normalizedCustomizations.size) ? normalizedCustomizations.size : [];
+            const sizes: import('../types').MenuSize[] = apiSizes.map((sizeName: string, index: number) => {
+              // Dynamic pricing based on size name
+              let priceModifier = 0;
+              const lowerSizeName = sizeName.toLowerCase();
+              
+              if (lowerSizeName.includes('large') || lowerSizeName.includes('l')) {
+                priceModifier = 15;
+              } else if (lowerSizeName.includes('medium') || lowerSizeName.includes('m')) {
+                priceModifier = 0;
+              } else if (lowerSizeName.includes('small') || lowerSizeName.includes('s')) {
+                priceModifier = 0;
+              } else {
+                // Fallback to index-based pricing for unknown sizes
+                priceModifier = index * 15;
+              }
+              
+              return {
+                id: sizeName.toLowerCase(),
+                name: sizeName,
+                priceModifier
+              };
+            });
 
             // Transform dynamic add-ons/extras from API for each item
-            const apiExtras = item.customizations?.extras || item.customizations?.syrups || [];
+            const apiExtras = Array.isArray(normalizedCustomizations.extras) ? normalizedCustomizations.extras :
+                             Array.isArray(normalizedCustomizations.syrups) ? normalizedCustomizations.syrups : [];
             const addOns = apiExtras.map((extra: string) => ({
               id: extra.toLowerCase().replace(/\s+/g, '-'),
               name: extra,
@@ -192,6 +230,14 @@ class ApiService {
             { id: 'extra-syrup', name: 'Extra Syrup', price: 0.0 },
             ];
 
+            // Transform milk options with pricing
+            const apiMilkOptions = Array.isArray(normalizedCustomizations.milk) ? normalizedCustomizations.milk : [];
+            const milkOptions = apiMilkOptions.map((milk: string) => ({
+              id: milk.toLowerCase().replace(/\s+/g, '-'),
+              name: milk.trim(),
+              price: milk.toLowerCase().includes('normal') ? 0 : 20
+            }));
+
             menuItems.push({
               id: item.id?.toString(),
               name: item.name,
@@ -200,9 +246,10 @@ class ApiService {
               category: category.category?.toLowerCase() || 'specialty',
               basePrice: parseFloat(item.base_price?.toString() || '4.50'),
               sizes,
-              milkOptions: item.customizations?.milk || ['Regular', 'Oat',],
-              sweetnessLevels: item.customizations?.sweetness || ['No Sugar', '25%', '50%', '75%', '100%'],
-              temperatureOptions: item.customizations?.ice !== false ? ['Iced', 'Hot'] : ['Iced'],
+              milkOptions,
+              sweetnessLevels: Array.isArray(normalizedCustomizations.sweetness) ? normalizedCustomizations.sweetness :
+                              Array.isArray(normalizedCustomizations.sweet) ? normalizedCustomizations.sweet : [],
+              temperatureOptions: ['Iced'],
               addOns: addOns.length > 0 ? addOns : fallbackAddOns,
               isPopular: item.popular || false,
             });
@@ -308,7 +355,11 @@ class ApiService {
           name: apiItem.customizations?.size || 'Medium',
           priceModifier: 0
         },
-        milk: apiItem.customizations?.milk || 'Regular Milk',
+        milk: {
+          id: 'regular-milk',
+          name: apiItem.customizations?.milk || 'Regular Milk',
+          price: 0
+        },
         sweetness: apiItem.customizations?.sweetness || '50%',
         temperature: apiItem.customizations?.temperature || 'Hot',
         addOns: (apiItem.customizations?.extras || []).map((extra: string) => ({
@@ -332,16 +383,54 @@ class ApiService {
       return null;
     }
 
+    // Normalize customizations keys to lowercase
+    interface NormalizedCustomizations {
+      sizes?: string[];
+      size?: string[];
+      milk?: string[];
+      sweetness?: string[];
+      sweet?: string[];
+      extras?: string[];
+      syrups?: string[];
+      [key: string]: string[] | boolean | undefined;
+    }
+    
+    const normalizedCustomizations: NormalizedCustomizations = {};
+    if (menuData.customizations) {
+      Object.keys(menuData.customizations).forEach(key => {
+        normalizedCustomizations[key.toLowerCase()] = menuData.customizations![key as keyof typeof menuData.customizations];
+      });
+    }
+
     // Transform dynamic sizes from API
-    const apiSizes = menuData.customizations?.sizes || ['Medium', 'Large'];
-    const sizes: import('../types').MenuSize[] = apiSizes.map((sizeName: string, index: number) => ({
-      id: sizeName.toLowerCase(),
-      name: sizeName,
-      priceModifier: index * 10 // Small: 0, Medium: 1.5, Large: 3.0
-    }));
+    const apiSizes = Array.isArray(normalizedCustomizations.sizes) ? normalizedCustomizations.sizes : 
+                    Array.isArray(normalizedCustomizations.size) ? normalizedCustomizations.size : [];
+    const sizes: import('../types').MenuSize[] = apiSizes.map((sizeName: string, index: number) => {
+      // Dynamic pricing based on size name
+      let priceModifier = 0;
+      const lowerSizeName = sizeName.toLowerCase();
+      
+      if (lowerSizeName.includes('large') || lowerSizeName.includes('l')) {
+        priceModifier = 15;
+      } else if (lowerSizeName.includes('medium') || lowerSizeName.includes('m')) {
+        priceModifier = 0;
+      } else if (lowerSizeName.includes('small') || lowerSizeName.includes('s')) {
+        priceModifier = 0;
+      } else {
+        // Fallback to index-based pricing for unknown sizes
+        priceModifier = index * 15;
+      }
+      
+      return {
+        id: sizeName.toLowerCase(),
+        name: sizeName,
+        priceModifier
+      };
+    });
 
     // Transform dynamic add-ons/extras from API
-    const apiExtras = menuData.customizations?.extras || menuData.customizations?.syrups || [];
+    const apiExtras = Array.isArray(normalizedCustomizations.extras) ? normalizedCustomizations.extras :
+                     Array.isArray(normalizedCustomizations.syrups) ? normalizedCustomizations.syrups : [];
     const addOns = apiExtras.map((extra: string) => ({
       id: extra.toLowerCase().replace(/\s+/g, '-'),
       name: extra,
@@ -355,16 +444,20 @@ class ApiService {
       { id: 'extra-syrup', name: 'Extra Syrup', price: 0.0 },
     ];
 
-    // Transform dynamic milk options from API
-    const apiMilkOptions = menuData.customizations?.milk || [];
+    // Transform dynamic milk options from API with pricing
+    const apiMilkOptions = Array.isArray(normalizedCustomizations.milk) ? normalizedCustomizations.milk : [];
+    const milkOptions = apiMilkOptions.map((milk: string) => ({
+      id: milk.toLowerCase().replace(/\s+/g, '-'),
+      name: milk.trim(),
+      price: milk.toLowerCase().includes('normal') ? 0 : 20
+    }));
 
-    // Handle sweetness levels (API might provide this in future)
-    const sweetnessLevels = menuData.customizations?.sweetness || ['No Sugar', '25%', '50%', '75%', '100%'];
+    // Handle sweetness levels from API
+    const sweetnessLevels = Array.isArray(normalizedCustomizations.sweetness) ? normalizedCustomizations.sweetness :
+                           Array.isArray(normalizedCustomizations.sweet) ? normalizedCustomizations.sweet : [];
 
-    // Handle temperature options (check if menu supports iced)
-    const supportsIced = menuData.customizations?.ice !== false && 
-                         menuData.category?.toLowerCase() !== 'hot-only';
-    const temperatureOptions = supportsIced ? ['Iced', 'Hot'] : ['Iced'];
+    // Handle temperature options (only Iced is available)
+    const temperatureOptions = ['Iced'];
 
     const menu: Menu = {
       id: menuData.id?.toString(),
@@ -374,7 +467,7 @@ class ApiService {
       category: menuData.category?.toLowerCase() || 'specialty',
       basePrice: parseFloat(menuData.base_price?.toString() || '4.50'),
       sizes,
-      milkOptions: apiMilkOptions,
+      milkOptions,
       sweetnessLevels,
       temperatureOptions,
       addOns: addOns.length > 0 ? addOns : fallbackAddOns,

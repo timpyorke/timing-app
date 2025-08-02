@@ -225,7 +225,7 @@ const OrderDetailPage: React.FC = () => {
                   {item.milk && (
                     <div className="flex justify-between">
                       <span>Milk:</span>
-                      <span>{item.milk}</span>
+                      <span>{item.milk.name}</span>
                     </div>
                   )}
                   {item.sweetness && (

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useReducer, useEffect } from 'react';
 import { CartItem, Customer } from '../types';
 
 interface CartState {
@@ -16,7 +16,7 @@ type CartAction =
   | { type: 'TOGGLE_CART' }
   | { type: 'LOAD_CART'; payload: CartState };
 
-interface CartContextType extends CartState {
+export interface CartContextType extends CartState {
   dispatch: React.Dispatch<CartAction>;
   addItem: (item: CartItem) => void;
   removeItem: (id: string) => void;
@@ -28,7 +28,7 @@ interface CartContextType extends CartState {
   getTotalPrice: () => number;
 }
 
-const CartContext = createContext<CartContextType | undefined>(undefined);
+export const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
@@ -37,7 +37,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
         item => 
           item.menuId === action.payload.menuId &&
           item.size.id === action.payload.size.id &&
-          item.milk === action.payload.milk &&
+          item.milk.id === action.payload.milk.id &&
           item.sweetness === action.payload.sweetness &&
           item.temperature === action.payload.temperature &&
           JSON.stringify(item.addOns) === JSON.stringify(action.payload.addOns)
@@ -163,10 +163,3 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-export const useCart = () => {
-  const context = useContext(CartContext);
-  if (context === undefined) {
-    throw new Error('useCart must be used within a CartProvider');
-  }
-  return context;
-};

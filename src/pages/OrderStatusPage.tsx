@@ -142,7 +142,7 @@ const OrderStatusPage: React.FC = () => {
                           <p className="text-xs text-base-content/60">
                             {item.size.name}
                             {item.temperature && ` • ${item.temperature}`}
-                            {item.milk && ` • ${item.milk}`}
+                            {item.milk && ` • ${item.milk.name}`}
                             {item.sweetness && ` • ${item.sweetness}`}
                           </p>
                           {item.addOns && item.addOns.length > 0 &&

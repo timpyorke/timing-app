@@ -40,7 +40,7 @@ const OrderConfirmationPage: React.FC = () => {
               menuName: item.name || `Menu Item ${index + 1}`,
               imageUrl: `/images/${(item.name || 'placeholder-menu').toLowerCase().replace(/\s+/g, '-')}.svg`,
               size: { id: 'medium', name: 'Medium', priceModifier: 0 },
-              milk: 'Regular Milk',
+              milk: { id: 'regular', name: 'Regular Milk', price: 0 },
               sweetness: '50%',
               temperature: 'Hot',
               addOns: [],

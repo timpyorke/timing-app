@@ -1,22 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Search, Star, Plus } from 'lucide-react';
 import { useTranslation } from '../i18n/stub';
-import { Menu, MenuCategory, CartItem } from '../types';
+import { Menu, MenuCategory } from '../types';
 import { apiService } from '../services/api';
-import { formatPrice, debounce, generateId } from '../utils';
-import { useCart } from '../context/CartContext';
+import { formatPrice, debounce } from '../utils';
+import QuickAddBottomSheet from '../components/QuickAddBottomSheet';
 
 const MenuPage: React.FC = () => {
-  const navigate = useNavigate();
   const { t } = useTranslation();
-  const { addItem, toggleCart } = useCart();
   const [menuItems, setMenuItems] = useState<Menu[]>([]);
   const [categories, setCategories] = useState<MenuCategory[]>([]);
   const [filteredMenuItems, setFilteredMenuItems] = useState<Menu[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const [selectedMenuForQuickAdd, setSelectedMenuForQuickAdd] = useState<Menu | null>(null);
+  const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
 
   useEffect(() => {
     const fetchMenu = async () => {
@@ -61,52 +60,16 @@ const MenuPage: React.FC = () => {
     setSelectedCategory(categoryId);
   };
 
-  const handleMenuItemClick = (menuItemId: string) => {
-    navigate(`/menu/${menuItemId}`);
+  const handleQuickAddClick = (e: React.MouseEvent, menuItem: Menu) => {
+    e.stopPropagation();
+    setSelectedMenuForQuickAdd(menuItem);
+    setIsQuickAddOpen(true);
   };
 
-  const handleQuickAddToCart = (e: React.MouseEvent, menuItem: Menu) => {
-    e.stopPropagation(); // Prevent navigating to menu item details
-    
-    // Use default options for quick add
-    const defaultSize = menuItem.sizes[0];
-    const defaultMilk = menuItem.milkOptions[0];
-    const defaultSweetness = menuItem.sweetnessLevels[0];
-    const defaultTemperature = menuItem.temperatureOptions.includes('Iced') ? 'Iced' : menuItem.temperatureOptions[0];
-    
-    const cartItem: CartItem = {
-      id: generateId(),
-      menuId: menuItem.id,
-      menuName: menuItem.name,
-      imageUrl: menuItem.image,
-      size: defaultSize,
-      milk: defaultMilk,
-      sweetness: defaultSweetness,
-      temperature: defaultTemperature,
-      addOns: [],
-      quantity: 1,
-      totalPrice: menuItem.basePrice + defaultSize.priceModifier,
-    };
-
-    addItem(cartItem);
-    
-    // Show success feedback
-    const button = e.currentTarget as HTMLButtonElement;
-    const originalText = button.innerHTML;
-    button.innerHTML = t('menu.added');
-    button.disabled = true;
-    
-    setTimeout(() => {
-      button.innerHTML = originalText;
-      button.disabled = false;
-    }, 1500);
-    
-    // Open cart drawer to show the added item
-    setTimeout(() => {
-      toggleCart();
-    }, 800);
+  const handleCloseQuickAdd = () => {
+    setIsQuickAddOpen(false);
+    setSelectedMenuForQuickAdd(null);
   };
-
 
 
   if (loading) {
@@ -166,7 +129,7 @@ const MenuPage: React.FC = () => {
           {filteredMenuItems.map((menuItem) => (
             <div
               key={menuItem.id}
-              onClick={() => handleMenuItemClick(menuItem.id)}
+              onClick={(e) => handleQuickAddClick(e, menuItem)}
               className="card-menu group cursor-pointer hover:shadow-xl transition-all duration-200 relative border border-black rounded-lg hover:border-black"
             >
               <div className="flex items-start gap-3 p-2">
@@ -218,7 +181,7 @@ const MenuPage: React.FC = () => {
 
                 {/* Circular Add Button - Bottom Right */}
                 <button
-                  onClick={(e) => handleQuickAddToCart(e, menuItem)}
+                  onClick={(e) => handleQuickAddClick(e, menuItem)}
                   className="absolute bottom-2 right-2 btn btn-circle btn-primary btn-sm hover:btn-primary-focus transition-all duration-200"
                   aria-label={`Quick add ${menuItem.name} to cart`}
                 >
@@ -230,6 +193,11 @@ const MenuPage: React.FC = () => {
         </div>
       )}
 
+      <QuickAddBottomSheet
+        isOpen={isQuickAddOpen}
+        onClose={handleCloseQuickAdd}
+        menuItem={selectedMenuForQuickAdd}
+      />
     </div>
   );
 };

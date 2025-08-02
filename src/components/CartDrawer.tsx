@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Plus, Minus, Trash2 } from 'lucide-react';
 import { useTranslation } from '../i18n/stub';
-import { useCart } from '../context/CartContext';
+import { useCart } from '../hooks/useCart';
 import { formatPrice } from '../utils';
 
 const CartDrawer: React.FC = () => {
@@ -60,7 +60,7 @@ const CartDrawer: React.FC = () => {
                 <div className="flex-1 min-w-0">
                   <h3 className="font-medium text-sm truncate">{item.menuName}</h3>
                   <p className="text-xs text-base-content/60">
-                    {item.size.name} • {item.milk} • {item.sweetness} • {item.temperature}
+                    {item.size.name} • {item.milk.name} • {item.sweetness} • {item.temperature}
                   </p>
                   {item.addOns.length > 0 && (
                     <p className="text-xs text-base-content/60">
