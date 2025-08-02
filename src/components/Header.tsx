@@ -30,6 +30,8 @@ const Header: React.FC = () => {
         return t('header.orderStatus');
       case '/my-orders':
         return 'My Orders';
+      case '/contact':
+        return t('header.contact');
       default:
         if (location.pathname.startsWith('/menu/')) {
           return t('header.menuDetails');

@@ -10,6 +10,7 @@ import OrderConfirmationPage from './pages/OrderConfirmationPage';
 import OrderStatusPage from './pages/OrderStatusPage';
 import OrderDetailPage from './pages/OrderDetailPage';
 import CustomerOrdersPage from './pages/CustomerOrdersPage';
+import ContactPage from './pages/ContactPage';
 import { getAnonymousUserId } from './utils';
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
             <Route path="/order-status" element={<OrderStatusPage />} />
             <Route path="/order-detail/:orderId" element={<OrderDetailPage />} />
             <Route path="/my-orders" element={<CustomerOrdersPage />} />
+            <Route path="/contact" element={<ContactPage />} />
           </Routes>
         </Layout>
       </Router>

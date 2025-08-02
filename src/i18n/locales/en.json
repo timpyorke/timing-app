@@ -18,6 +18,7 @@
     "menu": "Menu",
     "cart": "Cart",
     "orders": "Orders",
+    "contact": "Contact",
     "goBack": "Go back"
   },
   "header": {
@@ -26,7 +27,8 @@
     "checkout": "Checkout",
     "orderStatus": "Order Status",
     "menuDetails": "Menu Details",
-    "orderConfirmed": "Order Confirmed"
+    "orderConfirmed": "Order Confirmed",
+    "contact": "Contact Us"
   },
   "menu": {
     "searchPlaceholder": "Search menu...",
@@ -95,6 +97,17 @@
     "estimatedTime": "Est. {{minutes}} min",
     "items": "{{count}} item",
     "items_plural": "{{count}} items"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "We're here to serve you",
+    "phone": "Phone",
+    "phoneDescription": "Call us.",
+    "hours": "Business Hours",
+    "weekdays": "Monday - Friday",
+    "weekends": "Saturday - Sunday",
+    "location": "Location",
+    "address": "Sunkid Studio"
   },
   "pwa": {
     "installTitle": "Install TIMING App",
