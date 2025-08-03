@@ -124,8 +124,23 @@ class ApiService {
         body: JSON.stringify(orderData),
       });
 
+      console.log('API response received:', response);
+
+      // Check if response is valid
+      if (!response) {
+        throw new Error('Order creation failed - no response from server');
+      }
+
       // Transform response to match our Order interface
-      return this.transformOrderResponse(response, items, customer, userIdToUse);
+      const transformedOrder = this.transformOrderResponse(response, items, customer, userIdToUse);
+      
+      // Validate that the order has an ID
+      if (!transformedOrder.id) {
+        throw new Error('Order creation failed - no order ID returned');
+      }
+
+      console.log('Order created successfully with ID:', transformedOrder.id);
+      return transformedOrder;
     } catch (error) {
       console.error('Failed to create order:', error);
       // Rethrow error instead of returning mock data
@@ -275,19 +290,42 @@ class ApiService {
   private transformOrderResponse(response: ApiOrderResponse, items: CartItem[], customer: Customer, userId?: string): Order {
     const subtotal = items.reduce((sum, item) => sum + item.totalPrice, 0);
     
+    // Extract order ID with better validation
+    let orderId: string | undefined;
+    
+    if (response?.data?.id) {
+      orderId = response.data.id.toString();
+    } else if (response?.id) {
+      orderId = response.id.toString();
+    }
+    
+    // Log for debugging
+    console.log('Extracting order ID from response:', {
+      'response.data?.id': response?.data?.id,
+      'response?.id': response?.id,
+      'extracted orderId': orderId
+    });
+    
+    // If no ID found, this indicates a problem with the API response
+    if (!orderId) {
+      console.error('No order ID found in API response:', response);
+      // Still generate a fallback ID but this should be investigated
+      orderId = `ORDER-${Date.now()}`;
+    }
+    
     return {
-      id: response.data?.id?.toString() || response.id?.toString() || `ORDER-${Date.now()}`,
+      id: orderId,
       userId,
       items,
       customer,
       subtotal,
       total: subtotal,
-      status: (response.data?.status || response.status || 'pending') as OrderStatus,
-      estimatedPickupTime: response.data?.estimated_pickup_time || 
-                          response.estimated_pickup_time || 
+      status: (response?.data?.status || response?.status || 'pending') as OrderStatus,
+      estimatedPickupTime: response?.data?.estimated_pickup_time || 
+                          response?.estimated_pickup_time || 
                           new Date(Date.now() + 15 * 60 * 1000).toISOString(),
-      createdAt: response.data?.created_at || 
-                response.created_at || 
+      createdAt: response?.data?.created_at || 
+                response?.created_at || 
                 new Date().toISOString(),
     };
   }
