@@ -14,11 +14,9 @@ export const useOrderHistory = () => {
       setError(null);
       
       const customerId = getAnonymousUserId();
-      console.log('Fetching orders for customer ID:', customerId);
       
       const apiOrders = await apiService.getOrdersByCustomerId(customerId);
       
-      console.log('Loaded orders from API:', apiOrders);
       setOrders(apiOrders);
       
       // Cache the API orders in localStorage if any found
@@ -29,10 +27,8 @@ export const useOrderHistory = () => {
         const savedOrders = localStorage.getItem('menuOrderHistory');
         if (savedOrders) {
           const parsedOrders = JSON.parse(savedOrders);
-          console.log('Loaded orders from localStorage:', parsedOrders);
           setOrders(parsedOrders);
         } else {
-          console.log('No orders found');
           setOrders([]);
         }
       }

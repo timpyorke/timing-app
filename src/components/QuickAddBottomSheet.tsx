@@ -76,7 +76,7 @@ const QuickAddBottomSheet: React.FC<QuickAddBottomSheetProps> = ({
     <BottomSheet
       isOpen={isOpen}
       onClose={onClose}
-      title={`Quick Add ${menuItem.name}`}
+      title={`${t('quickAdd.title')} ${menuItem.name}`}
       maxHeight="max-h-[80vh]"
     >
       <div className="p-4 pb-24">
@@ -85,7 +85,7 @@ const QuickAddBottomSheet: React.FC<QuickAddBottomSheetProps> = ({
           <img
             src={menuItem.image}
             alt={menuItem.name}
-            className="w-16 h-16 object-cover rounded-lg"
+            className="w-16 h-16 object-cover object-center rounded-lg"
             onError={(e) => {
               (e.target as HTMLImageElement).src = '/images/placeholder-menu.svg';
             }}

@@ -4,8 +4,10 @@ import { CheckCircle, Clock, User, Phone, MapPin } from 'lucide-react';
 import { Order, Customer, OrderConfirmationLocationState } from '../types';
 import { apiService } from '../services/api';
 import { formatDateTime } from '../utils';
+import { useTranslation } from '../i18n/stub';
 
 const OrderConfirmationPage: React.FC = () => {
+  const { t } = useTranslation();
   const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -59,7 +61,6 @@ const OrderConfirmationPage: React.FC = () => {
           };
           setOrder(orderFromStatus)
         } else {
-          console.log('Order status not found');
           setOrder(null);
         }
       } catch (error) {
@@ -95,12 +96,12 @@ const OrderConfirmationPage: React.FC = () => {
     return (
       <div className="container mx-auto px-4 py-6">
         <div className="text-center py-12">
-          <p className="text-base-content/60">Order not found</p>
+          <p className="text-base-content/60">{t('orderConfirmation.notFound')}</p>
           <button
             onClick={() => navigate('/')}
             className="btn btn-primary mt-4"
           >
-            Back to Menu
+            {t('orderConfirmation.backToMenu')}
           </button>
         </div>
       </div>
@@ -114,23 +115,23 @@ const OrderConfirmationPage: React.FC = () => {
           <CheckCircle size={64} className="text-success" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-base-content">Order Confirmed!</h1>
+          <h1 className="text-2xl font-bold text-base-content">{t('orderConfirmation.confirmed')}</h1>
           <p className="text-base-content/70 mt-2">
-            Thank you for choosing TIMING! We're preparing your menu now.
+            {t('orderConfirmation.thankYou')}
           </p>
         </div>
       </div>
 
       <div className="bg-base-200 rounded-lg p-4 space-y-3">
         <div className="flex justify-between items-center">
-          <span className="font-semibold">Order Number:</span>
+          <span className="font-semibold">{t('orderConfirmation.orderNumber')}</span>
           <span className="font-mono text-lg font-bold text-primary">#{order.id}</span>
         </div>
         
         <div className="flex justify-between items-center">
           <span className="font-semibold flex items-center">
             <Clock className="mr-2" size={16} />
-            Estimated Pickup:
+            {t('orderConfirmation.estimatedPickup')}:
           </span>
           <span className="font-bold text-warning">
             {formatDateTime(order.estimatedPickupTime)}
@@ -141,7 +142,7 @@ const OrderConfirmationPage: React.FC = () => {
       <div className="bg-base-200 rounded-lg p-4">
         <h2 className="font-bold text-lg mb-3 flex items-center">
           <User className="mr-2" size={20} />
-          Customer Details
+          {t('orderConfirmation.customerDetails')}
         </h2>
         <div className="space-y-2">
           <div className="flex items-center">
@@ -155,17 +156,17 @@ const OrderConfirmationPage: React.FC = () => {
           {order.customer.tableNumber && (
             <div className="flex items-center">
               <MapPin className="mr-3 text-base-content/50" size={16} />
-              <span>Table {order.customer.tableNumber}</span>
+              <span>{t('orderConfirmation.table')} {order.customer.tableNumber}</span>
             </div>
           )}
         </div>
       </div>
 
       <div className="bg-warning/10 border border-warning/20 rounded-lg p-4">
-        <h3 className="font-bold text-warning mb-2">Important Information</h3>
+        <h3 className="font-bold text-warning mb-2">{t('orderConfirmation.importantInfo')}</h3>
         <ul className="text-sm space-y-1">
-          <li>• Orders are held for 15 minutes after ready time</li>
-          <li>• Show your order number to the staff</li>
+          <li>• {t('orderConfirmation.holdTime')}</li>
+          <li>• {t('orderConfirmation.showNumber')}</li>
         </ul>
       </div>
 
@@ -174,14 +175,14 @@ const OrderConfirmationPage: React.FC = () => {
           onClick={handleTrackOrder}
           className="btn btn-primary btn-touch w-full"
         >
-          Track Order Status
+          {t('orderConfirmation.trackStatus')}
         </button>
         
         <button
           onClick={handleNewOrder}
           className="btn btn-outline btn-touch w-full"
         >
-          Place Another Order
+          {t('orderConfirmation.placeAnother')}
         </button>
       </div>
     </div>

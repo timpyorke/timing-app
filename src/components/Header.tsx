@@ -1,17 +1,13 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, ShoppingCart, Languages } from 'lucide-react';
+import { ArrowLeft, Languages } from 'lucide-react';
 import { useTranslation } from '../i18n/stub';
-import { useCart } from '../hooks/useCart';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t, i18n } = useTranslation();
-  const { getTotalItems, toggleCart } = useCart();
-
   const isHome = location.pathname === '/';
-  const totalItems = getTotalItems();
 
   const toggleLanguage = () => {
     const newLanguage = i18n.language === 'th' ? 'en' : 'th';
@@ -22,14 +18,12 @@ const Header: React.FC = () => {
     switch (location.pathname) {
       case '/':
         return t('header.timing');
-      case '/cart':
-        return t('header.cart');
       case '/checkout':
         return t('header.checkout');
       case '/order-status':
         return t('header.orderStatus');
       case '/my-orders':
-        return 'My Orders';
+        return t('header.myOrders');
       case '/contact':
         return t('header.contact');
       default:
@@ -40,7 +34,7 @@ const Header: React.FC = () => {
           return t('header.orderConfirmed');
         }
         if (location.pathname.startsWith('/order-detail/')) {
-          return 'Order Details';
+          return t('header.orderDetails');
         }
         return t('header.timing');
     }
@@ -66,8 +60,8 @@ const Header: React.FC = () => {
           <button
             onClick={toggleLanguage}
             className="btn btn-ghost btn-sm p-2 text-white hover:bg-white/10"
-            aria-label={`Change language to ${i18n.language === 'th' ? 'English' : 'Thai'}`}
-            title={i18n.language === 'th' ? 'Switch to English' : 'เปลี่ยนเป็นภาษาไทย'}
+            aria-label={t('header.changeLanguageTo', { language: i18n.language === 'th' ? 'English' : 'Thai' })}
+            title={i18n.language === 'th' ? t('header.switchToEnglish') : 'เปลี่ยนเป็นภาษาไทย'}
           >
             <Languages size={18} />
             <span className="text-xs ml-1 font-medium">
@@ -75,20 +69,6 @@ const Header: React.FC = () => {
             </span>
           </button>
           
-          {location.pathname !== '/cart' && (
-            <button
-              onClick={toggleCart}
-              className="btn btn-ghost btn-sm relative p-2 text-white hover:bg-white/10"
-              aria-label={`Cart with ${totalItems} items`}
-            >
-              <ShoppingCart size={20} />
-              {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-secondary text-secondary-content text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
-                  {totalItems > 9 ? '9+' : totalItems}
-                </span>
-              )}
-            </button>
-          )}
         </div>
       </div>
     </header>

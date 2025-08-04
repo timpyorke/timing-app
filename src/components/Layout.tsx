@@ -3,7 +3,6 @@ import { useLocation } from 'react-router-dom';
 import Header from './Header';
 import BottomNav from './BottomNav';
 import CartDrawer from './CartDrawer';
-import PWAInstallPrompt from './PWAInstallPrompt';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -23,7 +22,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </main>
       {!hideBottomNav && <BottomNav />}
       <CartDrawer />
-      <PWAInstallPrompt />
     </div>
   );
 };

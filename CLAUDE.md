@@ -33,7 +33,6 @@ npm install react-i18next i18next i18next-browser-languagedetector
 - **Routing**: React Router 6
 - **State Management**: React Context API
 - **Build Tool**: Vite
-- **PWA**: Vite PWA Plugin
 - **Icons**: Lucide React
 - **Internationalization**: react-i18next (Thai default, English available)
 
@@ -46,20 +45,17 @@ src/
 │   ├── BottomNav.tsx    # Bottom navigation
 │   ├── CartDrawer.tsx   # Sliding cart drawer
 │   ├── Layout.tsx       # Main layout wrapper
-│   └── PWAInstallPrompt.tsx # PWA install prompt
 ├── pages/              # Route components
 │   ├── MenuPage.tsx     # Main menu with menu cards
 │   ├── MenuDetailsPage.tsx # Menu customization
-│   ├── CartPage.tsx     # Shopping cart view
 │   ├── CheckoutPage.tsx # Customer checkout form
 │   ├── OrderConfirmationPage.tsx # Order success
-│   └── OrderStatusPage.tsx # Order tracking
+│   └── OrderStatusPage.tsx # Order history with detailed menu items
 ├── context/            # React Context providers
 │   └── CartContext.tsx # Cart state management
 ├── hooks/              # Custom React hooks
 │   ├── useFavorites.ts # Favorites management (removed)
 │   ├── useOrderHistory.ts # Order history
-│   └── usePWA.ts       # PWA functionality
 ├── services/           # API and external services
 │   └── api.ts          # Mock API service
 ├── i18n/               # Internationalization
@@ -78,7 +74,7 @@ src/
 
 ## Key Features
 
-- **Mobile-first PWA** with offline capability
+- **Mobile-first responsive design**
 - **Thai language support** with Thai as default language
 - **Menu browsing** with categories and search
 - **Menu customization** (size, milk, sweetness, temperature, add-ons)
@@ -86,7 +82,6 @@ src/
 - **Quick add to cart** from menu page
 - **Customer checkout** with order confirmation
 - **Order status tracking**
-- **PWA install prompt**
 
 ## Design System
 
@@ -146,7 +141,5 @@ VITE_API_BASE_URL=http://localhost:3001
 ## Testing
 
 - Test on mobile devices for touch interactions
-- Verify PWA installation works
 - Check cart persistence across sessions
-- Test offline functionality
 - Validate form inputs on checkout

@@ -28,7 +28,11 @@
     "orderStatus": "Order Status",
     "menuDetails": "Menu Details",
     "orderConfirmed": "Order Confirmed",
-    "contact": "Contact Us"
+    "contact": "Contact Us",
+    "myOrders": "My Orders",
+    "orderDetails": "Order Details",
+    "changeLanguageTo": "Change language to",
+    "switchToEnglish": "Switch to English"
   },
   "menu": {
     "searchPlaceholder": "Search menu...",
@@ -50,7 +54,12 @@
     "temperature": "Temperature",
     "addOns": "Add-ons",
     "addToCart": "Add to Cart",
-    "updateCart": "Update Cart"
+    "updateCart": "Update Cart",
+    "notFound": "Menu item not found",
+    "backToMenu": "Back to Menu",
+    "popular": "Popular",
+    "total": "Total",
+    "addQuantityToCart": "Add {{quantity}} to Cart"
   },
   "cart": {
     "yourCart": "Your Cart",
@@ -73,15 +82,46 @@
     "placeOrder": "Place Order",
     "nameRequired": "Name is required",
     "phoneRequired": "Phone number is required",
-    "phoneInvalid": "Please enter a valid phone number"
+    "phoneInvalid": "Please enter a valid phone number",
+    "phoneRequiredLargeOrder": "Phone number is required for orders 5+ items",
+    "disabledAlert": "Checkout is currently disabled. Please try again later.",
+    "orderFailedAlert": "Failed to place order. Please try again.",
+    "emptyCart": "Your cart is empty",
+    "backToMenu": "Back to Menu",
+    "total": "Total:",
+    "fullName": "Name *",
+    "enterName": "Enter your name",
+    "phoneNumber": "Phone Number",
+    "optional": "(Optional)",
+    "phonePlaceholder": "089-123-4567",
+    "tableNumber": "Table Number (Optional)",
+    "tablePlaceholder": "Table 5, Counter, etc.",
+    "takeoutNote": "Leave blank for takeout orders",
+    "temporarilyDisabled": "Checkout is temporarily disabled",
+    "tryAgainLater": "Please try again later",
+    "placingOrder": "Placing Order...",
+    "checkout": "Checkout"
   },
   "orderConfirmation": {
     "title": "Order Confirmed!",
     "subtitle": "Thank you for your order. We'll start preparing your menu right away.",
-    "orderNumber": "Order #{{orderNumber}}",
+    "orderNumberWithId": "Order #{{orderNumber}}",
     "estimatedTime": "Estimated preparation time: {{minutes}} minutes",
     "trackOrder": "Track Your Order",
-    "orderAnother": "Order More Menu"
+    "orderAnother": "Order More Menu",
+    "notFound": "Order not found",
+    "backToMenu": "Back to Menu",
+    "confirmed": "Order Confirmed!",
+    "thankYou": "Thank you for choosing TIMING! We're preparing your menu now.",
+    "orderNumber": "Order Number:",
+    "estimatedPickup": "Estimated Pickup:",
+    "customerDetails": "Customer Details",
+    "table": "Table",
+    "importantInfo": "Important Information",
+    "holdTime": "Orders are held for 15 minutes after ready time",
+    "showNumber": "Show your order number to the staff",
+    "trackStatus": "Track Order Status",
+    "placeAnother": "Place Another Order"
   },
   "orderStatus": {
     "title": "Order Status",
@@ -96,7 +136,19 @@
     },
     "estimatedTime": "Est. {{minutes}} min",
     "items": "{{count}} item",
-    "items_plural": "{{count}} items"
+    "items_plural": "{{count}} items",
+    "myOrders": "My Orders",
+    "loading": "Loading orders...",
+    "noOrdersYet": "No Orders Yet",
+    "startOrdering": "Start ordering to see your order history",
+    "browseMenu": "Browse Menu",
+    "orderItems": "Order Items:",
+    "size": "Size:",
+    "milk": "Milk:",
+    "sweetness": "Sweetness:",
+    "temperature": "Temperature:",
+    "addOns": "Add-ons:",
+    "table": "Table:"
   },
   "contact": {
     "title": "Contact Us",
@@ -109,10 +161,19 @@
     "location": "Location",
     "address": "Sunkid Studio"
   },
-  "pwa": {
-    "installTitle": "Install TIMING App",
-    "installSubtitle": "Get the full app experience with faster loading and offline access.",
-    "install": "Install",
-    "dismiss": "Not Now"
+  "quickAdd": {
+    "title": "Quick Add"
+  },
+  "merchantClosed": {
+    "whatYouCanDo": "What you can do:",
+    "checkLater": "Check back later when we reopen",
+    "followSocial": "Follow our social media for updates",
+    "contactUs": "Contact us for more information"
+  },
+  "aria": {
+    "closeCart": "Close cart",
+    "decreaseQuantity": "Decrease quantity",
+    "increaseQuantity": "Increase quantity",
+    "removeItem": "Remove item"
   }
 }
