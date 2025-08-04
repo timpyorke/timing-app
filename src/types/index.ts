@@ -129,6 +129,13 @@ export interface ApiCustomerInfo {
   phone?: string;
 }
 
+export interface ApiCustomerInfoResponse {
+  name?: string;
+  phone?: string;
+  table_number?: string;
+  tableNumber?: string;
+}
+
 export interface ApiOrderItemCustomizations {
   size: string;
   milk: string;
@@ -184,32 +191,29 @@ export interface ApiOrdersResponse {
   success?: boolean;
 }
 
+export interface ApiOrderHistoryItemData {
+  menu_id?: string | number;
+  name?: string;
+  menuName?: string;
+  menu_name?: string;
+  image_url?: string;
+  imageUrl?: string;
+  quantity?: string | number;
+  price?: string | number;
+  customizations?: {
+    size?: string;
+    milk?: string;
+    sweetness?: string;
+    temperature?: string;
+    extras?: string[];
+  };
+}
+
 export interface ApiOrderHistoryItem {
   id: string | number;
   user_id?: string;
-  customer_info?: {
-    name?: string;
-    phone?: string;
-    table_number?: string;
-    tableNumber?: string;
-  };
-  items?: Array<{
-    menu_id?: string | number;
-    name?: string;
-    menuName?: string;
-    menu_name?: string;
-    image_url?: string;
-    imageUrl?: string;
-    quantity?: string | number;
-    price?: string | number;
-    customizations?: {
-      size?: string;
-      milk?: string;
-      sweetness?: string;
-      temperature?: string;
-      extras?: string[];
-    };
-  }>;
+  customer_info?: ApiCustomerInfoResponse;
+  items?: ApiOrderHistoryItemData[];
   total?: string | number;
   status?: string;
   estimated_pickup_time?: string;

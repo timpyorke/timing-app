@@ -1,5 +1,6 @@
 import React, { createContext, useReducer, useEffect } from 'react';
 import { CartItem, Customer } from '../types';
+import { debounce, CONSTANTS } from '../utils';
 
 interface CartState {
   items: CartItem[];
@@ -92,7 +93,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [state, dispatch] = useReducer(cartReducer, initialState);
 
   useEffect(() => {
-    const savedCart = localStorage.getItem('menuOrderCart');
+    const savedCart = localStorage.getItem(CONSTANTS.STORAGE_KEYS.CART);
     if (savedCart) {
       try {
         const parsedCart = JSON.parse(savedCart);
@@ -104,7 +105,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('menuOrderCart', JSON.stringify(state));
+    const saveToStorage = debounce(() => {
+      localStorage.setItem(CONSTANTS.STORAGE_KEYS.CART, JSON.stringify(state));
+    }, CONSTANTS.DEBOUNCE_DELAY);
+    
+    saveToStorage();
   }, [state]);
 
   const addItem = (item: CartItem) => {

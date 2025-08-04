@@ -28,7 +28,8 @@ remoteConfig.settings = {
 remoteConfig.defaultConfig = {
   is_close: false,
   close_message: 'Sorry, we are temporarily closed. Please try again later.',
-  close_title: 'Store Temporarily Closed'
+  close_title: 'Store Temporarily Closed',
+  is_disable_checkout: false
 };
 
 export { remoteConfig, fetchAndActivate, getValue, getBoolean };

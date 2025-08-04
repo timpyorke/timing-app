@@ -17,7 +17,7 @@ import {
   ApiOrderHistoryItem,
   ApiCustomerInfo
 } from '../types';
-import { getAnonymousUserId } from '../utils';
+import { getAnonymousUserId, transformApiSizes, generateImagePath, generateUUID } from '../utils';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
@@ -72,13 +72,9 @@ class ApiService {
       // Transform to match Timing API format
       const formatPhone = (phone: string): string => {
         if (!phone || phone.trim() === '') {
-          return '';
+          return '-';
         }
-        if (phone.startsWith('+')) {
-          return phone;
-        }
-        // Remove leading 0 and add +66 for Thai numbers
-        return `+66${phone.replace(/^0/, '')}`;
+        return phone;
       };
 
       const customerInfo: ApiCustomerInfo = {
@@ -112,19 +108,12 @@ class ApiService {
         total: total
       };
 
-      console.log('Creating order with data:', {
-        customer_id: orderData.customer_id,
-        customer_name: orderData.customer_info.name,
-        items_count: orderData.items.length,
-        total: orderData.total
-      });
 
       const response = await this.request<ApiOrderResponse>('/api/orders', {
         method: 'POST',
         body: JSON.stringify(orderData),
       });
 
-      console.log('API response received:', response);
 
       // Check if response is valid
       if (!response) {
@@ -139,7 +128,6 @@ class ApiService {
         throw new Error('Order creation failed - no order ID returned');
       }
 
-      console.log('Order created successfully with ID:', transformedOrder.id);
       return transformedOrder;
     } catch (error) {
       console.error('Failed to create order:', error);
@@ -206,34 +194,16 @@ class ApiService {
             // Transform dynamic sizes from API for each item
             const apiSizes = Array.isArray(normalizedCustomizations.sizes) ? normalizedCustomizations.sizes : 
                             Array.isArray(normalizedCustomizations.size) ? normalizedCustomizations.size : [];
-            const sizes: import('../types').MenuSize[] = apiSizes.map((sizeName: string, index: number) => {
-              // Dynamic pricing based on size name
-              let priceModifier = 0;
-              const lowerSizeName = sizeName.toLowerCase();
-              
-              if (lowerSizeName.includes('large') || lowerSizeName.includes('l')) {
-                priceModifier = 15;
-              } else if (lowerSizeName.includes('medium') || lowerSizeName.includes('m')) {
-                priceModifier = 0;
-              } else if (lowerSizeName.includes('small') || lowerSizeName.includes('s')) {
-                priceModifier = 0;
-              } else {
-                // Fallback to index-based pricing for unknown sizes
-                priceModifier = index * 15;
-              }
-              
-              return {
-                id: sizeName.toLowerCase(),
-                name: sizeName,
-                priceModifier
-              };
-            });
+            const sizes = transformApiSizes(apiSizes).map(size => ({
+              ...size,
+              id: size.name.toLowerCase()
+            }));
 
             // Transform dynamic add-ons/extras from API for each item
             const apiExtras = Array.isArray(normalizedCustomizations.extras) ? normalizedCustomizations.extras :
                              Array.isArray(normalizedCustomizations.syrups) ? normalizedCustomizations.syrups : [];
             const addOns = apiExtras.map((extra: string) => ({
-              id: extra.toLowerCase().replace(/\s+/g, '-'),
+              id: generateImagePath(extra),
               name: extra,
               price: 0.5
             }));
@@ -248,7 +218,7 @@ class ApiService {
             // Transform milk options with pricing
             const apiMilkOptions = Array.isArray(normalizedCustomizations.milk) ? normalizedCustomizations.milk : [];
             const milkOptions = apiMilkOptions.map((milk: string) => ({
-              id: milk.toLowerCase().replace(/\s+/g, '-'),
+              id: generateImagePath(milk),
               name: milk.trim(),
               price: milk.toLowerCase().includes('normal') ? 0 : 20
             }));
@@ -257,7 +227,7 @@ class ApiService {
               id: item.id?.toString(),
               name: item.name,
               description: item.description || `Delicious ${item.name}`,
-              image: item.image_url || `/images/${item.name.toLowerCase().replace(/\s+/g, '-')}.svg`,
+              image: item.image_url || `/images/${generateImagePath(item.name)}.svg`,
               category: category.category?.toLowerCase() || 'specialty',
               basePrice: parseFloat(item.base_price?.toString() || '4.50'),
               sizes,
@@ -299,18 +269,12 @@ class ApiService {
       orderId = response.id.toString();
     }
     
-    // Log for debugging
-    console.log('Extracting order ID from response:', {
-      'response.data?.id': response?.data?.id,
-      'response?.id': response?.id,
-      'extracted orderId': orderId
-    });
     
     // If no ID found, this indicates a problem with the API response
     if (!orderId) {
       console.error('No order ID found in API response:', response);
       // Still generate a fallback ID but this should be investigated
-      orderId = `ORDER-${Date.now()}`;
+      orderId = generateUUID();
     }
     
     return {
@@ -356,7 +320,7 @@ class ApiService {
       // Transform API order to our Order interface
       const statusValue = apiOrder.status || 'pending';
       const transformedOrder: Order = {
-        id: apiOrder.id?.toString() || `ORDER-${Date.now()}`,
+        id: apiOrder.id?.toString() || generateUUID(),
         userId: apiOrder.user_id,
         items: this.transformOrderItems(apiOrder.items || []),
         customer: {
@@ -387,9 +351,9 @@ class ApiService {
         id: `item-${index}`,
         menuId: apiItem.menu_id?.toString() || '1',
         menuName: apiItem.name || apiItem.menuName || apiItem.menu_name || `Menu #${apiItem.menu_id || 'Unknown'}`,
-        imageUrl: apiItem.image_url || apiItem.imageUrl || `/images/${(apiItem.name || apiItem.menuName || apiItem.menu_name || 'placeholder-menu').toLowerCase().replace(/\s+/g, '-')}.svg`,
+        imageUrl: apiItem.image_url || apiItem.imageUrl || `/images/${generateImagePath(apiItem.name || apiItem.menuName || apiItem.menu_name || 'placeholder-menu')}.svg`,
         size: {
-          id: apiItem.customizations?.size?.toLowerCase().replace(/\s+/g, '-') || 'medium',
+          id: apiItem.customizations?.size ? generateImagePath(apiItem.customizations.size) : 'medium',
           name: apiItem.customizations?.size || 'Medium',
           priceModifier: 0
         },
@@ -401,7 +365,7 @@ class ApiService {
         sweetness: apiItem.customizations?.sweetness || '50%',
         temperature: apiItem.customizations?.temperature || 'Hot',
         addOns: (apiItem.customizations?.extras || []).map((extra: string) => ({
-          id: extra.toLowerCase().replace(/\s+/g, '-'),
+          id: generateImagePath(extra),
           name: extra,
           price: 0.5
         })),
@@ -443,34 +407,16 @@ class ApiService {
     // Transform dynamic sizes from API
     const apiSizes = Array.isArray(normalizedCustomizations.sizes) ? normalizedCustomizations.sizes : 
                     Array.isArray(normalizedCustomizations.size) ? normalizedCustomizations.size : [];
-    const sizes: import('../types').MenuSize[] = apiSizes.map((sizeName: string, index: number) => {
-      // Dynamic pricing based on size name
-      let priceModifier = 0;
-      const lowerSizeName = sizeName.toLowerCase();
-      
-      if (lowerSizeName.includes('large') || lowerSizeName.includes('l')) {
-        priceModifier = 15;
-      } else if (lowerSizeName.includes('medium') || lowerSizeName.includes('m')) {
-        priceModifier = 0;
-      } else if (lowerSizeName.includes('small') || lowerSizeName.includes('s')) {
-        priceModifier = 0;
-      } else {
-        // Fallback to index-based pricing for unknown sizes
-        priceModifier = index * 15;
-      }
-      
-      return {
-        id: sizeName.toLowerCase(),
-        name: sizeName,
-        priceModifier
-      };
-    });
+    const sizes = transformApiSizes(apiSizes).map(size => ({
+      ...size,
+      id: size.name.toLowerCase()
+    }));
 
     // Transform dynamic add-ons/extras from API
     const apiExtras = Array.isArray(normalizedCustomizations.extras) ? normalizedCustomizations.extras :
                      Array.isArray(normalizedCustomizations.syrups) ? normalizedCustomizations.syrups : [];
     const addOns = apiExtras.map((extra: string) => ({
-      id: extra.toLowerCase().replace(/\s+/g, '-'),
+      id: generateImagePath(extra),
       name: extra,
       price: 0.5 // Standard price for all add-ons
     }));
@@ -485,7 +431,7 @@ class ApiService {
     // Transform dynamic milk options from API with pricing
     const apiMilkOptions = Array.isArray(normalizedCustomizations.milk) ? normalizedCustomizations.milk : [];
     const milkOptions = apiMilkOptions.map((milk: string) => ({
-      id: milk.toLowerCase().replace(/\s+/g, '-'),
+      id: generateImagePath(milk),
       name: milk.trim(),
       price: milk.toLowerCase().includes('normal') ? 0 : 20
     }));
@@ -501,7 +447,7 @@ class ApiService {
       id: menuData.id?.toString(),
       name: menuData.name,
       description: menuData.description || `Delicious ${menuData.name}`,
-      image: menuData.image_url || `/images/${menuData.name.toLowerCase().replace(/\s+/g, '-')}.svg`,
+      image: menuData.image_url || `/images/${generateImagePath(menuData.name)}.svg`,
       category: menuData.category?.toLowerCase() || 'specialty',
       basePrice: parseFloat(menuData.base_price?.toString() || '4.50'),
       sizes,
