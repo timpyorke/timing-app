@@ -30,7 +30,6 @@ const OrderDetailPage: React.FC = () => {
           updateOrderStatus(orderId, status.status, status.estimatedPickupTime);
         }
       } else {
-        console.log('No live status available for order:', orderId);
         setLiveStatus(null);
       }
     } catch (error) {

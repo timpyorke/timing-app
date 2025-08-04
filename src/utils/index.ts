@@ -1,5 +1,15 @@
 import { OrderStatus } from '../types';
 
+export const CONSTANTS = {
+  MINUTES_TO_MS: 60 * 1000,
+  STORAGE_KEYS: {
+    ANONYMOUS_USER_ID: 'timing_anonymous_user_id',
+    CART: 'menuOrderCart'
+  },
+  DEBOUNCE_DELAY: 300,
+  SIZE_PRICE_MODIFIER: 15
+} as const;
+
 export const formatPrice = (price: number): string => {
   return `฿${price.toFixed(2)}`;
 };
@@ -16,7 +26,7 @@ export const formatDateTime = (dateString: string): string => {
 };
 
 export const generateId = (): string => {
-  return Math.random().toString(36).substr(2, 9);
+  return Math.random().toString(36).substring(2, 11);
 };
 
 export const generateUUID = (): string => {
@@ -28,12 +38,11 @@ export const generateUUID = (): string => {
 };
 
 export const getAnonymousUserId = (): string => {
-  const storageKey = 'timing_anonymous_user_id';
-  let userId = localStorage.getItem(storageKey);
+  let userId = localStorage.getItem(CONSTANTS.STORAGE_KEYS.ANONYMOUS_USER_ID);
   
   if (!userId) {
     userId = generateUUID();
-    localStorage.setItem(storageKey, userId);
+    localStorage.setItem(CONSTANTS.STORAGE_KEYS.ANONYMOUS_USER_ID, userId);
   }
   
   return userId;
@@ -41,7 +50,7 @@ export const getAnonymousUserId = (): string => {
 
 export const calculateEstimatedTime = (minutes: number): string => {
   const now = new Date();
-  const estimated = new Date(now.getTime() + minutes * 60 * 1000);
+  const estimated = new Date(now.getTime() + minutes * CONSTANTS.MINUTES_TO_MS);
   return formatDateTime(estimated.toISOString());
 };
 
@@ -96,4 +105,27 @@ export const debounce = <T extends (...args: unknown[]) => void>(
 
 export const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+export const transformApiSizes = (apiSizes: string[]) => {
+  return apiSizes.map((sizeName: string, index: number) => {
+    let priceModifier = 0;
+    const lowerSizeName = sizeName.toLowerCase();
+    
+    if (lowerSizeName.includes('large') || lowerSizeName.includes('l')) {
+      priceModifier = CONSTANTS.SIZE_PRICE_MODIFIER;
+    } else if (lowerSizeName.includes('medium') || lowerSizeName.includes('m')) {
+      priceModifier = Math.floor(CONSTANTS.SIZE_PRICE_MODIFIER / 2);
+    }
+
+    return {
+      id: `size-${index}`,
+      name: sizeName,
+      priceModifier
+    };
+  });
+};
+
+export const generateImagePath = (name: string): string => {
+  return name.toLowerCase().replace(/\s+/g, '-');
 };

@@ -59,7 +59,6 @@ const OrderConfirmationPage: React.FC = () => {
           };
           setOrder(orderFromStatus)
         } else {
-          console.log('Order status not found');
           setOrder(null);
         }
       } catch (error) {

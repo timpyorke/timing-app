@@ -8,7 +8,6 @@ const OrderStatusPage: React.FC = () => {
   const navigate = useNavigate();
   const { orders, isLoading, error, refreshOrders } = useOrderHistory();
   
-  console.log('Orders received in OrderStatusPage:', orders, 'Length:', orders.length);
 
   const handleOrderClick = (orderId: string) => {
     navigate(`/order-detail/${orderId}`);

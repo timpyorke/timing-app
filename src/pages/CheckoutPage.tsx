@@ -15,13 +15,13 @@ const CheckoutPage: React.FC = () => {
   const { addOrder } = useOrderHistory();
   const { userId } = useAnonymousUser();
   const { isCheckoutDisabled, isLoading: isCheckoutLoading } = useCheckoutStatus();
-  
+
   const [formData, setFormData] = useState<Customer>({
     name: customer?.name || '',
     phone: customer?.phone || '',
     tableNumber: customer?.tableNumber || '',
   });
-  
+
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Partial<Customer>>({});
 
@@ -52,7 +52,7 @@ const CheckoutPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
     if (items.length === 0) return;
     if (isCheckoutDisabled) {
@@ -61,11 +61,11 @@ const CheckoutPage: React.FC = () => {
     }
 
     setLoading(true);
-    
+
     try {
       setCustomer(formData);
       const order = await apiService.createOrder(items, formData, userId);
-      
+
       // Add order to history
       const orderWithItems = {
         ...order,
@@ -76,12 +76,12 @@ const CheckoutPage: React.FC = () => {
         createdAt: new Date().toISOString(),
       };
       addOrder(orderWithItems);
-      
+
       clearCart();
-      navigate(`/order-confirmation/${order.id}`, { 
-        state: { 
+      navigate(`/order-confirmation/${order.id}`, {
+        state: {
           customer: formData,
-          orderData: orderWithItems 
+          orderData: orderWithItems
         } as OrderConfirmationLocationState
       });
     } catch (error) {
@@ -139,7 +139,7 @@ const CheckoutPage: React.FC = () => {
             <User className="mr-2" size={20} />
             Customer Information
           </h2>
-          
+
           <div className="space-y-4">
             <div>
               <label className="label">
@@ -149,9 +149,8 @@ const CheckoutPage: React.FC = () => {
                 type="text"
                 value={formData.name}
                 onChange={(e) => handleInputChange('name', e.target.value)}
-                className={`input input-bordered input-touch w-full ${
-                  errors.name ? 'input-error' : ''
-                }`}
+                className={`input input-bordered input-touch w-full ${errors.name ? 'input-error' : ''
+                  }`}
                 placeholder="Enter your name"
                 disabled={loading}
               />
@@ -170,9 +169,8 @@ const CheckoutPage: React.FC = () => {
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => handleInputChange('phone', e.target.value)}
-                  className={`input input-bordered input-touch w-full pl-10 ${
-                    errors.phone ? 'input-error' : ''
-                  }`}
+                  className={`input input-bordered input-touch w-full pl-10 ${errors.phone ? 'input-error' : ''
+                    }`}
                   placeholder="089-123-4567"
                   disabled={loading}
                 />
@@ -222,12 +220,12 @@ const CheckoutPage: React.FC = () => {
                 Placing Order...
               </>
             ) : isCheckoutDisabled ? (
-              "Checkout Disabled"
+              "Checkout"
             ) : (
               `Place Order • ${formatPrice(getTotalPrice())}`
             )}
           </button>
-          
+
           <button
             type="button"
             onClick={() => navigate('/cart')}

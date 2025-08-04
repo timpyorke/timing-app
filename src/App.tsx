@@ -19,8 +19,7 @@ function App() {
 
   // Initialize anonymous user ID on app startup
   useEffect(() => {
-    const userId = getAnonymousUserId();
-    console.log('App initialized with user ID:', userId);
+    getAnonymousUserId();
   }, []);
 
   return (

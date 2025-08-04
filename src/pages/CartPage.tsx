@@ -7,13 +7,13 @@ import { formatPrice } from '../utils';
 
 const CartPage: React.FC = () => {
   const navigate = useNavigate();
-  const { 
-    items, 
-    updateQuantity, 
-    removeItem, 
+  const {
+    items,
+    updateQuantity,
+    removeItem,
     clearCart,
     getTotalPrice,
-    getTotalItems 
+    getTotalItems
   } = useCart();
   const { isCheckoutDisabled, isLoading: isCheckoutLoading } = useCheckoutStatus();
 
@@ -73,10 +73,10 @@ const CartPage: React.FC = () => {
                   (e.target as HTMLImageElement).src = '/images/placeholder-menu.svg';
                 }}
               />
-              
+
               <div className="flex-1 min-w-0">
                 <h3 className="font-bold text-lg">{item.menuName}</h3>
-                
+
                 <div className="space-y-1 text-sm text-base-content/70">
                   <p>Size: {item.size.name}</p>
                   <p>Milk: {item.milk.name}</p>
@@ -145,17 +145,21 @@ const CartPage: React.FC = () => {
       <div className="flex space-x-3">
         <button
           onClick={handleContinueShopping}
-          className="btn btn-outline btn-touch flex-1 text-xs font-bold"
-        > 
-        Continue Shopping
+          className="btn btn-outline btn-touch flex-1 text-xs font-bold px-1"
+        >
+          Continue Shopping
         </button>
         <button
           onClick={handleCheckout}
           disabled={isCheckoutDisabled || isCheckoutLoading}
-          className="btn btn-primary btn-touch flex-1 text-base font-bold"
+          className="btn btn-primary btn-touch flex-1 text-base font-bold px-1"
           title={isCheckoutDisabled ? "Checkout is temporarily disabled" : undefined}
         >
-          {isCheckoutDisabled ? "Checkout Disabled" : "Checkout"}
+          {isCheckoutDisabled ? (
+            "Checkout"
+          ) : (
+            `Place Order • ${formatPrice(getTotalPrice())}`
+          )}
         </button>
       </div>
     </div>
