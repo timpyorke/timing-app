@@ -72,13 +72,9 @@ class ApiService {
       // Transform to match Timing API format
       const formatPhone = (phone: string): string => {
         if (!phone || phone.trim() === '') {
-          return '';
+          return '-';
         }
-        if (phone.startsWith('+')) {
-          return phone;
-        }
-        // Remove leading 0 and add +66 for Thai numbers
-        return `+66${phone.replace(/^0/, '')}`;
+        return phone;
       };
 
       const customerInfo: ApiCustomerInfo = {

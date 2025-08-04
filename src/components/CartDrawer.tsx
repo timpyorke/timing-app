@@ -33,7 +33,7 @@ const CartDrawer: React.FC = () => {
           <button
             onClick={toggleCart}
             className="btn btn-ghost btn-sm p-2"
-            aria-label="Close cart"
+            aria-label={t('aria.closeCart')}
           >
             <X size={20} />
           </button>
@@ -74,7 +74,7 @@ const CartDrawer: React.FC = () => {
                   <button
                     onClick={() => updateQuantity(item.id, item.quantity - 1)}
                     className="btn btn-ghost btn-xs p-1"
-                    aria-label="Decrease quantity"
+                    aria-label={t('aria.decreaseQuantity')}
                   >
                     <Minus size={14} />
                   </button>
@@ -82,14 +82,14 @@ const CartDrawer: React.FC = () => {
                   <button
                     onClick={() => updateQuantity(item.id, item.quantity + 1)}
                     className="btn btn-ghost btn-xs p-1"
-                    aria-label="Increase quantity"
+                    aria-label={t('aria.increaseQuantity')}
                   >
                     <Plus size={14} />
                   </button>
                   <button
                     onClick={() => removeItem(item.id)}
                     className="btn btn-ghost btn-xs p-1 text-error hover:bg-error/10"
-                    aria-label="Remove item"
+                    aria-label={t('aria.removeItem')}
                   >
                     <Trash2 size={14} />
                   </button>

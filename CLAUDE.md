@@ -50,7 +50,7 @@ src/
 │   ├── MenuDetailsPage.tsx # Menu customization
 │   ├── CheckoutPage.tsx # Customer checkout form
 │   ├── OrderConfirmationPage.tsx # Order success
-│   └── OrderStatusPage.tsx # Order tracking
+│   └── OrderStatusPage.tsx # Order history with detailed menu items
 ├── context/            # React Context providers
 │   └── CartContext.tsx # Cart state management
 ├── hooks/              # Custom React hooks

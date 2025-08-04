@@ -1,5 +1,6 @@
 import React from 'react';
 import { Clock, AlertCircle } from 'lucide-react';
+import { useTranslation } from '../i18n/stub';
 
 interface MerchantClosedModalProps {
   isOpen: boolean;
@@ -12,6 +13,8 @@ const MerchantClosedModal: React.FC<MerchantClosedModalProps> = ({
   title,
   message
 }) => {
+  const { t } = useTranslation();
+  
   if (!isOpen) return null;
 
   return (
@@ -46,12 +49,12 @@ const MerchantClosedModal: React.FC<MerchantClosedModalProps> = ({
         {/* Additional Info */}
         <div className="bg-base-200 rounded-lg p-4">
           <h3 className="font-semibold text-sm mb-2 text-base-content">
-            What you can do:
+            {t('merchantClosed.whatYouCanDo')}
           </h3>
           <ul className="text-xs text-base-content/70 space-y-1">
-            <li>• Check back later when we reopen</li>
-            <li>• Follow our social media for updates</li>
-            <li>• Contact us for more information</li>
+            <li>• {t('merchantClosed.checkLater')}</li>
+            <li>• {t('merchantClosed.followSocial')}</li>
+            <li>• {t('merchantClosed.contactUs')}</li>
           </ul>
         </div>
       </div>

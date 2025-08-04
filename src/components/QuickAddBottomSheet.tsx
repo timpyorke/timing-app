@@ -76,7 +76,7 @@ const QuickAddBottomSheet: React.FC<QuickAddBottomSheetProps> = ({
     <BottomSheet
       isOpen={isOpen}
       onClose={onClose}
-      title={`Quick Add ${menuItem.name}`}
+      title={`${t('quickAdd.title')} ${menuItem.name}`}
       maxHeight="max-h-[80vh]"
     >
       <div className="p-4 pb-24">

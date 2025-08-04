@@ -5,11 +5,13 @@ import { Menu, MenuSize, MenuAddOn, CartItem, MilkOption } from '../types';
 import { apiService } from '../services/api';
 import { useCart } from '../hooks/useCart';
 import { formatPrice, generateId } from '../utils';
+import { useTranslation } from '../i18n/stub';
 
 const MenuDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addItem, toggleCart } = useCart();
+  const { t } = useTranslation();
 
   const [menuItem, setMenuItem] = useState<Menu | null>(null);
   const [loading, setLoading] = useState(true);
@@ -109,12 +111,12 @@ const MenuDetailsPage: React.FC = () => {
     return (
       <div className="container mx-auto px-4 py-6">
         <div className="text-center py-12">
-          <p className="text-base-content/60">Menu item not found</p>
+          <p className="text-base-content/60">{t('menuDetails.notFound')}</p>
           <button
             onClick={() => navigate('/')}
             className="btn btn-primary mt-4"
           >
-            Back to Menu
+            {t('menuDetails.backToMenu')}
           </button>
         </div>
       </div>
@@ -136,7 +138,7 @@ const MenuDetailsPage: React.FC = () => {
           {menuItem.isPopular && (
             <div className="badge badge-secondary p-3">
               <Star size={12} className="mr-1" />
-              Popular
+              {t('menuDetails.popular')}
             </div>
           )}
         </div>
@@ -152,7 +154,7 @@ const MenuDetailsPage: React.FC = () => {
         <div className="space-y-6">
           {menuItem.sizes && menuItem.sizes.length > 0 && (
             <div>
-              <h3 className="font-semibold mb-3">Size</h3>
+              <h3 className="font-semibold mb-3">{t('menuDetails.size')}</h3>
               <div className="grid grid-cols-1 gap-2">
                 {menuItem.sizes.map((size) => (
                   <label key={size.id} className="cursor-pointer">
@@ -178,7 +180,7 @@ const MenuDetailsPage: React.FC = () => {
 
           {menuItem.milkOptions && menuItem.milkOptions.length > 0 && (
             <div>
-              <h3 className="font-semibold mb-3">Milk</h3>
+              <h3 className="font-semibold mb-3">{t('menuDetails.milk')}</h3>
               <div className="grid grid-cols-2 gap-2">
                 {menuItem.milkOptions.map((milk) => (
                   <button
@@ -202,7 +204,7 @@ const MenuDetailsPage: React.FC = () => {
 
           {menuItem.sweetnessLevels && menuItem.sweetnessLevels.length > 0 && (
             <div>
-              <h3 className="font-semibold mb-3">Sweetness</h3>
+              <h3 className="font-semibold mb-3">{t('menuDetails.sweetness')}</h3>
               <div className="grid grid-cols-3 gap-2">
                 {menuItem.sweetnessLevels.map((sweetness) => (
                   <button
@@ -221,7 +223,7 @@ const MenuDetailsPage: React.FC = () => {
 
           {menuItem.temperatureOptions && menuItem.temperatureOptions.length > 0 && (
             <div>
-              <h3 className="font-semibold mb-3">Temperature</h3>
+              <h3 className="font-semibold mb-3">{t('menuDetails.temperature')}</h3>
               <div className="grid grid-cols-2 gap-2">
                 {menuItem.temperatureOptions.map((temp) => (
                   <button
@@ -239,7 +241,7 @@ const MenuDetailsPage: React.FC = () => {
           )}
 
           <div>
-            <h3 className="font-semibold mb-3">Add-ons</h3>
+            <h3 className="font-semibold mb-3">{t('menuDetails.addOns')}</h3>
             <div className="space-y-2">
               {menuItem.addOns.map((addOn) => (
                 <label key={addOn.id} className="cursor-pointer flex items-center justify-between p-2 rounded-lg hover:bg-base-200">
@@ -267,7 +269,7 @@ const MenuDetailsPage: React.FC = () => {
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   className="btn btn-ghost btn-sm p-2"
                   disabled={quantity <= 1}
-                  aria-label="Decrease quantity"
+                  aria-label={t('aria.decreaseQuantity')}
                 >
                   <Minus size={16} />
                 </button>
@@ -275,14 +277,14 @@ const MenuDetailsPage: React.FC = () => {
                 <button
                   onClick={() => setQuantity(quantity + 1)}
                   className="btn btn-ghost btn-sm p-2"
-                  aria-label="Increase quantity"
+                  aria-label={t('aria.increaseQuantity')}
                 >
                   <Plus size={16} />
                 </button>
               </div>
 
               <div className="text-right">
-                <p className="text-sm text-base-content/60">Total</p>
+                <p className="text-sm text-base-content/60">{t('menuDetails.total')}</p>
                 <p className="text-2xl font-bold text-primary">{formatPrice(calculateTotalPrice())}</p>
               </div>
             </div>
@@ -293,7 +295,7 @@ const MenuDetailsPage: React.FC = () => {
               disabled={!selectedSize}
             >
               <ShoppingCart size={20} className="mr-2" />
-              Add {quantity} to Cart • {formatPrice(calculateTotalPrice())}
+              {t('menuDetails.addQuantityToCart', { quantity })} • {formatPrice(calculateTotalPrice())}
             </button>
           </div>
         </div>
@@ -326,7 +328,7 @@ const MenuDetailsPage: React.FC = () => {
             disabled={!selectedSize}
           >
             <ShoppingCart size={20} className="mr-2" />
-            Add to Cart • {formatPrice(calculateTotalPrice())}
+            {t('menuDetails.addToCart')} • {formatPrice(calculateTotalPrice())}
           </button>
         </div>
       </div>

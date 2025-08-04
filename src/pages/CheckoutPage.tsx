@@ -8,6 +8,7 @@ import { Customer, OrderConfirmationLocationState } from '../types';
 import { formatPrice } from '../utils';
 import { useOrderHistory } from '../hooks/useOrderHistory';
 import { useAnonymousUser } from '../hooks/useAnonymousUser';
+import { useTranslation } from '../i18n/stub';
 
 const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const CheckoutPage: React.FC = () => {
   const { addOrder } = useOrderHistory();
   const { userId } = useAnonymousUser();
   const { isCheckoutDisabled, isLoading: isCheckoutLoading } = useCheckoutStatus();
+  const { t } = useTranslation();
 
   const [formData, setFormData] = useState<Customer>({
     name: customer?.name || '',
@@ -30,13 +32,13 @@ const CheckoutPage: React.FC = () => {
     const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = t('checkout.nameRequired');
     }
 
     if (totalItems > 4 && !formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required for orders 5++ items';
+      newErrors.phone = t('checkout.phoneRequiredLargeOrder');
     } else if (formData.phone.trim() && !/^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) {
-      newErrors.phone = 'Please enter a valid 10-digit phone number';
+      newErrors.phone = t('checkout.phoneInvalid');
     }
 
     setErrors(newErrors);
@@ -56,7 +58,7 @@ const CheckoutPage: React.FC = () => {
     if (!validateForm()) return;
     if (items.length === 0) return;
     if (isCheckoutDisabled) {
-      alert('Checkout is currently disabled. Please try again later.');
+      alert(t('checkout.disabledAlert'));
       return;
     }
 
@@ -86,7 +88,7 @@ const CheckoutPage: React.FC = () => {
       });
     } catch (error) {
       console.error('Failed to create order:', error);
-      alert('Failed to place order. Please try again.');
+      alert(t('checkout.orderFailedAlert'));
     } finally {
       setLoading(false);
     }
@@ -96,12 +98,12 @@ const CheckoutPage: React.FC = () => {
     return (
       <div className="container mx-auto px-4 py-6">
         <div className="text-center py-12">
-          <p className="text-base-content/60">Your cart is empty</p>
+          <p className="text-base-content/60">{t('checkout.emptyCart')}</p>
           <button
             onClick={() => navigate('/')}
             className="btn btn-primary mt-4"
           >
-            Back to Menu
+            {t('checkout.backToMenu')}
           </button>
         </div>
       </div>
@@ -111,7 +113,7 @@ const CheckoutPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
       <div className="bg-base-200 rounded-lg p-4">
-        <h2 className="font-bold text-lg mb-3">Order Summary</h2>
+        <h2 className="font-bold text-lg mb-3">{t('checkout.orderSummary')}</h2>
         <div className="space-y-2">
           {items.map((item) => (
             <div key={item.id} className="flex justify-between items-center text-sm">
@@ -126,7 +128,7 @@ const CheckoutPage: React.FC = () => {
           ))}
           <div className="border-t border-base-300 pt-2 mt-3">
             <div className="flex justify-between items-center font-bold text-lg">
-              <span>Total:</span>
+              <span>{t('checkout.total')}</span>
               <span className="text-primary">{formatPrice(getTotalPrice())}</span>
             </div>
           </div>
@@ -137,13 +139,13 @@ const CheckoutPage: React.FC = () => {
         <div className="bg-base-200 rounded-lg p-4 space-y-4">
           <h2 className="font-bold text-lg flex items-center">
             <User className="mr-2" size={20} />
-            Customer Information
+            {t('checkout.customerInfo')}
           </h2>
 
           <div className="space-y-4">
             <div>
               <label className="label">
-                <span className="label-text font-medium">Full Name *</span>
+                <span className="label-text font-medium">{t('checkout.fullName')}</span>
               </label>
               <input
                 type="text"
@@ -151,7 +153,7 @@ const CheckoutPage: React.FC = () => {
                 onChange={(e) => handleInputChange('name', e.target.value)}
                 className={`input input-bordered input-touch w-full ${errors.name ? 'input-error' : ''
                   }`}
-                placeholder="Enter your name"
+                placeholder={t('checkout.enterName')}
                 disabled={loading}
               />
               {errors.name && (
@@ -161,7 +163,7 @@ const CheckoutPage: React.FC = () => {
 
             <div>
               <label className="label">
-                <span className="label-text font-medium">Phone Number {items.reduce((sum, item) => sum + item.quantity, 0) > 4 ? '*' : '(Optional)'}</span>
+                <span className="label-text font-medium">{t('checkout.phoneNumber')} {items.reduce((sum, item) => sum + item.quantity, 0) > 4 ? '*' : t('checkout.optional')}</span>
               </label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/50" size={18} />
@@ -171,7 +173,7 @@ const CheckoutPage: React.FC = () => {
                   onChange={(e) => handleInputChange('phone', e.target.value)}
                   className={`input input-bordered input-touch w-full pl-10 ${errors.phone ? 'input-error' : ''
                     }`}
-                  placeholder="089-123-4567"
+                  placeholder={t('checkout.phonePlaceholder')}
                   disabled={loading}
                 />
               </div>
@@ -182,7 +184,7 @@ const CheckoutPage: React.FC = () => {
 
             <div>
               <label className="label">
-                <span className="label-text font-medium">Table Number (Optional)</span>
+                <span className="label-text font-medium">{t('checkout.tableNumber')}</span>
               </label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/50" size={18} />
@@ -191,13 +193,10 @@ const CheckoutPage: React.FC = () => {
                   value={formData.tableNumber}
                   onChange={(e) => handleInputChange('tableNumber', e.target.value)}
                   className="input input-bordered input-touch w-full pl-10"
-                  placeholder="Table 5, Counter, etc."
+                  placeholder={t('checkout.tablePlaceholder')}
                   disabled={loading}
                 />
               </div>
-              <p className="text-base-content/60 text-sm mt-1">
-                Leave blank for takeout orders
-              </p>
             </div>
           </div>
         </div>
@@ -205,8 +204,8 @@ const CheckoutPage: React.FC = () => {
         <div className="space-y-3">
           {isCheckoutDisabled && (
             <div className="bg-error/10 border border-error/20 rounded-lg p-3 text-center">
-              <p className="text-error font-medium">Checkout is temporarily disabled</p>
-              <p className="text-error/70 text-sm mt-1">Please try again later</p>
+              <p className="text-error font-medium">{t('checkout.temporarilyDisabled')}</p>
+              <p className="text-error/70 text-sm mt-1">{t('checkout.tryAgainLater')}</p>
             </div>
           )}
           <button
@@ -217,12 +216,12 @@ const CheckoutPage: React.FC = () => {
             {loading ? (
               <>
                 <span className="loading loading-spinner loading-sm mr-2"></span>
-                Placing Order...
+                {t('checkout.placingOrder')}
               </>
             ) : isCheckoutDisabled ? (
-              "Checkout"
+              t('checkout.checkout')
             ) : (
-              `Place Order • ${formatPrice(getTotalPrice())}`
+              `${t('checkout.placeOrder')} • ${formatPrice(getTotalPrice())}`
             )}
           </button>
 
@@ -232,7 +231,7 @@ const CheckoutPage: React.FC = () => {
             className="btn btn-outline btn-touch w-full"
             disabled={loading}
           >
-            Back to Menu
+            {t('checkout.backToMenu')}
           </button>
         </div>
       </form>

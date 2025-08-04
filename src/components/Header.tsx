@@ -23,7 +23,7 @@ const Header: React.FC = () => {
       case '/order-status':
         return t('header.orderStatus');
       case '/my-orders':
-        return 'My Orders';
+        return t('header.myOrders');
       case '/contact':
         return t('header.contact');
       default:
@@ -34,7 +34,7 @@ const Header: React.FC = () => {
           return t('header.orderConfirmed');
         }
         if (location.pathname.startsWith('/order-detail/')) {
-          return 'Order Details';
+          return t('header.orderDetails');
         }
         return t('header.timing');
     }
@@ -60,8 +60,8 @@ const Header: React.FC = () => {
           <button
             onClick={toggleLanguage}
             className="btn btn-ghost btn-sm p-2 text-white hover:bg-white/10"
-            aria-label={`Change language to ${i18n.language === 'th' ? 'English' : 'Thai'}`}
-            title={i18n.language === 'th' ? 'Switch to English' : 'เปลี่ยนเป็นภาษาไทย'}
+            aria-label={t('header.changeLanguageTo', { language: i18n.language === 'th' ? 'English' : 'Thai' })}
+            title={i18n.language === 'th' ? t('header.switchToEnglish') : 'เปลี่ยนเป็นภาษาไทย'}
           >
             <Languages size={18} />
             <span className="text-xs ml-1 font-medium">

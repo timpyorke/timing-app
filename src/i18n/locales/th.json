@@ -28,7 +28,11 @@
     "orderStatus": "สถานะคำสั่งซื้อ",
     "menuDetails": "รายละเอียดเครื่องดื่ม",
     "orderConfirmed": "ยืนยันคำสั่งซื้อแล้ว",
-    "contact": "ติดต่อเรา"
+    "contact": "ติดต่อเรา",
+    "myOrders": "คำสั่งซื้อของฉัน",
+    "orderDetails": "รายละเอียดคำสั่งซื้อ",
+    "changeLanguageTo": "เปลี่ยนภาษาเป็น",
+    "switchToEnglish": "Switch to English"
   },
   "menu": {
     "searchPlaceholder": "ค้นหาเครื่องดื่ม...",
@@ -50,7 +54,12 @@
     "temperature": "อุณหภูมิ",
     "addOns": "เพิ่มเติม",
     "addToCart": "เพิ่มลงตะกร้า",
-    "updateCart": "อัปเดตตะกร้า"
+    "updateCart": "อัปเดตตะกร้า",
+    "notFound": "ไม่พบรายการเมนู",
+    "backToMenu": "กลับไปที่เมนู",
+    "popular": "ยอดนิยม",
+    "total": "รวม",
+    "addQuantityToCart": "เพิ่ม {{quantity}} ใส่ตะกร้า"
   },
   "cart": {
     "yourCart": "ตะกร้าของคุณ",
@@ -73,15 +82,46 @@
     "placeOrder": "สั่งซื้อ",
     "nameRequired": "จำเป็นต้องระบุชื่อ",
     "phoneRequired": "จำเป็นต้องระบุหมายเลขโทรศัพท์",
-    "phoneInvalid": "กรุณาระบุหมายเลขโทรศัพท์ที่ถูกต้อง"
+    "phoneInvalid": "กรุณาระบุหมายเลขโทรศัพท์ที่ถูกต้อง",
+    "phoneRequiredLargeOrder": "จำเป็นต้องมีเบอร์โทรศัพท์สำหรับคำสั่งซื้อ 5 รายการขึ้นไป",
+    "disabledAlert": "การชำระเงินถูกปิดใช้งานชั่วคราว กรุณาลองใหม่ภายหลัง",
+    "orderFailedAlert": "ไม่สามารถสั่งซื้อได้ กรุณาลองใหม่อีกครั้ง",
+    "emptyCart": "ตะกร้าของคุณว่างเปล่า",
+    "backToMenu": "กลับไปที่เมนู",
+    "total": "รวม:",
+    "fullName": "ชื่อ-นามสกุล *",
+    "enterName": "กรอกชื่อของคุณ",
+    "phoneNumber": "เบอร์โทรศัพท์",
+    "optional": "(ไม่บังคับ)",
+    "phonePlaceholder": "089-123-4567",
+    "tableNumber": "หมายเลขโต๊ะ (ไม่บังคับ)",
+    "tablePlaceholder": "โต๊ะ 5, เคาน์เตอร์, ฯลฯ",
+    "takeoutNote": "เว้นว่างไว้สำหรับคำสั่งซื้อแบบสั่งกลับบ้าน",
+    "temporarilyDisabled": "การชำระเงินถูกปิดใช้งานชั่วคราว",
+    "tryAgainLater": "กรุณาลองใหม่ภายหลัง",
+    "placingOrder": "กำลังสั่งซื้อ...",
+    "checkout": "ชำระเงิน"
   },
   "orderConfirmation": {
     "title": "ยืนยันคำสั่งซื้อแล้ว!",
     "subtitle": "ขอบคุณสำหรับคำสั่งซื้อของคุณ เราจะเริ่มเตรียมเครื่องดื่มของคุณทันที",
-    "orderNumber": "คำสั่งซื้อ #{{orderNumber}}",
+    "orderNumberWithId": "คำสั่งซื้อ #{{orderNumber}}",
     "estimatedTime": "เวลาเตรียมโดยประมาณ: {{minutes}} นาที",
     "trackOrder": "ติดตามคำสั่งซื้อของคุณ",
-    "orderAnother": "สั่งเครื่องดื่มเพิ่ม"
+    "orderAnother": "สั่งเครื่องดื่มเพิ่ม",
+    "notFound": "ไม่พบคำสั่งซื้อ",
+    "backToMenu": "กลับไปที่เมนู",
+    "confirmed": "ยืนยันคำสั่งซื้อแล้ว!",
+    "thankYou": "ขอบคุณที่เลือก TIMING! เรากำลังเตรียมเมนูของคุณอยู่",
+    "orderNumber": "หมายเลขคำสั่งซื้อ:",
+    "estimatedPickup": "เวลารับประมาณ:",
+    "customerDetails": "รายละเอียดลูกค้า",
+    "table": "โต๊ะ",
+    "importantInfo": "ข้อมูลสำคัญ",
+    "holdTime": "คำสั่งซื้อจะถูกเก็บไว้ 15 นาทีหลังจากเวลาที่พร้อม",
+    "showNumber": "แสดงหมายเลขคำสั่งซื้อให้เจ้าหน้าที่",
+    "trackStatus": "ติดตามสถานะคำสั่งซื้อ",
+    "placeAnother": "สั่งซื้ออีกครั้ง"
   },
   "orderStatus": {
     "title": "สถานะคำสั่งซื้อ",
@@ -96,7 +136,19 @@
     },
     "estimatedTime": "ประมาณ {{minutes}} นาที",
     "items": "{{count}} รายการ",
-    "items_plural": "{{count}} รายการ"
+    "items_plural": "{{count}} รายการ",
+    "myOrders": "คำสั่งซื้อของฉัน",
+    "loading": "กำลังโหลดคำสั่งซื้อ...",
+    "noOrdersYet": "ยังไม่มีคำสั่งซื้อ",
+    "startOrdering": "เริ่มสั่งเพื่อดูประวัติคำสั่งซื้อของคุณ",
+    "browseMenu": "ดูเมนู",
+    "orderItems": "รายการสั่งซื้อ:",
+    "size": "ขนาด:",
+    "milk": "นม:",
+    "sweetness": "ความหวาน:",
+    "temperature": "อุณหภูมิ:",
+    "addOns": "เพิ่มเติม:",
+    "table": "โต๊ะ:"
   },
   "contact": {
     "title": "ติดต่อเรา",
@@ -108,5 +160,20 @@
     "weekends": "เสาร์ - อาทิตย์",
     "location": "ที่ตั้ง",
     "address": "Sunkid Studio"
+  },
+  "quickAdd": {
+    "title": "เพิ่มด่วน"
+  },
+  "merchantClosed": {
+    "whatYouCanDo": "สิ่งที่คุณสามารถทำได้:",
+    "checkLater": "กลับมาตรวจสอบอีกครั้งเมื่อเราเปิดใหม่",
+    "followSocial": "ติดตามโซเชียลมีเดียของเราเพื่อรับข้อมูลอัปเดต",
+    "contactUs": "ติดต่อเราเพื่อข้อมูลเพิ่มเติม"
+  },
+  "aria": {
+    "closeCart": "ปิดตะกร้า",
+    "decreaseQuantity": "ลดจำนวน",
+    "increaseQuantity": "เพิ่มจำนวน",
+    "removeItem": "ลบรายการ"
   }
 }
