@@ -48,6 +48,21 @@ class RemoteConfigService {
     }
   }
 
+  getCheckoutStatus(): boolean {
+    try {
+      return getBoolean(remoteConfig, 'is_disable_checkout');
+    } catch (error) {
+      console.error('Failed to get checkout status from remote config:', error);
+      // Return default value (false = checkout enabled)
+      return false;
+    }
+  }
+
+  async checkCheckoutStatus(): Promise<boolean> {
+    await this.fetchConfig();
+    return this.getCheckoutStatus();
+  }
+
   async checkMerchantStatus(): Promise<MerchantStatus> {
     await this.fetchConfig();
     return this.getMerchantStatus();

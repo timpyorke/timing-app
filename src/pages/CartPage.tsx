@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Minus, Trash2, ShoppingBag } from 'lucide-react';
 import { useCart } from '../hooks/useCart';
+import { useCheckoutStatus } from '../hooks/useCheckoutStatus';
 import { formatPrice } from '../utils';
 
 const CartPage: React.FC = () => {
@@ -14,6 +15,7 @@ const CartPage: React.FC = () => {
     getTotalPrice,
     getTotalItems 
   } = useCart();
+  const { isCheckoutDisabled, isLoading: isCheckoutLoading } = useCheckoutStatus();
 
   const handleContinueShopping = () => {
     navigate('/');
@@ -149,9 +151,11 @@ const CartPage: React.FC = () => {
         </button>
         <button
           onClick={handleCheckout}
+          disabled={isCheckoutDisabled || isCheckoutLoading}
           className="btn btn-primary btn-touch flex-1 text-base font-bold"
+          title={isCheckoutDisabled ? "Checkout is temporarily disabled" : undefined}
         >
-          Checkout
+          {isCheckoutDisabled ? "Checkout Disabled" : "Checkout"}
         </button>
       </div>
     </div>

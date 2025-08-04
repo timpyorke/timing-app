@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Phone, MapPin } from 'lucide-react';
 import { useCart } from '../hooks/useCart';
+import { useCheckoutStatus } from '../hooks/useCheckoutStatus';
 import { apiService } from '../services/api';
 import { Customer, OrderConfirmationLocationState } from '../types';
 import { formatPrice } from '../utils';
@@ -13,6 +14,7 @@ const CheckoutPage: React.FC = () => {
   const { items, customer, setCustomer, clearCart, getTotalPrice } = useCart();
   const { addOrder } = useOrderHistory();
   const { userId } = useAnonymousUser();
+  const { isCheckoutDisabled, isLoading: isCheckoutLoading } = useCheckoutStatus();
   
   const [formData, setFormData] = useState<Customer>({
     name: customer?.name || '',
@@ -53,6 +55,10 @@ const CheckoutPage: React.FC = () => {
     
     if (!validateForm()) return;
     if (items.length === 0) return;
+    if (isCheckoutDisabled) {
+      alert('Checkout is currently disabled. Please try again later.');
+      return;
+    }
 
     setLoading(true);
     
@@ -199,9 +205,15 @@ const CheckoutPage: React.FC = () => {
         </div>
 
         <div className="space-y-3">
+          {isCheckoutDisabled && (
+            <div className="bg-error/10 border border-error/20 rounded-lg p-3 text-center">
+              <p className="text-error font-medium">Checkout is temporarily disabled</p>
+              <p className="text-error/70 text-sm mt-1">Please try again later</p>
+            </div>
+          )}
           <button
             type="submit"
-            disabled={loading || items.length === 0}
+            disabled={loading || items.length === 0 || isCheckoutDisabled || isCheckoutLoading}
             className="btn btn-primary btn-touch w-full"
           >
             {loading ? (
@@ -209,6 +221,8 @@ const CheckoutPage: React.FC = () => {
                 <span className="loading loading-spinner loading-sm mr-2"></span>
                 Placing Order...
               </>
+            ) : isCheckoutDisabled ? (
+              "Checkout Disabled"
             ) : (
               `Place Order • ${formatPrice(getTotalPrice())}`
             )}
