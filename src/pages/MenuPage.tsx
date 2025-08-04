@@ -23,7 +23,7 @@ const MenuPage: React.FC = () => {
         const menuData = await apiService.getMenu();
         setMenuItems(menuData.menu);
         setCategories(menuData.categories);
-        setFilteredMenuItems(menuData.menu);
+        setFilteredMenuItems([...menuData.menu].reverse());
       } catch (error) {
         console.error('Failed to fetch menu:', error);
       } finally {
@@ -49,7 +49,7 @@ const MenuPage: React.FC = () => {
       );
     }
 
-    setFilteredMenuItems(filtered);
+    setFilteredMenuItems([...filtered].reverse());
   }, 300);
 
   useEffect(() => {
@@ -98,9 +98,8 @@ const MenuPage: React.FC = () => {
       <div className="flex space-x-2 overflow-x-auto pb-2 px-1">
         <button
           onClick={() => handleCategoryChange('all')}
-          className={`btn btn-sm whitespace-nowrap px-4 py-2 ${
-            selectedCategory === 'all' ? 'btn-primary' : 'btn-outline'
-          }`}
+          className={`btn btn-sm whitespace-nowrap px-4 py-2 ${selectedCategory === 'all' ? 'btn-primary' : 'btn-outline'
+            }`}
         >
           {t('menu.all')}
         </button>
@@ -108,9 +107,8 @@ const MenuPage: React.FC = () => {
           <button
             key={category.id}
             onClick={() => handleCategoryChange(category.id)}
-            className={`btn btn-sm whitespace-nowrap px-4 py-2 ${
-              selectedCategory === category.id ? 'btn-primary' : 'btn-outline'
-            }`}
+            className={`btn btn-sm whitespace-nowrap px-4 py-2 ${selectedCategory === category.id ? 'btn-primary' : 'btn-outline'
+              }`}
           >
             {category.name}
           </button>
@@ -130,15 +128,15 @@ const MenuPage: React.FC = () => {
             <div
               key={menuItem.id}
               onClick={(e) => handleQuickAddClick(e, menuItem)}
-              className="card-menu group cursor-pointer hover:shadow-xl transition-all duration-200 relative border border-black rounded-lg hover:border-black"
+              className="card-menu p-2 group cursor-pointer hover:shadow-xl transition-all duration-200 relative border border-black rounded-lg hover:border-black"
             >
-              <div className="flex items-start gap-3 p-2">
+              <div className="flex items-start gap-2 p-1">
                 {/* Image on the left */}
                 <div className="relative flex-shrink-0">
                   <img
                     src={menuItem.image}
                     alt={menuItem.name}
-                    className="w-16 h-16 object-cover rounded-lg group-hover:scale-105 transition-transform duration-200"
+                    className="w-24 h-24 object-cover object-center rounded-lg group-hover:scale-105 transition-transform duration-200"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = '/images/placeholder-menu.svg';
                     }}
@@ -157,7 +155,7 @@ const MenuPage: React.FC = () => {
                     <h3 className="font-bold text-base text-base-content truncate">{menuItem.name}</h3>
                     <span className="text-lg font-bold text-primary ml-2">{formatPrice(menuItem.basePrice)}</span>
                   </div>
-                  
+
                   <p className="text-xs text-base-content/70 line-clamp-2 mb-2">
                     {menuItem.description}
                   </p>
@@ -182,7 +180,7 @@ const MenuPage: React.FC = () => {
                 {/* Circular Add Button - Bottom Right */}
                 <button
                   onClick={(e) => handleQuickAddClick(e, menuItem)}
-                  className="absolute bottom-2 right-2 btn btn-circle btn-primary btn-sm hover:btn-primary-focus transition-all duration-200"
+                  className="absolute bottom-3 right-3 btn btn-circle btn-primary btn-sm hover:btn-primary-focus transition-all duration-200"
                   aria-label={`Quick add ${menuItem.name} to cart`}
                 >
                   <Plus size={14} />

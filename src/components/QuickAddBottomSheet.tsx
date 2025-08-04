@@ -85,7 +85,7 @@ const QuickAddBottomSheet: React.FC<QuickAddBottomSheetProps> = ({
           <img
             src={menuItem.image}
             alt={menuItem.name}
-            className="w-16 h-16 object-cover rounded-lg"
+            className="w-16 h-16 object-cover object-center rounded-lg"
             onError={(e) => {
               (e.target as HTMLImageElement).src = '/images/placeholder-menu.svg';
             }}

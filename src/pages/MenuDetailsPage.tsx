@@ -127,7 +127,7 @@ const MenuDetailsPage: React.FC = () => {
         <img
           src={menuItem.image}
           alt={menuItem.name}
-          className="w-full h-64 object-cover rounded-2xl"
+          className="w-full h-64 object-cover object-center rounded-2xl"
           onError={(e) => {
             (e.target as HTMLImageElement).src = '/images/placeholder-menu.svg';
           }}

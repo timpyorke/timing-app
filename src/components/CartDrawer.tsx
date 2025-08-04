@@ -51,7 +51,7 @@ const CartDrawer: React.FC = () => {
                 <img
                   src={item.imageUrl}
                   alt={item.menuName}
-                  className="w-12 h-12 rounded-lg object-cover"
+                  className="w-12 h-12 rounded-lg object-cover object-center"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = '/images/placeholder-menu.svg';
                   }}
