@@ -108,11 +108,5 @@
     "weekends": "เสาร์ - อาทิตย์",
     "location": "ที่ตั้ง",
     "address": "Sunkid Studio"
-  },
-  "pwa": {
-    "installTitle": "ติดตั้งแอป TIMING",
-    "installSubtitle": "รับประสบการณ์แอปแบบเต็มรูปแบบพร้อมการโหลดที่เร็วขึ้นและการเข้าถึงแบบออฟไลน์",
-    "install": "ติดตั้ง",
-    "dismiss": "ไว้ทีหลัง"
   }
 }

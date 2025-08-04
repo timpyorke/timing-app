@@ -228,11 +228,11 @@ const CheckoutPage: React.FC = () => {
 
           <button
             type="button"
-            onClick={() => navigate('/cart')}
+            onClick={() => navigate('/')}
             className="btn btn-outline btn-touch w-full"
             disabled={loading}
           >
-            Back to Cart
+            Back to Menu
           </button>
         </div>
       </form>

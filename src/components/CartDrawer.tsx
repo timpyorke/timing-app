@@ -17,9 +17,9 @@ const CartDrawer: React.FC = () => {
     getTotalPrice 
   } = useCart();
 
-  const handleViewCart = () => {
+  const handleCheckout = () => {
     toggleCart();
-    navigate('/cart');
+    navigate('/checkout');
   };
 
   if (!isOpen) return null;
@@ -106,10 +106,10 @@ const CartDrawer: React.FC = () => {
               <span className="text-lg font-bold text-primary">{formatPrice(getTotalPrice())}</span>
             </div>
             <button
-              onClick={handleViewCart}
+              onClick={handleCheckout}
               className="btn btn-primary btn-touch w-full"
             >
-{t('cart.checkout')}
+              {t('cart.checkout')}
             </button>
           </div>
         )}
