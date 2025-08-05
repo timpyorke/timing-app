@@ -16,9 +16,14 @@ let currentLanguage = typeof window !== 'undefined'
   ? localStorage.getItem('i18nextLng') || 'th' 
   : 'th';
 let listeners: (() => void)[] = [];
+let languageChangeListeners: ((newLanguage: string) => void)[] = [];
 
 const notifyListeners = () => {
   listeners.forEach(listener => listener());
+};
+
+const notifyLanguageChangeListeners = (newLanguage: string) => {
+  languageChangeListeners.forEach(listener => listener(newLanguage));
 };
 
 const t = (key: string, options?: TranslationOptions): string => {
@@ -66,6 +71,7 @@ export const useTranslation = () => {
           // Store in localStorage
           localStorage.setItem('i18nextLng', lng);
           notifyListeners();
+          notifyLanguageChangeListeners(lng);
         }
       }
     }
@@ -76,6 +82,16 @@ export const useTranslation = () => {
 export const initReactI18next = () => ({
   init: () => Promise.resolve(),
 });
+
+// Function to subscribe to language changes
+export const subscribeToLanguageChange = (callback: (newLanguage: string) => void) => {
+  languageChangeListeners.push(callback);
+  
+  // Return unsubscribe function
+  return () => {
+    languageChangeListeners = languageChangeListeners.filter(listener => listener !== callback);
+  };
+};
 
 // Mock for LanguageDetector
 const LanguageDetector = {

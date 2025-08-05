@@ -23,7 +23,20 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000
 
 class ApiService {
   private async request<T>(endpoint: string, options?: FetchRequestOptions): Promise<T> {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    // Add locale parameter to the endpoint if not already present
+    const url = new URL(`${API_BASE_URL}${endpoint}`);
+    
+    // Get current language from localStorage or default to Thai
+    const currentLocale = typeof window !== 'undefined' 
+      ? localStorage.getItem('i18nextLng') || 'th' 
+      : 'th';
+    
+    // Add locale parameter if not already in the URL
+    if (!url.searchParams.has('locale')) {
+      url.searchParams.set('locale', currentLocale);
+    }
+
+    const response = await fetch(url.toString(), {
       headers: {
         'Content-Type': 'application/json',
         ...options?.headers,
@@ -220,7 +233,7 @@ class ApiService {
             const milkOptions = apiMilkOptions.map((milk: string) => ({
               id: generateImagePath(milk),
               name: milk.trim(),
-              price: milk.toLowerCase().includes('normal') ? 0 : 20
+              price: milk.toLowerCase().includes('normal') || milk.toLowerCase().includes('oat') ? 0 : 20
             }));
 
             menuItems.push({
@@ -433,7 +446,7 @@ class ApiService {
     const milkOptions = apiMilkOptions.map((milk: string) => ({
       id: generateImagePath(milk),
       name: milk.trim(),
-      price: milk.toLowerCase().includes('normal') ? 0 : 20
+      price: milk.toLowerCase().includes('normal') || milk.toLowerCase().includes('oat') ? 0 : 20
     }));
 
     // Handle sweetness levels from API

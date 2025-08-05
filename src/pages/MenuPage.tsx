@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Star, Plus } from 'lucide-react';
-import { useTranslation } from '../i18n/stub';
+import { useTranslation, subscribeToLanguageChange } from '../i18n/stub';
 import { Menu, MenuCategory } from '../types';
 import { apiService } from '../services/api';
 import { formatPrice, debounce } from '../utils';
@@ -17,21 +17,31 @@ const MenuPage: React.FC = () => {
   const [selectedMenuForQuickAdd, setSelectedMenuForQuickAdd] = useState<Menu | null>(null);
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchMenu = async () => {
-      try {
-        const menuData = await apiService.getMenu();
-        setMenuItems(menuData.menu);
-        setCategories(menuData.categories);
-        setFilteredMenuItems([...menuData.menu].reverse());
-      } catch (error) {
-        console.error('Failed to fetch menu:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchMenu = async () => {
+    try {
+      setLoading(true);
+      const menuData = await apiService.getMenu();
+      setMenuItems(menuData.menu);
+      setCategories(menuData.categories);
+      setFilteredMenuItems([...menuData.menu].reverse());
+    } catch (error) {
+      console.error('Failed to fetch menu:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchMenu();
+  }, []);
+
+  // Subscribe to language changes and refresh menu
+  useEffect(() => {
+    const unsubscribe = subscribeToLanguageChange(() => {
+      fetchMenu();
+    });
+
+    return unsubscribe;
   }, []);
 
   const debouncedSearch = debounce((...args: unknown[]) => {
