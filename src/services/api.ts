@@ -82,23 +82,14 @@ class ApiService {
     try {
       const total = items.reduce((sum, item) => sum + item.totalPrice, 0);
       
-      // Transform to match Timing API format
-      const formatPhone = (phone: string): string => {
-        if (!phone || phone.trim() === '') {
-          return '-';
-        }
-        return phone;
-      };
-
       const customerInfo: ApiCustomerInfo = {
         name: customer.name,
         email: `${customer.name.toLowerCase().replace(/\s+/g, '.')}@customer.timing.com`,
       };
 
-      // Only include phone if it's not empty
-      const formattedPhone = formatPhone(customer.phone);
-      if (formattedPhone && formattedPhone.trim() !== '') {
-        customerInfo.phone = formattedPhone;
+      // Only include phone if it's not empty and valid
+      if (customer.phone && customer.phone.trim() !== '') {
+        customerInfo.phone = customer.phone.trim();
       }
 
       const orderData: ApiOrderRequest = {
