@@ -5,7 +5,7 @@ import { Menu, MenuSize, MenuAddOn, CartItem, MilkOption } from '../types';
 import { apiService } from '../services/api';
 import { useCart } from '../hooks/useCart';
 import { formatPrice, generateId } from '../utils';
-import { useTranslation } from '../i18n/stub';
+import { useTranslation, subscribeToLanguageChange } from '../i18n/stub';
 
 const MenuDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -22,34 +22,44 @@ const MenuDetailsPage: React.FC = () => {
   const [selectedAddOns, setSelectedAddOns] = useState<MenuAddOn[]>([]);
   const [quantity, setQuantity] = useState(1);
 
-  useEffect(() => {
-    const fetchMenuItem = async () => {
-      if (!id) return;
+  const fetchMenuItem = async () => {
+    if (!id) return;
+    
+    try {
+      setLoading(true);
+      const menuItemData = await apiService.getMenuDetails(id);
       
-      try {
-        const menuItemData = await apiService.getMenuDetails(id);
-        
-        if (menuItemData) {
-          setMenuItem(menuItemData);
-          setSelectedSize(menuItemData.sizes[0] || null);
-          setSelectedMilk(menuItemData.milkOptions?.[0] || null);
-          setSelectedSweetness(menuItemData.sweetnessLevels[0] || '');
-          // Default to first option (Iced)
-          const defaultTemp = menuItemData.temperatureOptions[0] || '';
-          setSelectedTemperature(defaultTemp);
-        } else {
-          console.error('Menu item not found');
-          setMenuItem(null);
-        }
-      } catch (error) {
-        console.error('Failed to fetch menu item details:', error);
+      if (menuItemData) {
+        setMenuItem(menuItemData);
+        setSelectedSize(menuItemData.sizes[0] || null);
+        setSelectedMilk(menuItemData.milkOptions?.[0] || null);
+        setSelectedSweetness(menuItemData.sweetnessLevels[0] || '');
+        // Default to first option (Iced)
+        const defaultTemp = menuItemData.temperatureOptions[0] || '';
+        setSelectedTemperature(defaultTemp);
+      } else {
+        console.error('Menu item not found');
         setMenuItem(null);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (error) {
+      console.error('Failed to fetch menu item details:', error);
+      setMenuItem(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchMenuItem();
+  }, [id]);
+
+  // Subscribe to language changes and refresh menu details
+  useEffect(() => {
+    const unsubscribe = subscribeToLanguageChange(() => {
+      fetchMenuItem();
+    });
+
+    return unsubscribe;
   }, [id]);
 
   const calculateTotalPrice = (): number => {

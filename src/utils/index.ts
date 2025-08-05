@@ -115,7 +115,7 @@ export const transformApiSizes = (apiSizes: string[]) => {
     if (lowerSizeName.includes('large') || lowerSizeName.includes('l')) {
       priceModifier = CONSTANTS.SIZE_PRICE_MODIFIER;
     } else if (lowerSizeName.includes('medium') || lowerSizeName.includes('m')) {
-      priceModifier = Math.floor(CONSTANTS.SIZE_PRICE_MODIFIER / 2);
+      priceModifier = 0; // Medium size is now free
     }
 
     return {
