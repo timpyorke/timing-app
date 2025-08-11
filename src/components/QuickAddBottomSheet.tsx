@@ -39,7 +39,7 @@ const QuickAddBottomSheet: React.FC<QuickAddBottomSheetProps> = ({
 
   const calculateTotalPrice = (): number => {
     if (!menuItem) return 0;
-    
+
     const basePrice = menuItem.basePrice + (selectedSize?.priceModifier || 0);
     const milkPrice = selectedMilk?.price || 0;
     return (basePrice + milkPrice) * quantity;
@@ -64,7 +64,7 @@ const QuickAddBottomSheet: React.FC<QuickAddBottomSheetProps> = ({
 
     addItem(cartItem);
     onClose();
-    
+
     setTimeout(() => {
       toggleCart();
     }, 300);
@@ -92,7 +92,7 @@ const QuickAddBottomSheet: React.FC<QuickAddBottomSheetProps> = ({
           />
           <div className="flex-1">
             <h3 className="font-bold text-base">{menuItem.name}</h3>
-            <p className="text-xs text-base-content/70 line-clamp-2 mt-1">
+            <p className="text-xs text-base-content/70 line-clamp-4 mt-1">
               {menuItem.description}
             </p>
             <p className="text-lg font-bold text-primary mt-1">{formatPrice(menuItem.basePrice)}</p>
@@ -110,9 +110,8 @@ const QuickAddBottomSheet: React.FC<QuickAddBottomSheetProps> = ({
                   <button
                     key={size.id}
                     onClick={() => setSelectedSize(size)}
-                    className={`btn btn-outline btn-xs flex-1 ${
-                      selectedSize?.id === size.id ? 'btn-active' : ''
-                    }`}
+                    className={`btn btn-outline btn-xs flex-1 ${selectedSize?.id === size.id ? 'btn-active' : ''
+                      }`}
                   >
                     {size.name}
                     {size.priceModifier > 0 && ` +${formatPrice(size.priceModifier)}`}
@@ -131,9 +130,8 @@ const QuickAddBottomSheet: React.FC<QuickAddBottomSheetProps> = ({
                   <button
                     key={milk.id}
                     onClick={() => setSelectedMilk(milk)}
-                    className={`btn btn-outline btn-xs ${
-                      selectedMilk?.id === milk.id ? 'btn-active' : ''
-                    }`}
+                    className={`btn btn-outline btn-xs ${selectedMilk?.id === milk.id ? 'btn-active' : ''
+                      }`}
                   >
                     {milk.name}
                     {milk.price > 0 && ` +${formatPrice(milk.price)}`}
@@ -152,9 +150,8 @@ const QuickAddBottomSheet: React.FC<QuickAddBottomSheetProps> = ({
                   <button
                     key={sweetness}
                     onClick={() => setSelectedSweetness(sweetness)}
-                    className={`btn btn-outline btn-xs flex-1 ${
-                      selectedSweetness === sweetness ? 'btn-active' : ''
-                    }`}
+                    className={`btn btn-outline btn-xs flex-1 ${selectedSweetness === sweetness ? 'btn-active' : ''
+                      }`}
                   >
                     {sweetness}
                   </button>
@@ -172,9 +169,8 @@ const QuickAddBottomSheet: React.FC<QuickAddBottomSheetProps> = ({
                   <button
                     key={temp}
                     onClick={() => setSelectedTemperature(temp)}
-                    className={`btn btn-outline btn-xs flex-1 ${
-                      selectedTemperature === temp ? 'btn-active' : ''
-                    }`}
+                    className={`btn btn-outline btn-xs flex-1 ${selectedTemperature === temp ? 'btn-active' : ''
+                      }`}
                   >
                     {temp}
                   </button>
