@@ -127,6 +127,7 @@ export interface ApiCustomerInfo {
   name: string;
   email: string;
   phone?: string;
+  table_number?: string;
 }
 
 export interface ApiCustomerInfoResponse {

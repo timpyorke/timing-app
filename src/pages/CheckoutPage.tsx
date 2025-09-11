@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Phone, MapPin } from 'lucide-react';
 import { useCart } from '../hooks/useCart';
 import { useCheckoutStatus } from '../hooks/useCheckoutStatus';
 import { apiService } from '../services/api';
 import { Customer, OrderConfirmationLocationState } from '../types';
-import { formatPrice } from '../utils';
+import { CONSTANTS, formatPrice } from '../utils';
 import { useOrderHistory } from '../hooks/useOrderHistory';
 import { useAnonymousUser } from '../hooks/useAnonymousUser';
 import { useTranslation } from '../i18n/stub';
@@ -18,11 +18,26 @@ const CheckoutPage: React.FC = () => {
   const { isCheckoutDisabled, isLoading: isCheckoutLoading } = useCheckoutStatus();
   const { t } = useTranslation();
 
-  const [formData, setFormData] = useState<Customer>({
-    name: customer?.name || '',
-    phone: customer?.phone || '',
-    tableNumber: customer?.tableNumber || '',
+  const [formData, setFormData] = useState<Customer>(() => {
+    let storedTable = '';
+    try {
+      storedTable = localStorage.getItem(CONSTANTS.STORAGE_KEYS.TABLE_NUMBER) || '';
+    } catch (e) {
+      storedTable = '';
+    }
+    return {
+      name: customer?.name || '',
+      phone: customer?.phone || '',
+      tableNumber: customer?.tableNumber || storedTable,
+    };
   });
+
+  // Sync table number from cart if it changes (e.g., set by URL capture in Layout)
+  useEffect(() => {
+    if (customer?.tableNumber) {
+      setFormData(prev => ({ ...prev, tableNumber: customer.tableNumber! }));
+    }
+  }, [customer?.tableNumber]);
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Partial<Customer>>({});
