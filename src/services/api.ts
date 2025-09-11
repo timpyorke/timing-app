@@ -92,6 +92,11 @@ class ApiService {
         customerInfo.phone = customer.phone.trim();
       }
 
+      // Include table number if provided
+      if (customer.tableNumber && customer.tableNumber.trim() !== '') {
+        customerInfo.table_number = customer.tableNumber.trim();
+      }
+
       const orderData: ApiOrderRequest = {
         customer_id: userIdToUse, // API expects customer_id field
         customer_info: customerInfo,
