@@ -4,7 +4,8 @@ export const CONSTANTS = {
   MINUTES_TO_MS: 60 * 1000,
   STORAGE_KEYS: {
     ANONYMOUS_USER_ID: 'timing_anonymous_user_id',
-    CART: 'menuOrderCart'
+    CART: 'menuOrderCart',
+    TABLE_NUMBER: 'timing_table_number'
   },
   DEBOUNCE_DELAY: 300,
   SIZE_PRICE_MODIFIER: 15
