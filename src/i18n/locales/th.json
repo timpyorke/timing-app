@@ -100,7 +100,12 @@
     "temporarilyDisabled": "การชำระเงินถูกปิดใช้งานชั่วคราว",
     "tryAgainLater": "กรุณาลองใหม่ภายหลัง",
     "placingOrder": "กำลังสั่งซื้อ...",
-    "checkout": "ชำระเงิน"
+    "checkout": "ชำระเงิน",
+    "paymentAttachment": "หลักฐานการชำระเงิน (จำเป็น)",
+    "paymentAttachmentHint": "กรุณาอัปโหลดสลิปหรือหลักฐานการชำระเงิน",
+    "uploadFile": "อัปโหลดไฟล์",
+    "remove": "ลบ",
+    "fileRequired": "จำเป็นต้องมีไฟล์หลักฐานการชำระเงิน"
   },
   "orderConfirmation": {
     "title": "ยืนยันคำสั่งซื้อแล้ว!",

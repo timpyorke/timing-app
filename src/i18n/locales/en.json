@@ -100,7 +100,12 @@
     "temporarilyDisabled": "Checkout is temporarily disabled",
     "tryAgainLater": "Please try again later",
     "placingOrder": "Placing Order...",
-    "checkout": "Checkout"
+    "checkout": "Checkout",
+    "paymentAttachment": "Payment slip (required)",
+    "paymentAttachmentHint": "Please upload a payment slip or receipt.",
+    "uploadFile": "Upload file",
+    "remove": "Remove",
+    "fileRequired": "Payment file is required"
   },
   "orderConfirmation": {
     "title": "Order Confirmed!",

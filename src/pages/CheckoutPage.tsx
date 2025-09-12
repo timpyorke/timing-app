@@ -43,6 +43,9 @@ const CheckoutPage: React.FC = () => {
   const [errors, setErrors] = useState<Partial<Customer>>({});
   const [qrLoading, setQrLoading] = useState(true);
   const [qrError, setQrError] = useState<string | null>(null);
+  const [attachment, setAttachment] = useState<File | null>(null);
+  const [attachmentPreview, setAttachmentPreview] = useState<string | null>(null);
+  const [attachmentError, setAttachmentError] = useState<string | null>(null);
 
   const totalAmount = useMemo(() => getTotalPrice(), [items]);
   const qrPaymentUrl = useMemo(() => {
@@ -81,6 +84,10 @@ const CheckoutPage: React.FC = () => {
 
     if (!validateForm()) return;
     if (items.length === 0) return;
+    if (!attachment) {
+      setAttachmentError('checkout.fileRequired' in ({} as any) ? t('checkout.fileRequired') : 'Payment file is required');
+      return;
+    }
     if (isCheckoutDisabled) {
       alert(t('checkout.disabledAlert'));
       return;
@@ -192,6 +199,64 @@ const CheckoutPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Payment Attachment (Required) */}
+      <div className="bg-base-200 rounded-lg p-4 space-y-3">
+        <h2 className="font-bold text-lg">{t('checkout.paymentAttachment') || 'Payment slip (required)'}</h2>
+        <p className="text-sm text-base-content/70">{t('checkout.paymentAttachmentHint') || 'Please upload a payment slip or receipt.'}</p>
+
+        {attachment ? (
+          <div className="flex items-center gap-3">
+            {attachmentPreview ? (
+              <img src={attachmentPreview} alt="Attachment preview" className="w-16 h-16 object-cover rounded border" />
+            ) : (
+              <div className="w-16 h-16 rounded border flex items-center justify-center text-xs">FILE</div>
+            )}
+            <div className="flex-1">
+              <div className="text-sm font-medium break-all">{attachment.name}</div>
+              <div className="text-xs text-base-content/60">{Math.round(attachment.size / 1024)} KB</div>
+            </div>
+            <button
+              type="button"
+              className="btn btn-outline btn-sm"
+              onClick={() => {
+                setAttachment(null);
+                setAttachmentPreview(null);
+                setAttachmentError(t('checkout.fileRequired') || null);
+              }}
+            >
+              {t('checkout.remove') || 'Remove'}
+            </button>
+          </div>
+        ) : (
+          <div>
+            <label className="btn btn-primary btn-touch w-full" htmlFor="payment-attachment">
+              {t('checkout.uploadFile') || 'Upload file'}
+            </label>
+            <input
+              id="payment-attachment"
+              type="file"
+              accept="image/*,application/pdf"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0] || null;
+                setAttachment(file);
+                setAttachmentError(null);
+                if (file && file.type.startsWith('image/')) {
+                  const url = URL.createObjectURL(file);
+                  setAttachmentPreview(url);
+                } else {
+                  setAttachmentPreview(null);
+                }
+              }}
+              disabled={loading}
+            />
+            {attachmentError && (
+              <p className="text-error text-sm mt-2">{attachmentError}</p>
+            )}
+          </div>
+        )}
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-base-200 rounded-lg p-4 space-y-4">
           <h2 className="font-bold text-lg flex items-center">
@@ -267,7 +332,7 @@ const CheckoutPage: React.FC = () => {
           )}
           <button
             type="submit"
-            disabled={loading || items.length === 0 || isCheckoutDisabled || isCheckoutLoading}
+            disabled={loading || items.length === 0 || isCheckoutDisabled || isCheckoutLoading || !attachment}
             className="btn btn-primary btn-touch w-full"
           >
             {loading ? (
