@@ -68,6 +68,7 @@ export interface Order {
   status: OrderStatus;
   estimatedPickupTime: string;
   createdAt: string;
+  paymentSlipUrl?: string;
 }
 
 export type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'completed' | 'cancelled';

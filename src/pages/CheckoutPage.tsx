@@ -5,6 +5,7 @@ import { useCart } from '../hooks/useCart';
 import { useCheckoutStatus } from '../hooks/useCheckoutStatus';
 import { apiService } from '../services/api';
 import { Customer, OrderConfirmationLocationState } from '../types';
+import { uploadPaymentSlip } from '../services/supabaseUpload';
 import { CONSTANTS, formatPrice } from '../utils';
 import { useOrderHistory } from '../hooks/useOrderHistory';
 import { useAnonymousUser } from '../hooks/useAnonymousUser';
@@ -98,6 +99,13 @@ const CheckoutPage: React.FC = () => {
 
     try {
       setCustomer(formData);
+      // Upload payment slip first
+      let paymentSlipUrl: string | undefined;
+      if (attachment) {
+        const upload = await uploadPaymentSlip(attachment, { directory: (userId || 'anon'), upsert: true });
+        paymentSlipUrl = upload.publicUrl;
+      }
+
       const order = await apiService.createOrder(items, formData, userId);
 
       // Add order to history
@@ -108,6 +116,7 @@ const CheckoutPage: React.FC = () => {
         subtotal: getTotalPrice(),
         total: getTotalPrice(),
         createdAt: new Date().toISOString(),
+        paymentSlipUrl,
       };
       addOrder(orderWithItems);
 
