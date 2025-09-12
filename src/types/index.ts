@@ -161,6 +161,7 @@ export interface ApiOrderRequest {
   customer_info: ApiCustomerInfo;
   items: ApiOrderItem[];
   total: number;
+  attachment_url?: string;
 }
 
 export interface ApiOrderResponse {

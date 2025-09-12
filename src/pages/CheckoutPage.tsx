@@ -106,7 +106,7 @@ const CheckoutPage: React.FC = () => {
         paymentSlipUrl = upload.publicUrl;
       }
 
-      const order = await apiService.createOrder(items, formData, userId);
+      const order = await apiService.createOrder(items, formData, userId, paymentSlipUrl);
 
       // Add order to history
       const orderWithItems = {
