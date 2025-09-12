@@ -55,6 +55,7 @@ export interface Customer {
   name: string;
   phone: string;
   tableNumber?: string;
+  notes?: string;
 }
 
 export interface Order {

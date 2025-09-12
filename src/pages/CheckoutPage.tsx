@@ -29,6 +29,7 @@ const CheckoutPage: React.FC = () => {
       name: customer?.name || '',
       phone: customer?.phone || '',
       tableNumber: customer?.tableNumber || storedTable,
+      notes: customer?.notes || '',
     };
   });
 
@@ -319,6 +320,19 @@ const CheckoutPage: React.FC = () => {
                   disabled={loading}
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="label">
+                <span className="label-text font-medium">{t('checkout.orderNotes')}</span>
+              </label>
+              <textarea
+                value={formData.notes || ''}
+                onChange={(e) => handleInputChange('notes', e.target.value)}
+                className="textarea textarea-bordered w-full min-h-24"
+                placeholder={t('checkout.orderNotesPlaceholder')}
+                disabled={loading}
+              />
             </div>
           </div>
         </div>
