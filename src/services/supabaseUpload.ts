@@ -20,29 +20,46 @@ export async function uploadPaymentSlip(
 ): Promise<UploadResult> {
   const { supabaseUrl, supabaseAnonKey } = getSupabaseEnv();
   const bucket = opts?.bucket || 'payment-slip';
-  const directory = safeSegment(opts?.directory || 'slips');
   const ext = file.name.includes('.') ? file.name.split('.').pop() : '';
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${ext ? '.' + safeSegment(ext) : ''}`;
+  const directory = safeSegment(opts?.directory || 'slips');
   const objectPath = `${directory}/${filename}`;
 
-  const uploadUrl = `${supabaseUrl}/storage/v1/object/${bucket}/${objectPath}` + (opts?.upsert ? '?upsert=true' : '');
-
-  const res = await fetch(uploadUrl, {
-    method: 'PUT',
+  // First attempt: raw POST with file body to object path
+  const rawUrl = `${supabaseUrl}/storage/v1/object/${bucket}/${objectPath}`;
+  let res = await fetch(rawUrl, {
+    method: 'POST',
     headers: {
       Authorization: `Bearer ${supabaseAnonKey}`,
       apikey: supabaseAnonKey,
       'Content-Type': file.type || 'application/octet-stream',
+      ...(opts?.upsert ? { 'x-upsert': 'true' } : {}),
     },
     body: file,
   });
 
   if (!res.ok) {
+    // Fallback: multipart form with path
+    const multiUrl = `${supabaseUrl}/storage/v1/object/${bucket}`;
+    const form = new FormData();
+    form.append('file', file, filename);
+    form.append('path', objectPath);
+    res = await fetch(multiUrl, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${supabaseAnonKey}`,
+        apikey: supabaseAnonKey,
+        ...(opts?.upsert ? { 'x-upsert': 'true' } : {}),
+      },
+      body: form,
+    });
+  }
+
+  if (!res.ok) {
     const text = await res.text().catch(() => '');
-    throw new Error(`Upload failed: ${res.status} ${res.statusText} ${text}`);
+    throw new Error(`Upload failed: ${res.status} ${res.statusText}${text ? ` - ${text}` : ''}`);
   }
 
   const publicUrl = `${supabaseUrl}/storage/v1/object/public/${bucket}/${objectPath}`;
   return { path: objectPath, publicUrl };
 }
-
