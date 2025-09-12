@@ -56,6 +56,24 @@ const CheckoutPage: React.FC = () => {
     return `https://rub-tung.vercel.app/api/0990995156?amont=${amountParam}`;
   }, [totalAmount]);
 
+  const handleDownloadQr = async () => {
+    try {
+      const response = await fetch(qrPaymentUrl, { mode: 'cors' });
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `payment-qr-${totalAmount.toFixed(2)}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      // Fallback: open in new tab if direct download fails (CORS, etc.)
+      window.open(qrPaymentUrl, '_blank', 'noopener');
+    }
+  };
+
   const validateForm = (): boolean => {
     const newErrors: Partial<Customer> = {};
     const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -206,6 +224,9 @@ const CheckoutPage: React.FC = () => {
           <div className="mt-3 text-sm text-base-content/70">
             Amount: <span className="font-medium text-base-content">{formatPrice(totalAmount)}</span>
           </div>
+          <button type="button" onClick={handleDownloadQr} className="btn btn-outline btn-touch w-full mt-4">
+            Download QR Code
+          </button>
         </div>
       </div>
 
