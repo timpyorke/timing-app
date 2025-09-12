@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Phone, MapPin } from 'lucide-react';
 import { useCart } from '../hooks/useCart';
@@ -41,6 +41,15 @@ const CheckoutPage: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Partial<Customer>>({});
+  const [qrLoading, setQrLoading] = useState(true);
+  const [qrError, setQrError] = useState<string | null>(null);
+
+  const totalAmount = useMemo(() => getTotalPrice(), [items]);
+  const qrPaymentUrl = useMemo(() => {
+    // API provided by user (note: 'amont' as given in request)
+    const amountParam = encodeURIComponent(totalAmount.toFixed(2));
+    return `https://rub-tung.vercel.app/api/0990995156?amont=${amountParam}`;
+  }, [totalAmount]);
 
   const validateForm = (): boolean => {
     const newErrors: Partial<Customer> = {};
@@ -146,6 +155,39 @@ const CheckoutPage: React.FC = () => {
               <span>{t('checkout.total')}</span>
               <span className="text-primary">{formatPrice(getTotalPrice())}</span>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* QR Payment Section */}
+      <div className="bg-base-200 rounded-lg p-4">
+        <h2 className="font-bold text-lg mb-3">QR Payment</h2>
+        <p className="text-sm text-base-content/70 mb-3">Scan to pay the exact total amount.</p>
+        <div className="flex flex-col items-center justify-center">
+          <div className="w-64 h-64 bg-base-100 rounded-lg flex items-center justify-center overflow-hidden border border-base-300 relative">
+            {qrLoading && !qrError && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="loading loading-spinner"></span>
+              </div>
+            )}
+            {qrError && (
+              <div className="p-4 text-center text-error text-sm">Failed to load QR. Please try again.</div>
+            )}
+            {!qrError && (
+              <img
+                src={qrPaymentUrl}
+                alt="QR Payment"
+                className={`w-full h-full object-contain ${qrLoading ? 'opacity-0' : 'opacity-100'}`}
+                onLoad={() => setQrLoading(false)}
+                onError={() => {
+                  setQrLoading(false);
+                  setQrError('Failed to load');
+                }}
+              />
+            )}
+          </div>
+          <div className="mt-3 text-sm text-base-content/70">
+            Amount: <span className="font-medium text-base-content">{formatPrice(totalAmount)}</span>
           </div>
         </div>
       </div>
