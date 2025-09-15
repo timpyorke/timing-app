@@ -3,6 +3,7 @@ import { Search, Star, Plus } from 'lucide-react';
 import { useTranslation, subscribeToLanguageChange } from '../i18n/stub';
 import { Menu, MenuCategory } from '../types';
 import { apiService } from '../services/api';
+import { remoteConfigService, MenuCategoryConfigItem } from '../services/remoteConfig';
 import { formatPrice, debounce } from '../utils';
 import QuickAddBottomSheet from '../components/QuickAddBottomSheet';
 
@@ -20,10 +21,39 @@ const MenuPage: React.FC = () => {
   const fetchMenu = async () => {
     try {
       setLoading(true);
+      // Fetch menu data
       const menuData = await apiService.getMenu();
-      setMenuItems(menuData.menu);
-      setCategories(menuData.categories);
-      setFilteredMenuItems([...menuData.menu].reverse());
+
+      // Fetch Remote Config for category control
+      const categoryConfig: MenuCategoryConfigItem[] = await remoteConfigService.checkMenuCategoryConfig();
+
+      // If config exists, filter menu and categories accordingly
+      if (categoryConfig.length > 0) {
+        const allowedTypes = new Set(categoryConfig.map(c => c.type.toLowerCase()));
+        const orderMap = new Map(categoryConfig.map(c => [c.type.toLowerCase(), c.order] as const));
+
+        // Filter categories by allowed types and sort by config order
+        const filteredCategories = menuData.categories
+          .filter(cat => allowedTypes.has(cat.id.toLowerCase()))
+          .sort((a, b) => (orderMap.get(a.id.toLowerCase()) ?? 0) - (orderMap.get(b.id.toLowerCase()) ?? 0));
+
+        // Filter menu items that belong to allowed categories only
+        const filteredMenu = menuData.menu.filter(item => allowedTypes.has(item.category.toLowerCase()));
+
+        setMenuItems(filteredMenu);
+        setCategories(filteredCategories);
+        setFilteredMenuItems([...filteredMenu].reverse());
+
+        // Reset selected category if it's not allowed anymore
+        if (selectedCategory !== 'all' && !allowedTypes.has(selectedCategory.toLowerCase())) {
+          setSelectedCategory('all');
+        }
+      } else {
+        // No config: fall back to API order and all categories
+        setMenuItems(menuData.menu);
+        setCategories(menuData.categories);
+        setFilteredMenuItems([...menuData.menu].reverse());
+      }
     } catch (error) {
       console.error('Failed to fetch menu:', error);
     } finally {

@@ -29,7 +29,14 @@ remoteConfig.defaultConfig = {
   is_close: false,
   close_message: 'Sorry, we are temporarily closed. Please try again later.',
   close_title: 'Store Temporarily Closed',
-  is_disable_checkout: false
+  is_disable_checkout: false,
+  // Default menu category configuration for feature flagging and ordering
+  'config/categoty_config': JSON.stringify([
+    { type: 'coffee', is_show: true, order: 0 },
+    { type: 'tea', is_show: true, order: 1 },
+    { type: 'soda', is_show: true, order: 2 },
+    { type: 'sunkid', is_show: false, order: 3 }
+  ])
 };
 
 export { remoteConfig, fetchAndActivate, getValue, getBoolean };
