@@ -48,6 +48,7 @@ const CheckoutPage: React.FC = () => {
   const [attachment, setAttachment] = useState<File | null>(null);
   const [attachmentPreview, setAttachmentPreview] = useState<string | null>(null);
   const [attachmentError, setAttachmentError] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'qr'>('qr');
 
   const totalAmount = useMemo(() => getTotalPrice(), [items]);
   const qrPaymentUrl = useMemo(() => {
@@ -104,7 +105,7 @@ const CheckoutPage: React.FC = () => {
 
     if (!validateForm()) return;
     if (items.length === 0) return;
-    if (!attachment) {
+    if (paymentMethod === 'qr' && !attachment) {
       setAttachmentError('checkout.fileRequired' in ({} as any) ? t('checkout.fileRequired') : 'Payment file is required');
       return;
     }
@@ -201,7 +202,38 @@ const CheckoutPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Payment Method Selection */}
+      <div className="bg-base-200 rounded-lg p-4">
+        <h2 className="font-bold text-lg mb-3">Payment Method</h2>
+        <div className="flex flex-col gap-2">
+          <label className="label cursor-pointer justify-start gap-3">
+            <input
+              type="radio"
+              name="paymentMethod"
+              className="radio radio-primary"
+              checked={paymentMethod === 'qr'}
+              onChange={() => setPaymentMethod('qr')}
+            />
+            <span className="label-text">QR payment</span>
+          </label>
+          <label className="label cursor-pointer justify-start gap-3">
+            <input
+              type="radio"
+              name="paymentMethod"
+              className="radio radio-primary"
+              checked={paymentMethod === 'cash'}
+              onChange={() => {
+                setPaymentMethod('cash');
+                setAttachmentError(null);
+              }}
+            />
+            <span className="label-text">Cash on pickup</span>
+          </label>
+        </div>
+      </div>
+
       {/* QR Payment Section */}
+      {paymentMethod === 'qr' && (
       <div className="bg-base-200 rounded-lg p-4">
         <h2 className="font-bold text-lg mb-3">QR Payment</h2>
         <p className="text-sm text-base-content/70 mb-3">Scan to pay the exact total amount.</p>
@@ -236,8 +268,10 @@ const CheckoutPage: React.FC = () => {
           </button>
         </div>
       </div>
+      )}
 
-      {/* Payment Attachment (Required) */}
+      {/* Payment Attachment (Required for QR) */}
+      {paymentMethod === 'qr' && (
       <div className="bg-base-200 rounded-lg p-4 space-y-3">
         <h2 className="font-bold text-lg">{t('checkout.paymentAttachment') || 'Payment slip (required)'}</h2>
         <p className="text-sm text-base-content/70">{t('checkout.paymentAttachmentHint') || 'Please upload a payment slip or receipt.'}</p>
@@ -294,6 +328,7 @@ const CheckoutPage: React.FC = () => {
           </div>
         )}
       </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-base-200 rounded-lg p-4 space-y-4">
@@ -383,7 +418,7 @@ const CheckoutPage: React.FC = () => {
           )}
           <button
             type="submit"
-            disabled={loading || items.length === 0 || isCheckoutDisabled || isCheckoutLoading || !attachment}
+            disabled={loading || items.length === 0 || isCheckoutDisabled || isCheckoutLoading || (paymentMethod === 'qr' && !attachment)}
             className="btn btn-primary btn-touch w-full"
           >
             {loading ? (
