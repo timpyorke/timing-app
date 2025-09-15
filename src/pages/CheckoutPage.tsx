@@ -204,7 +204,7 @@ const CheckoutPage: React.FC = () => {
 
       {/* Payment Method Selection */}
       <div className="bg-base-200 rounded-lg p-4">
-        <h2 className="font-bold text-lg mb-3">Payment Method</h2>
+        <h2 className="font-bold text-lg mb-3">{t('checkout.paymentMethod') || 'Payment Method'}</h2>
         <div className="flex flex-col gap-2">
           <label className="label cursor-pointer justify-start gap-3">
             <input
@@ -214,7 +214,7 @@ const CheckoutPage: React.FC = () => {
               checked={paymentMethod === 'qr'}
               onChange={() => setPaymentMethod('qr')}
             />
-            <span className="label-text">QR payment</span>
+            <span className="label-text">{t('checkout.qrPayment') || 'QR payment'}</span>
           </label>
           <label className="label cursor-pointer justify-start gap-3">
             <input
@@ -227,7 +227,7 @@ const CheckoutPage: React.FC = () => {
                 setAttachmentError(null);
               }}
             />
-            <span className="label-text">Cash on pickup</span>
+            <span className="label-text">{t('checkout.cashOnPickup') || 'Cash on pickup'}</span>
           </label>
         </div>
       </div>
@@ -235,8 +235,8 @@ const CheckoutPage: React.FC = () => {
       {/* QR Payment Section */}
       {paymentMethod === 'qr' && (
         <div className="bg-base-200 rounded-lg p-4">
-          <h2 className="font-bold text-lg mb-3">QR Payment</h2>
-          <p className="text-sm text-base-content/70 mb-3">Scan to pay the exact total amount.</p>
+          <h2 className="font-bold text-lg mb-3">{t('checkout.qrPayment') || 'QR Payment'}</h2>
+          <p className="text-sm text-base-content/70 mb-3">{t('checkout.qrScanInstruction') || 'Scan to pay the exact total amount.'}</p>
         <div className="flex flex-col items-center justify-center">
           {/* Thai QR Payment styled card */}
           <div className="w-72 bg-white rounded-xl overflow-hidden border border-base-300 shadow-md">
@@ -259,7 +259,7 @@ const CheckoutPage: React.FC = () => {
                   </div>
                 )}
                 {qrError && (
-                  <div className="p-4 text-center text-error text-sm">Failed to load QR. Please try again.</div>
+                  <div className="p-4 text-center text-error text-sm">{t('checkout.qrLoadFailed') || 'Failed to load QR. Please try again.'}</div>
                 )}
                 {!qrError && (
                   <img
@@ -277,17 +277,15 @@ const CheckoutPage: React.FC = () => {
             </div>
           </div>
           <div className="mt-3 text-sm text-base-content/70">
-            Amount: <span className="font-medium text-base-content">{formatPrice(totalAmount)}</span>
+            {t('checkout.amount') || 'Amount:'} <span className="font-medium text-base-content">{formatPrice(totalAmount)}</span>
           </div>
             <button type="button" onClick={handleDownloadQr} className="btn btn-outline btn-touch w-full mt-4">
-              Download QR Code
+              {t('checkout.downloadQr') || 'Download QR Code'}
             </button>
           <div className="alert alert-warning mt-3 text-sm">
             <div className="flex items-start gap-2">
               <Info size={16} className="shrink-0 mt-0.5" />
-              <span>
-                โหลด QR สำหรับจ่ายตัง หรือ แคปหน้าจอเพื่อจ่ายในแอปธนาคารได้เลยครับ อย่าลืมอัพโหลดสลิปนะครับ
-              </span>
+              <span>{t('checkout.qrHint') || 'Download or screenshot the QR to pay in your banking app, then upload the payment slip.'}</span>
             </div>
           </div>
           </div>

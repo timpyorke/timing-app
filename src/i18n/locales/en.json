@@ -105,7 +105,15 @@
     "paymentAttachmentHint": "Please upload a payment slip or receipt.",
     "uploadFile": "Upload file",
     "remove": "Remove",
-    "fileRequired": "Payment file is required"
+    "fileRequired": "Payment file is required",
+    "paymentMethod": "Payment Method",
+    "qrPayment": "QR payment",
+    "cashOnPickup": "Cash on pickup",
+    "qrScanInstruction": "Scan to pay the exact total amount.",
+    "qrLoadFailed": "Failed to load QR. Please try again.",
+    "amount": "Amount:",
+    "downloadQr": "Download QR Code",
+    "qrHint": "Download or screenshot the QR to pay in your banking app, then upload the payment slip."
   },
   "orderConfirmation": {
     "title": "Order Confirmed!",
