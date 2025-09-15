@@ -25,9 +25,9 @@ export async function uploadPaymentSlip(
   const directory = safeSegment(opts?.directory || 'slips');
   const objectPath = `${directory}/${filename}`;
 
-  // First attempt: raw POST with file body to object path
-  const rawUrl = `${supabaseUrl}/storage/v1/object/${bucket}/${objectPath}`;
-  let res = await fetch(rawUrl, {
+  // Upload with raw POST to object path (correct Storage endpoint)
+  const uploadUrl = `${supabaseUrl}/storage/v1/object/${bucket}/${encodeURIComponent(directory)}/${encodeURIComponent(filename)}`;
+  const res = await fetch(uploadUrl, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${supabaseAnonKey}`,
@@ -39,27 +39,10 @@ export async function uploadPaymentSlip(
   });
 
   if (!res.ok) {
-    // Fallback: multipart form with path
-    const multiUrl = `${supabaseUrl}/storage/v1/object/${bucket}`;
-    const form = new FormData();
-    form.append('file', file, filename);
-    form.append('path', objectPath);
-    res = await fetch(multiUrl, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${supabaseAnonKey}`,
-        apikey: supabaseAnonKey,
-        ...(opts?.upsert ? { 'x-upsert': 'true' } : {}),
-      },
-      body: form,
-    });
-  }
-
-  if (!res.ok) {
     const text = await res.text().catch(() => '');
     throw new Error(`Upload failed: ${res.status} ${res.statusText}${text ? ` - ${text}` : ''}`);
   }
 
-  const publicUrl = `${supabaseUrl}/storage/v1/object/public/${bucket}/${objectPath}`;
+  const publicUrl = `${supabaseUrl}/storage/v1/object/public/${bucket}/${encodeURIComponent(directory)}/${encodeURIComponent(filename)}`;
   return { path: objectPath, publicUrl };
 }

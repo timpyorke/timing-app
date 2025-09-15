@@ -120,8 +120,15 @@ const CheckoutPage: React.FC = () => {
       // Upload payment slip first
       let paymentSlipUrl: string | undefined;
       if (attachment) {
-        const upload = await uploadPaymentSlip(attachment, { directory: (userId || 'anon'), upsert: true });
-        paymentSlipUrl = upload.publicUrl;
+        try {
+          const upload = await uploadPaymentSlip(attachment, { directory: (userId || 'anon') });
+          paymentSlipUrl = upload.publicUrl;
+        } catch (uploadErr: any) {
+          console.error('Payment slip upload failed:', uploadErr);
+          alert(`Upload failed: ${uploadErr?.message || 'Unknown error'}`);
+          setLoading(false);
+          return;
+        }
       }
 
       const order = await apiService.createOrder(items, formData, userId, paymentSlipUrl);
