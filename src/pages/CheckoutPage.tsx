@@ -235,8 +235,10 @@ const CheckoutPage: React.FC = () => {
       {/* QR Payment Section */}
       {paymentMethod === 'qr' && (
         <div className="bg-base-200 rounded-lg p-4">
-          <h2 className="font-bold text-lg mb-3">{t('checkout.qrPayment') || 'QR Payment'}</h2>
-          <p className="text-sm text-base-content/70 mb-3">{t('checkout.qrScanInstruction') || 'Scan to pay the exact total amount.'}</p>
+          <h2 className="font-bold text-lg mb-3 text-center">
+            {(t('checkout.qrPayment') || 'QR Payment')}
+            <span className="font-normal text-base-content/70"> ({t('checkout.qrScanInstruction') || 'Scan to pay the exact total amount.'})</span>
+          </h2>
         <div className="flex flex-col items-center justify-center">
           {/* Thai QR Payment styled card */}
           <div className="w-72 bg-white rounded-xl overflow-hidden border border-base-300 shadow-md">
