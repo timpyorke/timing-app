@@ -162,6 +162,7 @@ export interface ApiOrderRequest {
   items: ApiOrderItem[];
   total: number;
   attachment_url?: string;
+  notes?: string;
 }
 
 export interface ApiOrderResponse {

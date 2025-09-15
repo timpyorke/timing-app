@@ -120,7 +120,8 @@ class ApiService {
           }
         })),
         total: total,
-        ...(attachmentUrl ? { attachment_url: attachmentUrl } : {})
+        ...(attachmentUrl ? { attachment_url: attachmentUrl } : {}),
+        ...(customer.notes && customer.notes.trim() !== '' ? { notes: customer.notes.trim() } : {})
       };
 
 
