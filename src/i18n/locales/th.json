@@ -93,6 +93,7 @@
     "enterName": "กรอกชื่อของคุณ",
     "phoneNumber": "เบอร์โทรศัพท์",
     "optional": "(ไม่บังคับ)",
+    "required": "จำเป็น",
     "phonePlaceholder": "089-123-4567",
     "tableNumber": "หมายเลขโต๊ะ (ไม่บังคับ)",
     "tablePlaceholder": "โต๊ะ 5, เคาน์เตอร์, ฯลฯ",

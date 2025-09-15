@@ -36,6 +36,13 @@ remoteConfig.defaultConfig = {
     { type: 'tea', is_show: true, order: 1 },
     { type: 'soda', is_show: true, order: 2 },
     { type: 'sunkid', is_show: false, order: 3 }
+  ]),
+  // Default checkout form configuration
+  'config/checkout_config': JSON.stringify([
+    { input: 'name', required: true, is_show: true },
+    { input: 'phone', required: false, is_show: true },
+    { input: 'table', required: true, is_show: true },
+    { input: 'notes', required: false, is_show: true }
   ])
 };
 

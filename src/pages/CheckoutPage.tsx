@@ -10,6 +10,7 @@ import { CONSTANTS, formatPrice } from '../utils';
 import { useOrderHistory } from '../hooks/useOrderHistory';
 import { useAnonymousUser } from '../hooks/useAnonymousUser';
 import { useTranslation } from '../i18n/stub';
+import { remoteConfigService, CheckoutConfigMap } from '../services/remoteConfig';
 
 const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
@@ -49,6 +50,12 @@ const CheckoutPage: React.FC = () => {
   const [attachmentPreview, setAttachmentPreview] = useState<string | null>(null);
   const [attachmentError, setAttachmentError] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'qr'>('qr');
+  const [checkoutConfig, setCheckoutConfig] = useState<CheckoutConfigMap>({
+    name: { required: true, is_show: true },
+    phone: { required: false, is_show: true },
+    table: { required: true, is_show: true },
+    notes: { required: false, is_show: true },
+  });
 
   const totalAmount = useMemo(() => getTotalPrice(), [items]);
   const qrPaymentUrl = useMemo(() => {
@@ -56,6 +63,18 @@ const CheckoutPage: React.FC = () => {
     const amountParam = encodeURIComponent(totalAmount.toFixed(2));
     return `https://rub-tung.vercel.app/api/0990995156?amont=${amountParam}`;
   }, [totalAmount]);
+
+  // Load checkout field config from Firebase Remote Config
+  useEffect(() => {
+    (async () => {
+      try {
+        const cfg = await remoteConfigService.checkCheckoutConfig();
+        setCheckoutConfig(cfg);
+      } catch (e) {
+        // use defaults
+      }
+    })();
+  }, []);
 
   const handleDownloadQr = async () => {
     try {
@@ -77,16 +96,19 @@ const CheckoutPage: React.FC = () => {
 
   const validateForm = (): boolean => {
     const newErrors: Partial<Customer> = {};
-    const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
-    if (!formData.name.trim()) {
+    if (checkoutConfig.name.required && !formData.name.trim()) {
       newErrors.name = t('checkout.nameRequired');
     }
 
-    if (totalItems > 4 && !formData.phone.trim()) {
-      newErrors.phone = t('checkout.phoneRequiredLargeOrder');
+    if (checkoutConfig.phone.required && !formData.phone.trim()) {
+      newErrors.phone = t('checkout.phoneRequired');
     } else if (formData.phone.trim() && !/^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) {
       newErrors.phone = t('checkout.phoneInvalid');
+    }
+
+    if (checkoutConfig.table.required && !(formData.tableNumber || '').trim()) {
+      newErrors.tableNumber = 'Table number is required';
     }
 
     setErrors(newErrors);
@@ -362,9 +384,13 @@ const CheckoutPage: React.FC = () => {
           </h2>
 
           <div className="space-y-4">
+            {checkoutConfig.name.is_show && (
             <div>
               <label className="label">
-                <span className="label-text font-medium">{t('checkout.fullName')}</span>
+                <span className="label-text font-medium">
+                  {(t('checkout.fullName') || 'Name').replace(' *','')}
+                  <span className="text-base-content/60"> {checkoutConfig.name.required ? `(${t('checkout.required') || 'required'})` : `(${t('checkout.optional')})`}</span>
+                </span>
               </label>
               <input
                 type="text"
@@ -379,10 +405,14 @@ const CheckoutPage: React.FC = () => {
                 <p className="text-error text-sm mt-1">{errors.name}</p>
               )}
             </div>
+            )}
 
+            {checkoutConfig.phone.is_show && (
             <div>
               <label className="label">
-                <span className="label-text font-medium">{t('checkout.phoneNumber')} {items.reduce((sum, item) => sum + item.quantity, 0) > 4 ? '*' : t('checkout.optional')}</span>
+                <span className="label-text font-medium">{t('checkout.phoneNumber')}
+                  <span className="text-base-content/60"> {checkoutConfig.phone.required ? `(${t('checkout.required') || 'required'})` : `(${t('checkout.optional')})`}</span>
+                </span>
               </label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/50" size={18} />
@@ -400,10 +430,14 @@ const CheckoutPage: React.FC = () => {
                 <p className="text-error text-sm mt-1">{errors.phone}</p>
               )}
             </div>
+            )}
 
+            {checkoutConfig.table.is_show && (
             <div>
               <label className="label">
-                <span className="label-text font-medium">{t('checkout.tableNumber')}</span>
+                <span className="label-text font-medium">{(t('checkout.tableNumber') || 'Table Number').replace(/\s*\(.*\)/,'')}
+                  <span className="text-base-content/60"> {checkoutConfig.table.required ? `(${t('checkout.required') || 'required'})` : `(${t('checkout.optional')})`}</span>
+                </span>
               </label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/50" size={18} />
@@ -416,11 +450,18 @@ const CheckoutPage: React.FC = () => {
                   disabled={loading}
                 />
               </div>
+              {errors.tableNumber && (
+                <p className="text-error text-sm mt-1">{errors.tableNumber}</p>
+              )}
             </div>
+            )}
 
+            {checkoutConfig.notes.is_show && (
             <div>
               <label className="label">
-                <span className="label-text font-medium">{t('checkout.orderNotes')}</span>
+                <span className="label-text font-medium">{(t('checkout.orderNotes') || 'Order Notes').replace(/\s*\(.*\)/,'')}
+                  <span className="text-base-content/60"> {checkoutConfig.notes.required ? `(${t('checkout.required') || 'required'})` : `(${t('checkout.optional')})`}</span>
+                </span>
               </label>
               <textarea
                 value={formData.notes || ''}
@@ -430,6 +471,7 @@ const CheckoutPage: React.FC = () => {
                 disabled={loading}
               />
             </div>
+            )}
           </div>
         </div>
 

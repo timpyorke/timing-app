@@ -93,6 +93,7 @@
     "enterName": "Enter your name",
     "phoneNumber": "Phone Number",
     "optional": "(Optional)",
+    "required": "required",
     "phonePlaceholder": "089-123-4567",
     "tableNumber": "Table Number (Optional)",
     "tablePlaceholder": "Table 5, Counter, etc.",

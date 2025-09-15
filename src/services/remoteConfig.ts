@@ -12,6 +12,14 @@ export interface MenuCategoryConfigItem {
   order: number;
 }
 
+export type CheckoutInputKey = 'name' | 'phone' | 'table' | 'notes';
+export interface CheckoutFieldConfigItem {
+  input: CheckoutInputKey;
+  required: boolean;
+  is_show: boolean;
+}
+export type CheckoutConfigMap = Record<CheckoutInputKey, { required: boolean; is_show: boolean }>;
+
 class RemoteConfigService {
   private lastFetchTime: number = 0;
   private readonly FETCH_INTERVAL = 30 * 60 * 1000; // 30 minutes in milliseconds
@@ -118,6 +126,43 @@ class RemoteConfigService {
   async checkMenuCategoryConfig(): Promise<MenuCategoryConfigItem[]> {
     await this.fetchConfig();
     return this.getMenuCategoryConfig();
+  }
+
+  getCheckoutConfig(): CheckoutConfigMap {
+    const defaults: CheckoutConfigMap = {
+      name: { required: true, is_show: true },
+      phone: { required: false, is_show: true },
+      table: { required: true, is_show: true },
+      notes: { required: false, is_show: true },
+    };
+
+    try {
+      const raw = getValue(remoteConfig, 'config/checkout_config').asString();
+      if (!raw) return defaults;
+      const parsed = JSON.parse(raw) as unknown;
+      if (!Array.isArray(parsed)) return defaults;
+
+      const result: CheckoutConfigMap = { ...defaults };
+      for (const item of parsed as any[]) {
+        if (!item || typeof item !== 'object') continue;
+        const inputRaw = (item as any).input;
+        const input = typeof inputRaw === 'string' ? inputRaw.toLowerCase().trim() : '';
+        if (!['name', 'phone', 'table', 'notes'].includes(input)) continue;
+        const required = Boolean((item as any).required);
+        const is_show = Boolean((item as any).is_show);
+        (result as any)[input] = { required, is_show };
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Failed to parse checkout config from remote config:', error);
+      return defaults;
+    }
+  }
+
+  async checkCheckoutConfig(): Promise<CheckoutConfigMap> {
+    await this.fetchConfig();
+    return this.getCheckoutConfig();
   }
 }
 
