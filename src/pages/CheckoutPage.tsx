@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Phone, MapPin } from 'lucide-react';
+import { User, Phone, MapPin, Info } from 'lucide-react';
 import { useCart } from '../hooks/useCart';
 import { useCheckoutStatus } from '../hooks/useCheckoutStatus';
 import { apiService } from '../services/api';
@@ -234,100 +234,124 @@ const CheckoutPage: React.FC = () => {
 
       {/* QR Payment Section */}
       {paymentMethod === 'qr' && (
-      <div className="bg-base-200 rounded-lg p-4">
-        <h2 className="font-bold text-lg mb-3">QR Payment</h2>
-        <p className="text-sm text-base-content/70 mb-3">Scan to pay the exact total amount.</p>
+        <div className="bg-base-200 rounded-lg p-4">
+          <h2 className="font-bold text-lg mb-3">QR Payment</h2>
+          <p className="text-sm text-base-content/70 mb-3">Scan to pay the exact total amount.</p>
         <div className="flex flex-col items-center justify-center">
-          <div className="w-64 h-64 bg-base-100 rounded-lg flex items-center justify-center overflow-hidden border border-base-300 relative">
-            {qrLoading && !qrError && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="loading loading-spinner"></span>
+          {/* Thai QR Payment styled card */}
+          <div className="w-72 bg-white rounded-xl overflow-hidden border border-base-300 shadow-md">
+            {/* Header bar */}
+            <div className="bg-[#173B57] text-white h-12 flex items-center justify-center">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded bg-white/10 flex items-center justify-center text-[10px] font-bold">QR</div>
+                <span className="text-xs tracking-wider font-semibold">THAI QR PAYMENT</span>
               </div>
-            )}
-            {qrError && (
-              <div className="p-4 text-center text-error text-sm">Failed to load QR. Please try again.</div>
-            )}
-            {!qrError && (
-              <img
-                src={qrPaymentUrl}
-                alt="QR Payment"
-                className={`w-full h-full object-contain ${qrLoading ? 'opacity-0' : 'opacity-100'}`}
-                onLoad={() => setQrLoading(false)}
-                onError={() => {
-                  setQrLoading(false);
-                  setQrError('Failed to load');
-                }}
-              />
-            )}
+            </div>
+            {/* Body with PromptPay badge and QR image */}
+            <div className="p-4">
+              <div className="flex justify-center">
+                <div className="border border-[#173B57] text-[#173B57] rounded px-2 py-1 bg-white/90 text-[11px] font-semibold shadow-sm">PromptPay</div>
+              </div>
+              <div className="mt-3 relative flex items-center justify-center">
+                {qrLoading && !qrError && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="loading loading-spinner"></span>
+                  </div>
+                )}
+                {qrError && (
+                  <div className="p-4 text-center text-error text-sm">Failed to load QR. Please try again.</div>
+                )}
+                {!qrError && (
+                  <img
+                    src={qrPaymentUrl}
+                    alt="QR Payment"
+                    className={`w-56 h-56 object-contain ${qrLoading ? 'opacity-0' : 'opacity-100'}`}
+                    onLoad={() => setQrLoading(false)}
+                    onError={() => {
+                      setQrLoading(false);
+                      setQrError('Failed to load');
+                    }}
+                  />
+                )}
+              </div>
+            </div>
           </div>
           <div className="mt-3 text-sm text-base-content/70">
             Amount: <span className="font-medium text-base-content">{formatPrice(totalAmount)}</span>
           </div>
-          <button type="button" onClick={handleDownloadQr} className="btn btn-outline btn-touch w-full mt-4">
-            Download QR Code
-          </button>
+            <button type="button" onClick={handleDownloadQr} className="btn btn-outline btn-touch w-full mt-4">
+              Download QR Code
+            </button>
+          <div className="alert alert-warning mt-3 text-sm">
+            <div className="flex items-start gap-2">
+              <Info size={16} className="shrink-0 mt-0.5" />
+              <span>
+                โหลด QR สำหรับจ่ายตัง หรือ แคปหน้าจอเพื่อจ่ายในแอปธนาคารได้เลยครับ อย่าลืมอัพโหลดสลิปนะครับ
+              </span>
+            </div>
+          </div>
+          </div>
         </div>
-      </div>
       )}
 
       {/* Payment Attachment (Required for QR) */}
       {paymentMethod === 'qr' && (
-      <div className="bg-base-200 rounded-lg p-4 space-y-3">
-        <h2 className="font-bold text-lg">{t('checkout.paymentAttachment') || 'Payment slip (required)'}</h2>
-        <p className="text-sm text-base-content/70">{t('checkout.paymentAttachmentHint') || 'Please upload a payment slip or receipt.'}</p>
+        <div className="bg-base-200 rounded-lg p-4 space-y-3">
+          <h2 className="font-bold text-lg">{t('checkout.paymentAttachment') || 'Payment slip (required)'}</h2>
+          <p className="text-sm text-base-content/70">{t('checkout.paymentAttachmentHint') || 'Please upload a payment slip or receipt.'}</p>
 
-        {attachment ? (
-          <div className="flex items-center gap-3">
-            {attachmentPreview ? (
-              <img src={attachmentPreview} alt="Attachment preview" className="w-16 h-16 object-cover rounded border" />
-            ) : (
-              <div className="w-16 h-16 rounded border flex items-center justify-center text-xs">FILE</div>
-            )}
-            <div className="flex-1">
-              <div className="text-sm font-medium break-all">{attachment.name}</div>
-              <div className="text-xs text-base-content/60">{Math.round(attachment.size / 1024)} KB</div>
-            </div>
-            <button
-              type="button"
-              className="btn btn-outline btn-sm"
-              onClick={() => {
-                setAttachment(null);
-                setAttachmentPreview(null);
-                setAttachmentError(t('checkout.fileRequired') || null);
-              }}
-            >
-              {t('checkout.remove') || 'Remove'}
-            </button>
-          </div>
-        ) : (
-          <div>
-            <label className="btn btn-primary btn-touch w-full" htmlFor="payment-attachment">
-              {t('checkout.uploadFile') || 'Upload file'}
-            </label>
-            <input
-              id="payment-attachment"
-              type="file"
-              accept="image/*,application/pdf"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0] || null;
-                setAttachment(file);
-                setAttachmentError(null);
-                if (file && file.type.startsWith('image/')) {
-                  const url = URL.createObjectURL(file);
-                  setAttachmentPreview(url);
-                } else {
+          {attachment ? (
+            <div className="flex items-center gap-3">
+              {attachmentPreview ? (
+                <img src={attachmentPreview} alt="Attachment preview" className="w-16 h-16 object-cover rounded border" />
+              ) : (
+                <div className="w-16 h-16 rounded border flex items-center justify-center text-xs">FILE</div>
+              )}
+              <div className="flex-1">
+                <div className="text-sm font-medium break-all">{attachment.name}</div>
+                <div className="text-xs text-base-content/60">{Math.round(attachment.size / 1024)} KB</div>
+              </div>
+              <button
+                type="button"
+                className="btn btn-outline btn-sm"
+                onClick={() => {
+                  setAttachment(null);
                   setAttachmentPreview(null);
-                }
-              }}
-              disabled={loading}
-            />
-            {attachmentError && (
-              <p className="text-error text-sm mt-2">{attachmentError}</p>
-            )}
-          </div>
-        )}
-      </div>
+                  setAttachmentError(t('checkout.fileRequired') || null);
+                }}
+              >
+                {t('checkout.remove') || 'Remove'}
+              </button>
+            </div>
+          ) : (
+            <div>
+              <label className="btn btn-primary btn-touch w-full" htmlFor="payment-attachment">
+                {t('checkout.uploadFile') || 'Upload file'}
+              </label>
+              <input
+                id="payment-attachment"
+                type="file"
+                accept="image/*,application/pdf"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0] || null;
+                  setAttachment(file);
+                  setAttachmentError(null);
+                  if (file && file.type.startsWith('image/')) {
+                    const url = URL.createObjectURL(file);
+                    setAttachmentPreview(url);
+                  } else {
+                    setAttachmentPreview(null);
+                  }
+                }}
+                disabled={loading}
+              />
+              {attachmentError && (
+                <p className="text-error text-sm mt-2">{attachmentError}</p>
+              )}
+            </div>
+          )}
+        </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
