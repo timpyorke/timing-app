@@ -154,7 +154,7 @@ const CheckoutPage: React.FC = () => {
         }
       }
 
-      const order = await apiService.createOrder(items, formData, userId, paymentSlipUrl);
+      const order = await apiService.createOrder(items, formData, paymentMethod, userId, paymentSlipUrl);
 
       // Add order to history
       const orderWithItems = {
@@ -165,6 +165,7 @@ const CheckoutPage: React.FC = () => {
         total: getTotalPrice(),
         createdAt: new Date().toISOString(),
         paymentSlipUrl,
+        paymentMethod,
       };
       addOrder(orderWithItems);
 

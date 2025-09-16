@@ -43,7 +43,18 @@ remoteConfig.defaultConfig = {
     { input: 'phone', required: false, is_show: true },
     { input: 'table', required: true, is_show: true },
     { input: 'notes', required: false, is_show: true }
-  ])
+  ]),
+  // Default menu customization configuration
+  'config/menu_customize': JSON.stringify({
+    milk: [
+      { type: 'normal', price: 0, enable: true },
+      { type: 'oat', price: 0, enable: true }
+    ],
+    size: [
+      { type: 'medium', price: 0, enable: true },
+      { type: 'large', price: 0, enable: true }
+    ]
+  })
 };
 
 export { remoteConfig, fetchAndActivate, getValue, getBoolean };

@@ -15,9 +15,12 @@ import {
   ApiOrderStatusResponse,
   ApiOrdersResponse,
   ApiOrderHistoryItem,
-  ApiCustomerInfo
+  ApiCustomerInfo,
+  MenuSize,
+  MilkOption
 } from '../types';
 import { getAnonymousUserId, transformApiSizes, generateImagePath, generateUUID } from '../utils';
+import { remoteConfigService, MenuCustomizationConfig } from './remoteConfig';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
@@ -53,9 +56,12 @@ class ApiService {
 
   async getMenu(): Promise<{ categories: MenuCategory[]; menu: Menu[] }> {
     try {
-      const response = await this.request<ApiMenuResponse>('/api/menu');
+      const [response, customizationConfig] = await Promise.all([
+        this.request<ApiMenuResponse>('/api/menu'),
+        remoteConfigService.checkMenuCustomizationConfig(),
+      ]);
       // Transform API response to match our interface
-      return this.transformMenuResponse(response);
+      return this.transformMenuResponse(response, customizationConfig);
     } catch (error) {
       console.error('Failed to fetch menu:', error);
       // Return empty data instead of mock data
@@ -65,9 +71,12 @@ class ApiService {
 
   async getMenuDetails(id: string): Promise<Menu | null> {
     try {
-      const response = await this.request<{ data: ApiMenuItemResponse } | ApiMenuItemResponse>(`/api/menu/${id}`);
+      const [response, customizationConfig] = await Promise.all([
+        this.request<{ data: ApiMenuItemResponse } | ApiMenuItemResponse>(`/api/menu/${id}`),
+        remoteConfigService.checkMenuCustomizationConfig(),
+      ]);
       // Transform API response to match our Menu interface
-      return this.transformSingleMenuResponse(response);
+      return this.transformSingleMenuResponse(response, customizationConfig);
     } catch (error) {
       console.error('Failed to fetch menu item details:', error);
       // Return null instead of mock data
@@ -78,14 +87,17 @@ class ApiService {
   async createOrder(
     items: CartItem[],
     customer: Customer,
+    paymentMethod: string,
     userId?: string,
     attachmentUrl?: string
   ): Promise<Order> {
     // Get or use provided user ID (declare outside try block)
     const userIdToUse = userId || getAnonymousUserId();
-    
+
     try {
       const total = items.reduce((sum, item) => sum + item.totalPrice, 0);
+
+      const normalizedPaymentMethod = paymentMethod === 'cash' ? 'cash' : 'qr';
       
       const customerInfo: ApiCustomerInfo = {
         name: customer.name,
@@ -120,6 +132,7 @@ class ApiService {
           }
         })),
         total: total,
+        payment_method: normalizedPaymentMethod,
         ...(attachmentUrl ? { attachment_url: attachmentUrl } : {}),
         ...(customer.notes && customer.notes.trim() !== '' ? { notes: customer.notes.trim() } : {})
       };
@@ -137,7 +150,7 @@ class ApiService {
       }
 
       // Transform response to match our Order interface
-      const transformedOrder = this.transformOrderResponse(response, items, customer, userIdToUse);
+      const transformedOrder = this.transformOrderResponse(response, items, customer, userIdToUse, normalizedPaymentMethod);
       
       // Validate that the order has an ID
       if (!transformedOrder.id) {
@@ -177,7 +190,7 @@ class ApiService {
   }
 
   // Transform methods to convert API responses to our interface format
-  private transformMenuResponse(response: ApiMenuResponse): { categories: MenuCategory[]; menu: Menu[] } {
+  private transformMenuResponse(response: ApiMenuResponse, customizationConfig?: MenuCustomizationConfig): { categories: MenuCategory[]; menu: Menu[] } {
     // Handle the actual API response format: {success: true, data: [...]}
     const menuData = response?.data || response;
     
@@ -239,6 +252,9 @@ class ApiService {
               price: milk.toLowerCase().includes('normal') || milk.toLowerCase().includes('oat') ? 0 : 20
             }));
 
+            const customSizes = this.buildSizesFromConfig(customizationConfig);
+            const customMilkOptions = this.buildMilkOptionsFromConfig(customizationConfig);
+
             menuItems.push({
               id: item.id?.toString(),
               name: item.name,
@@ -246,8 +262,8 @@ class ApiService {
               image: item.image_url || `/images/${generateImagePath(item.name)}.svg`,
               category: category.category?.toLowerCase() || 'specialty',
               basePrice: parseFloat(item.base_price?.toString() || '4.50'),
-              sizes,
-              milkOptions,
+              sizes: customSizes.length > 0 ? customSizes : sizes,
+              milkOptions: customMilkOptions.length > 0 ? customMilkOptions : milkOptions,
               sweetnessLevels: Array.isArray(normalizedCustomizations.sweetness) ? normalizedCustomizations.sweetness :
                               Array.isArray(normalizedCustomizations.sweet) ? normalizedCustomizations.sweet : [],
               temperatureOptions: ['Iced'],
@@ -273,7 +289,13 @@ class ApiService {
     return { categories: [], menu: [] };
   }
 
-  private transformOrderResponse(response: ApiOrderResponse, items: CartItem[], customer: Customer, userId?: string): Order {
+  private transformOrderResponse(
+    response: ApiOrderResponse,
+    items: CartItem[],
+    customer: Customer,
+    userId?: string,
+    fallbackPaymentMethod?: string
+  ): Order {
     const subtotal = items.reduce((sum, item) => sum + item.totalPrice, 0);
     
     // Extract order ID with better validation
@@ -293,6 +315,8 @@ class ApiService {
       orderId = generateUUID();
     }
     
+    const paymentMethod = response?.data?.payment_method || response?.payment_method || fallbackPaymentMethod;
+
     return {
       id: orderId,
       userId,
@@ -307,6 +331,7 @@ class ApiService {
       createdAt: response?.data?.created_at || 
                 response?.created_at || 
                 new Date().toISOString(),
+      paymentMethod,
     };
   }
 
@@ -351,6 +376,7 @@ class ApiService {
                             apiOrder.estimatedPickupTime ||
                             new Date(Date.now() + 15 * 60 * 1000).toISOString(),
         createdAt: apiOrder.created_at || apiOrder.createdAt || new Date().toISOString(),
+        paymentMethod: apiOrder.payment_method || apiOrder.paymentMethod,
       };
 
       return transformedOrder;
@@ -393,7 +419,7 @@ class ApiService {
     });
   }
 
-  private transformSingleMenuResponse(response: { data: ApiMenuItemResponse } | ApiMenuItemResponse): Menu | null {
+  private transformSingleMenuResponse(response: { data: ApiMenuItemResponse } | ApiMenuItemResponse, customizationConfig?: MenuCustomizationConfig): Menu | null {
     // Handle API response format: {success: true, data: {...}}
     const menuData = 'data' in response ? response.data : response;
     
@@ -459,6 +485,9 @@ class ApiService {
     // Handle temperature options (only Iced is available)
     const temperatureOptions = ['Iced'];
 
+    const customSizes = this.buildSizesFromConfig(customizationConfig);
+    const customMilkOptions = this.buildMilkOptionsFromConfig(customizationConfig);
+
     const menu: Menu = {
       id: menuData.id?.toString(),
       name: menuData.name,
@@ -466,8 +495,8 @@ class ApiService {
       image: menuData.image_url || `/images/${generateImagePath(menuData.name)}.svg`,
       category: menuData.category?.toLowerCase() || 'specialty',
       basePrice: parseFloat(menuData.base_price?.toString() || '4.50'),
-      sizes,
-      milkOptions,
+      sizes: customSizes.length > 0 ? customSizes : sizes,
+      milkOptions: customMilkOptions.length > 0 ? customMilkOptions : milkOptions,
       sweetnessLevels,
       temperatureOptions,
       addOns: addOns.length > 0 ? addOns : fallbackAddOns,
@@ -475,6 +504,49 @@ class ApiService {
     };
 
     return menu;
+  }
+
+  private buildSizesFromConfig(config?: MenuCustomizationConfig): MenuSize[] {
+    if (!config || !Array.isArray(config.size) || config.size.length === 0) {
+      return [];
+    }
+
+    return config.size
+      .filter(option => option && option.enable && typeof option.type === 'string')
+      .map((option, index) => {
+        const normalizedType = option.type.toLowerCase();
+        return {
+          id: generateImagePath(normalizedType || `custom-size-${index}`),
+          name: this.formatCustomizationLabel(normalizedType || `size-${index}`),
+          priceModifier: typeof option.price === 'number' && Number.isFinite(option.price) ? option.price : 0,
+        };
+      });
+  }
+
+  private buildMilkOptionsFromConfig(config?: MenuCustomizationConfig): MilkOption[] {
+    if (!config || !Array.isArray(config.milk) || config.milk.length === 0) {
+      return [];
+    }
+
+    return config.milk
+      .filter(option => option && option.enable && typeof option.type === 'string')
+      .map((option, index) => {
+        const normalizedType = option.type.toLowerCase();
+        return {
+          id: generateImagePath(normalizedType || `milk-${index}`),
+          name: this.formatCustomizationLabel(normalizedType || `milk-${index}`),
+          price: typeof option.price === 'number' && Number.isFinite(option.price) ? option.price : 0,
+        };
+      });
+  }
+
+  private formatCustomizationLabel(value: string): string {
+    if (!value) return '';
+    return value
+      .split(/[\s_-]+/)
+      .filter(Boolean)
+      .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ');
   }
 }
 
