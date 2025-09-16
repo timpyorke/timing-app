@@ -55,6 +55,7 @@ export interface Customer {
   name: string;
   phone: string;
   tableNumber?: string;
+  notes?: string;
 }
 
 export interface Order {
@@ -67,6 +68,7 @@ export interface Order {
   status: OrderStatus;
   estimatedPickupTime: string;
   createdAt: string;
+  paymentSlipUrl?: string;
 }
 
 export type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'completed' | 'cancelled';
@@ -159,6 +161,8 @@ export interface ApiOrderRequest {
   customer_info: ApiCustomerInfo;
   items: ApiOrderItem[];
   total: number;
+  attachment_url?: string;
+  notes?: string;
 }
 
 export interface ApiOrderResponse {

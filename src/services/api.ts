@@ -75,7 +75,12 @@ class ApiService {
     }
   }
 
-  async createOrder(items: CartItem[], customer: Customer, userId?: string): Promise<Order> {
+  async createOrder(
+    items: CartItem[],
+    customer: Customer,
+    userId?: string,
+    attachmentUrl?: string
+  ): Promise<Order> {
     // Get or use provided user ID (declare outside try block)
     const userIdToUse = userId || getAnonymousUserId();
     
@@ -114,7 +119,9 @@ class ApiService {
             extras: item.addOns.map(addon => addon.name),
           }
         })),
-        total: total
+        total: total,
+        ...(attachmentUrl ? { attachment_url: attachmentUrl } : {}),
+        ...(customer.notes && customer.notes.trim() !== '' ? { notes: customer.notes.trim() } : {})
       };
 
 
