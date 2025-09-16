@@ -93,9 +93,11 @@ class ApiService {
   ): Promise<Order> {
     // Get or use provided user ID (declare outside try block)
     const userIdToUse = userId || getAnonymousUserId();
-    
+
     try {
       const total = items.reduce((sum, item) => sum + item.totalPrice, 0);
+
+      const normalizedPaymentMethod = paymentMethod === 'cash' ? 'cash' : 'qr';
       
       const customerInfo: ApiCustomerInfo = {
         name: customer.name,
@@ -130,7 +132,7 @@ class ApiService {
           }
         })),
         total: total,
-        payment_method: paymentMethod,
+        payment_method: normalizedPaymentMethod,
         ...(attachmentUrl ? { attachment_url: attachmentUrl } : {}),
         ...(customer.notes && customer.notes.trim() !== '' ? { notes: customer.notes.trim() } : {})
       };
@@ -148,7 +150,7 @@ class ApiService {
       }
 
       // Transform response to match our Order interface
-      const transformedOrder = this.transformOrderResponse(response, items, customer, userIdToUse, paymentMethod);
+      const transformedOrder = this.transformOrderResponse(response, items, customer, userIdToUse, normalizedPaymentMethod);
       
       // Validate that the order has an ID
       if (!transformedOrder.id) {

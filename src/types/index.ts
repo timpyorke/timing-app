@@ -162,9 +162,9 @@ export interface ApiOrderRequest {
   customer_info: ApiCustomerInfo;
   items: ApiOrderItem[];
   total: number;
+  payment_method: string;
   attachment_url?: string;
   notes?: string;
-  payment_method?: string;
 }
 
 export interface ApiOrderResponse {
