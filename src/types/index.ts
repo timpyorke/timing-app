@@ -35,6 +35,7 @@ export interface MenuSize {
   id: string;
   name: string;
   priceModifier: number;
+  enable?: boolean;
 }
 
 export interface CartItem {

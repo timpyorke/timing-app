@@ -24,11 +24,11 @@ const MenuDetailsPage: React.FC = () => {
 
   const fetchMenuItem = async () => {
     if (!id) return;
-    
+
     try {
       setLoading(true);
       const menuItemData = await apiService.getMenuDetails(id);
-      
+
       if (menuItemData) {
         setMenuItem(menuItemData);
         setSelectedSize(menuItemData.sizes[0] || null);
@@ -64,7 +64,7 @@ const MenuDetailsPage: React.FC = () => {
 
   const calculateTotalPrice = (): number => {
     if (!menuItem || !selectedSize) return 0;
-    
+
     const basePrice = menuItem.basePrice + selectedSize.priceModifier;
     const milkPrice = selectedMilk?.price || 0;
     const addOnsPrice = selectedAddOns.reduce((sum, addOn) => sum + addOn.price, 0);
@@ -100,7 +100,7 @@ const MenuDetailsPage: React.FC = () => {
     };
 
     addItem(cartItem);
-    
+
     // Show cart drawer after a brief delay
     setTimeout(() => {
       toggleCart();
@@ -196,9 +196,8 @@ const MenuDetailsPage: React.FC = () => {
                   <button
                     key={milk.id}
                     onClick={() => setSelectedMilk(milk)}
-                    className={`btn btn-outline btn-sm ${
-                      selectedMilk?.id === milk.id ? 'btn-active' : ''
-                    }`}
+                    className={`btn btn-outline btn-sm ${selectedMilk?.id === milk.id ? 'btn-active' : ''
+                      }`}
                   >
                     {milk.name}
                     {milk.price > 0 && (
@@ -220,9 +219,8 @@ const MenuDetailsPage: React.FC = () => {
                   <button
                     key={sweetness}
                     onClick={() => setSelectedSweetness(sweetness)}
-                    className={`btn btn-outline btn-sm ${
-                      selectedSweetness === sweetness ? 'btn-active' : ''
-                    }`}
+                    className={`btn btn-outline btn-sm ${selectedSweetness === sweetness ? 'btn-active' : ''
+                      }`}
                   >
                     {sweetness}
                   </button>
@@ -239,9 +237,8 @@ const MenuDetailsPage: React.FC = () => {
                   <button
                     key={temp}
                     onClick={() => setSelectedTemperature(temp)}
-                    className={`btn btn-outline btn-sm ${
-                      selectedTemperature === temp ? 'btn-active' : ''
-                    }`}
+                    className={`btn btn-outline btn-sm ${selectedTemperature === temp ? 'btn-active' : ''
+                      }`}
                   >
                     {temp}
                   </button>
