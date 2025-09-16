@@ -12,6 +12,17 @@ export interface MenuCategoryConfigItem {
   order: number;
 }
 
+export interface MenuCustomizationOption {
+  type: string;
+  price: number;
+  enable: boolean;
+}
+
+export interface MenuCustomizationConfig {
+  milk: MenuCustomizationOption[];
+  size: MenuCustomizationOption[];
+}
+
 export type CheckoutInputKey = 'name' | 'phone' | 'table' | 'notes';
 export interface CheckoutFieldConfigItem {
   input: CheckoutInputKey;
@@ -126,6 +137,54 @@ class RemoteConfigService {
   async checkMenuCategoryConfig(): Promise<MenuCategoryConfigItem[]> {
     await this.fetchConfig();
     return this.getMenuCategoryConfig();
+  }
+
+  getMenuCustomizationConfig(): MenuCustomizationConfig {
+    const defaults: MenuCustomizationConfig = {
+      milk: [],
+      size: [],
+    };
+
+    try {
+      const raw = getValue(remoteConfig, 'config/menu_customize').asString();
+      if (!raw) return defaults;
+      const parsed = JSON.parse(raw) as unknown;
+      if (!parsed || typeof parsed !== 'object') return defaults;
+
+      const normalizeOptions = (items: unknown[]): MenuCustomizationOption[] => {
+        return items
+          .map((item) => {
+            if (!item || typeof item !== 'object') return null;
+            const typeRaw = (item as any).type;
+            const type = typeof typeRaw === 'string' ? typeRaw.trim().toLowerCase() : '';
+            if (!type) return null;
+            const priceRaw = (item as any).price;
+            const price = Number(priceRaw);
+            const enableRaw = (item as any).enable;
+            const enable = enableRaw === undefined ? true : Boolean(enableRaw);
+
+            return {
+              type,
+              price: Number.isFinite(price) ? price : 0,
+              enable,
+            } as MenuCustomizationOption;
+          })
+          .filter(Boolean) as MenuCustomizationOption[];
+      };
+
+      const milk = Array.isArray((parsed as any).milk) ? normalizeOptions((parsed as any).milk) : [];
+      const size = Array.isArray((parsed as any).size) ? normalizeOptions((parsed as any).size) : [];
+
+      return { milk, size };
+    } catch (error) {
+      console.error('Failed to parse menu customization config from remote config:', error);
+      return defaults;
+    }
+  }
+
+  async checkMenuCustomizationConfig(): Promise<MenuCustomizationConfig> {
+    await this.fetchConfig();
+    return this.getMenuCustomizationConfig();
   }
 
   getCheckoutConfig(): CheckoutConfigMap {
