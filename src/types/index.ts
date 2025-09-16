@@ -69,6 +69,7 @@ export interface Order {
   estimatedPickupTime: string;
   createdAt: string;
   paymentSlipUrl?: string;
+  paymentMethod?: string;
 }
 
 export type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'completed' | 'cancelled';
@@ -163,6 +164,7 @@ export interface ApiOrderRequest {
   total: number;
   attachment_url?: string;
   notes?: string;
+  payment_method?: string;
 }
 
 export interface ApiOrderResponse {
@@ -171,11 +173,13 @@ export interface ApiOrderResponse {
     status: string;
     estimated_pickup_time: string;
     created_at: string;
+    payment_method?: string;
   };
   id?: string | number;
   status?: string;
   estimated_pickup_time?: string;
   created_at?: string;
+  payment_method?: string;
 }
 
 export interface ApiOrderStatusResponse {
@@ -225,4 +229,6 @@ export interface ApiOrderHistoryItem {
   estimatedPickupTime?: string;
   created_at?: string;
   createdAt?: string;
+  payment_method?: string;
+  paymentMethod?: string;
 }

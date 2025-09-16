@@ -87,6 +87,7 @@ class ApiService {
   async createOrder(
     items: CartItem[],
     customer: Customer,
+    paymentMethod: string,
     userId?: string,
     attachmentUrl?: string
   ): Promise<Order> {
@@ -129,6 +130,7 @@ class ApiService {
           }
         })),
         total: total,
+        payment_method: paymentMethod,
         ...(attachmentUrl ? { attachment_url: attachmentUrl } : {}),
         ...(customer.notes && customer.notes.trim() !== '' ? { notes: customer.notes.trim() } : {})
       };
@@ -146,7 +148,7 @@ class ApiService {
       }
 
       // Transform response to match our Order interface
-      const transformedOrder = this.transformOrderResponse(response, items, customer, userIdToUse);
+      const transformedOrder = this.transformOrderResponse(response, items, customer, userIdToUse, paymentMethod);
       
       // Validate that the order has an ID
       if (!transformedOrder.id) {
@@ -285,7 +287,13 @@ class ApiService {
     return { categories: [], menu: [] };
   }
 
-  private transformOrderResponse(response: ApiOrderResponse, items: CartItem[], customer: Customer, userId?: string): Order {
+  private transformOrderResponse(
+    response: ApiOrderResponse,
+    items: CartItem[],
+    customer: Customer,
+    userId?: string,
+    fallbackPaymentMethod?: string
+  ): Order {
     const subtotal = items.reduce((sum, item) => sum + item.totalPrice, 0);
     
     // Extract order ID with better validation
@@ -305,6 +313,8 @@ class ApiService {
       orderId = generateUUID();
     }
     
+    const paymentMethod = response?.data?.payment_method || response?.payment_method || fallbackPaymentMethod;
+
     return {
       id: orderId,
       userId,
@@ -319,6 +329,7 @@ class ApiService {
       createdAt: response?.data?.created_at || 
                 response?.created_at || 
                 new Date().toISOString(),
+      paymentMethod,
     };
   }
 
@@ -363,6 +374,7 @@ class ApiService {
                             apiOrder.estimatedPickupTime ||
                             new Date(Date.now() + 15 * 60 * 1000).toISOString(),
         createdAt: apiOrder.created_at || apiOrder.createdAt || new Date().toISOString(),
+        paymentMethod: apiOrder.payment_method || apiOrder.paymentMethod,
       };
 
       return transformedOrder;
