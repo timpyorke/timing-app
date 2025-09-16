@@ -122,7 +122,8 @@ export const transformApiSizes = (apiSizes: string[]) => {
     return {
       id: `size-${index}`,
       name: sizeName,
-      priceModifier
+      priceModifier,
+      enable: true,
     };
   });
 };

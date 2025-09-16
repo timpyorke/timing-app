@@ -161,7 +161,17 @@ class RemoteConfigService {
             const priceRaw = (item as any).price;
             const price = Number(priceRaw);
             const enableRaw = (item as any).enable;
-            const enable = enableRaw === undefined ? true : Boolean(enableRaw);
+            let enable: boolean;
+            if (enableRaw === undefined) {
+              enable = true;
+            } else if (typeof enableRaw === 'string') {
+              const normalized = enableRaw.trim().toLowerCase();
+              enable = normalized !== 'false' && normalized !== '0' && normalized !== 'off';
+            } else if (typeof enableRaw === 'number') {
+              enable = enableRaw !== 0;
+            } else {
+              enable = Boolean(enableRaw);
+            }
 
             return {
               type,

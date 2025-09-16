@@ -28,8 +28,10 @@ const QuickAddBottomSheet: React.FC<QuickAddBottomSheetProps> = ({
 
   React.useEffect(() => {
     if (menuItem && isOpen) {
-      setSelectedSize(menuItem.sizes[0] || null);
-      setSelectedMilk(menuItem.milkOptions?.[0] || null);
+      const firstEnabledSize = menuItem.sizes.find((size) => size.enable);
+      setSelectedSize(firstEnabledSize || null);
+      const firstEnabledMilk = menuItem.milkOptions?.find((milk) => milk.enable);
+      setSelectedMilk(firstEnabledMilk || null);
       setSelectedSweetness(menuItem.sweetnessLevels[0] || '');
       const defaultTemp = menuItem.temperatureOptions[0] || '';
       setSelectedTemperature(defaultTemp);
@@ -40,21 +42,25 @@ const QuickAddBottomSheet: React.FC<QuickAddBottomSheetProps> = ({
   const calculateTotalPrice = (): number => {
     if (!menuItem) return 0;
 
-    const basePrice = menuItem.basePrice + (selectedSize?.priceModifier || 0);
-    const milkPrice = selectedMilk?.price || 0;
+    const basePrice = menuItem.basePrice + (selectedSize && selectedSize.enable ? selectedSize.priceModifier : 0);
+    const milkPrice = selectedMilk && selectedMilk.enable ? selectedMilk.price : 0;
     return (basePrice + milkPrice) * quantity;
   };
 
   const handleAddToCart = () => {
-    if (!menuItem) return;
+    if (!menuItem || !selectedSize || !selectedSize.enable) return;
 
     const cartItem: CartItem = {
       id: generateId(),
       menuId: menuItem.id,
       menuName: menuItem.name,
       imageUrl: menuItem.image,
-      size: selectedSize || { id: 'default', name: 'Default', priceModifier: 0 },
-      milk: selectedMilk || { id: 'none', name: 'None', price: 0 },
+      size: selectedSize && selectedSize.enable
+        ? selectedSize
+        : { id: 'default', name: 'Default', priceModifier: 0, enable: true },
+      milk: selectedMilk && selectedMilk.enable
+        ? selectedMilk
+        : { id: 'none', name: 'None', price: 0, enable: true },
       sweetness: selectedSweetness,
       temperature: selectedTemperature,
       addOns: [], // Quick add doesn't include add-ons
@@ -109,9 +115,10 @@ const QuickAddBottomSheet: React.FC<QuickAddBottomSheetProps> = ({
                 {menuItem.sizes.map((size) => (
                   <button
                     key={size.id}
-                    onClick={() => setSelectedSize(size)}
-                    className={`btn btn-outline btn-xs flex-1 ${selectedSize?.id === size.id ? 'btn-active' : ''
+                    onClick={() => size.enable && setSelectedSize(size)}
+                    className={`btn btn-outline btn-xs flex-1 ${selectedSize?.id === size.id ? 'btn-active' : ''} ${!size.enable ? 'btn-disabled opacity-60 cursor-not-allowed' : ''
                       }`}
+                    disabled={!size.enable || size.name === 'large'}
                   >
                     {size.name}
                     {size.priceModifier > 0 && ` +${formatPrice(size.priceModifier)}`}
@@ -129,9 +136,10 @@ const QuickAddBottomSheet: React.FC<QuickAddBottomSheetProps> = ({
                 {menuItem.milkOptions.map((milk) => (
                   <button
                     key={milk.id}
-                    onClick={() => setSelectedMilk(milk)}
-                    className={`btn btn-outline btn-xs ${selectedMilk?.id === milk.id ? 'btn-active' : ''
+                    onClick={() => milk.enable && setSelectedMilk(milk)}
+                    className={`btn btn-outline btn-xs ${selectedMilk?.id === milk.id ? 'btn-active' : ''} ${!milk.enable ? 'btn-disabled opacity-60 cursor-not-allowed' : ''
                       }`}
+                    disabled={!milk.enable || milk.name === 'oat'}
                   >
                     {milk.name}
                     {milk.price > 0 && ` +${formatPrice(milk.price)}`}
@@ -205,7 +213,7 @@ const QuickAddBottomSheet: React.FC<QuickAddBottomSheetProps> = ({
             <button
               onClick={handleAddToCart}
               className="btn btn-primary flex-1 text-sm font-bold"
-              disabled={false}
+              disabled={!selectedSize || !selectedSize.enable}
             >
               <ShoppingCart size={16} className="mr-1" />
               {t('menuDetails.addToCart')} • {formatPrice(calculateTotalPrice())}

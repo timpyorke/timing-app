@@ -97,6 +97,25 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (savedCart) {
       try {
         const parsedCart = JSON.parse(savedCart);
+        if (parsedCart && Array.isArray(parsedCart.items)) {
+          parsedCart.items = parsedCart.items.map((item: CartItem) => ({
+            ...item,
+            size: {
+              ...item.size,
+              enable: item.size?.enable !== false,
+            },
+            milk: {
+              ...item.milk,
+              enable: item.milk?.enable !== false,
+            },
+            addOns: Array.isArray(item.addOns)
+              ? item.addOns.map(addOn => ({
+                  ...addOn,
+                  enable: addOn?.enable !== false,
+                }))
+              : [],
+          }));
+        }
         dispatch({ type: 'LOAD_CART', payload: parsedCart });
       } catch (error) {
         console.error('Failed to load cart from localStorage:', error);
@@ -167,4 +186,3 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     </CartContext.Provider>
   );
 };
-
