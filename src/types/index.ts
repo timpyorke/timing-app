@@ -8,12 +8,14 @@ export interface MenuAddOn {
   id: string;
   name: string;
   price: number;
+  enable: boolean;
 }
 
 export interface MilkOption {
   id: string;
   name: string;
   price: number;
+  enable: boolean;
 }
 
 export interface Menu {
@@ -35,7 +37,7 @@ export interface MenuSize {
   id: string;
   name: string;
   priceModifier: number;
-  enable?: boolean;
+  enable: boolean;
 }
 
 export interface CartItem {

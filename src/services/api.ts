@@ -1,10 +1,10 @@
-import { 
-  Menu, 
-  MenuCategory, 
-  Order, 
+import {
+  Menu,
+  MenuCategory,
+  Order,
   OrderStatus,
-  OrderStatusResponse, 
-  CartItem, 
+  OrderStatusResponse,
+  CartItem,
   Customer,
   FetchRequestOptions,
   ApiMenuResponse,
@@ -28,12 +28,12 @@ class ApiService {
   private async request<T>(endpoint: string, options?: FetchRequestOptions): Promise<T> {
     // Add locale parameter to the endpoint if not already present
     const url = new URL(`${API_BASE_URL}${endpoint}`);
-    
+
     // Get current language from localStorage or default to Thai
-    const currentLocale = typeof window !== 'undefined' 
-      ? localStorage.getItem('i18nextLng') || 'th' 
+    const currentLocale = typeof window !== 'undefined'
+      ? localStorage.getItem('i18nextLng') || 'th'
       : 'th';
-    
+
     // Add locale parameter if not already in the URL
     if (!url.searchParams.has('locale')) {
       url.searchParams.set('locale', currentLocale);
@@ -98,7 +98,7 @@ class ApiService {
       const total = items.reduce((sum, item) => sum + item.totalPrice, 0);
 
       const normalizedPaymentMethod = paymentMethod === 'cash' ? 'cash' : 'qr';
-      
+
       const customerInfo: ApiCustomerInfo = {
         name: customer.name,
         email: `${customer.name.toLowerCase().replace(/\s+/g, '.')}@customer.timing.com`,
@@ -151,7 +151,7 @@ class ApiService {
 
       // Transform response to match our Order interface
       const transformedOrder = this.transformOrderResponse(response, items, customer, userIdToUse, normalizedPaymentMethod);
-      
+
       // Validate that the order has an ID
       if (!transformedOrder.id) {
         throw new Error('Order creation failed - no order ID returned');
@@ -193,10 +193,10 @@ class ApiService {
   private transformMenuResponse(response: ApiMenuResponse, customizationConfig?: MenuCustomizationConfig): { categories: MenuCategory[]; menu: Menu[] } {
     // Handle the actual API response format: {success: true, data: [...]}
     const menuData = response?.data || response;
-    
+
     if (menuData && Array.isArray(menuData)) {
       const menuItems: Menu[] = [];
-      
+
       // Flatten the category-based structure
       menuData.forEach((category: ApiMenuCategoryResponse) => {
         if (category.items && Array.isArray(category.items)) {
@@ -212,7 +212,7 @@ class ApiService {
               syrups?: string[];
               [key: string]: string[] | boolean | undefined;
             }
-            
+
             const normalizedCustomizations: NormalizedCustomizations = {};
             if (item.customizations) {
               Object.keys(item.customizations).forEach(key => {
@@ -221,8 +221,8 @@ class ApiService {
             }
 
             // Transform dynamic sizes from API for each item
-            const apiSizes = Array.isArray(normalizedCustomizations.sizes) ? normalizedCustomizations.sizes : 
-                            Array.isArray(normalizedCustomizations.size) ? normalizedCustomizations.size : [];
+            const apiSizes = Array.isArray(normalizedCustomizations.sizes) ? normalizedCustomizations.sizes :
+              Array.isArray(normalizedCustomizations.size) ? normalizedCustomizations.size : [];
             const sizes = transformApiSizes(apiSizes).map(size => ({
               ...size,
               id: size.name.toLowerCase()
@@ -230,18 +230,19 @@ class ApiService {
 
             // Transform dynamic add-ons/extras from API for each item
             const apiExtras = Array.isArray(normalizedCustomizations.extras) ? normalizedCustomizations.extras :
-                             Array.isArray(normalizedCustomizations.syrups) ? normalizedCustomizations.syrups : [];
+              Array.isArray(normalizedCustomizations.syrups) ? normalizedCustomizations.syrups : [];
             const addOns = apiExtras.map((extra: string) => ({
               id: generateImagePath(extra),
               name: extra,
-              price: 0.5
+              price: 0.5,
+              enable: true,
             }));
 
             // Fallback add-ons if none provided by API
             const fallbackAddOns = [
-            { id: 'extra-shot', name: 'Extra Shot', price: 15.0 },
-            { id: 'whipped-cream', name: 'Whipped Cream', price: 15.0 },
-            { id: 'extra-syrup', name: 'Extra Syrup', price: 0.0 },
+              { id: 'extra-shot', name: 'Extra Shot', price: 15.0, enable: true },
+              { id: 'whipped-cream', name: 'Whipped Cream', price: 15.0, enable: true },
+              { id: 'extra-syrup', name: 'Extra Syrup', price: 0.0, enable: true },
             ];
 
             // Transform milk options with pricing
@@ -249,11 +250,12 @@ class ApiService {
             const milkOptions = apiMilkOptions.map((milk: string) => ({
               id: generateImagePath(milk),
               name: milk.trim(),
-              price: milk.toLowerCase().includes('normal') || milk.toLowerCase().includes('oat') ? 0 : 20
+              price: milk.toLowerCase().includes('normal') || milk.toLowerCase().includes('oat') ? 0 : 20,
+              enable: true,
             }));
 
-            const customSizes = this.buildSizesFromConfig(customizationConfig);
-            const customMilkOptions = this.buildMilkOptionsFromConfig(customizationConfig);
+            const sizesWithConfig = this.applySizeConfig(sizes, customizationConfig);
+            const milkOptionsWithConfig = this.applyMilkConfig(milkOptions, customizationConfig);
 
             menuItems.push({
               id: item.id?.toString(),
@@ -262,10 +264,10 @@ class ApiService {
               image: item.image_url || `/images/${generateImagePath(item.name)}.svg`,
               category: category.category?.toLowerCase() || 'specialty',
               basePrice: parseFloat(item.base_price?.toString() || '4.50'),
-              sizes: customSizes.length > 0 ? customSizes : sizes,
-              milkOptions: customMilkOptions.length > 0 ? customMilkOptions : milkOptions,
+              sizes: sizesWithConfig,
+              milkOptions: milkOptionsWithConfig,
               sweetnessLevels: Array.isArray(normalizedCustomizations.sweetness) ? normalizedCustomizations.sweetness :
-                              Array.isArray(normalizedCustomizations.sweet) ? normalizedCustomizations.sweet : [],
+                Array.isArray(normalizedCustomizations.sweet) ? normalizedCustomizations.sweet : [],
               temperatureOptions: ['Iced'],
               addOns: addOns.length > 0 ? addOns : fallbackAddOns,
               isPopular: item.popular || false,
@@ -284,7 +286,7 @@ class ApiService {
 
       return { categories: dynamicCategories, menu: menuItems };
     }
-    
+
     // Return empty data if API response format is unexpected
     return { categories: [], menu: [] };
   }
@@ -297,24 +299,24 @@ class ApiService {
     fallbackPaymentMethod?: string
   ): Order {
     const subtotal = items.reduce((sum, item) => sum + item.totalPrice, 0);
-    
+
     // Extract order ID with better validation
     let orderId: string | undefined;
-    
+
     if (response?.data?.id) {
       orderId = response.data.id.toString();
     } else if (response?.id) {
       orderId = response.id.toString();
     }
-    
-    
+
+
     // If no ID found, this indicates a problem with the API response
     if (!orderId) {
       console.error('No order ID found in API response:', response);
       // Still generate a fallback ID but this should be investigated
       orderId = generateUUID();
     }
-    
+
     const paymentMethod = response?.data?.payment_method || response?.payment_method || fallbackPaymentMethod;
 
     return {
@@ -325,12 +327,12 @@ class ApiService {
       subtotal,
       total: subtotal,
       status: (response?.data?.status || response?.status || 'pending') as OrderStatus,
-      estimatedPickupTime: response?.data?.estimated_pickup_time || 
-                          response?.estimated_pickup_time || 
-                          new Date(Date.now() + 15 * 60 * 1000).toISOString(),
-      createdAt: response?.data?.created_at || 
-                response?.created_at || 
-                new Date().toISOString(),
+      estimatedPickupTime: response?.data?.estimated_pickup_time ||
+        response?.estimated_pickup_time ||
+        new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+      createdAt: response?.data?.created_at ||
+        response?.created_at ||
+        new Date().toISOString(),
       paymentMethod,
     };
   }
@@ -340,9 +342,9 @@ class ApiService {
     return {
       id: response.data?.id?.toString() || response.id?.toString() || '',
       status: statusValue as OrderStatus,
-      estimatedPickupTime: response.data?.estimated_pickup_time || 
-                          response.estimated_pickup_time || 
-                          new Date(Date.now() + 10 * 60 * 1000).toISOString(),
+      estimatedPickupTime: response.data?.estimated_pickup_time ||
+        response.estimated_pickup_time ||
+        new Date(Date.now() + 10 * 60 * 1000).toISOString(),
       items: response.data?.items || response.items || [
         { name: 'Order Item', quantity: 1 }
       ],
@@ -352,7 +354,7 @@ class ApiService {
   private transformOrdersResponse(response: ApiOrdersResponse): Order[] {
     // Handle API response format: {success: true, data: [...]}
     const ordersData = response?.data || response;
-    
+
     if (!Array.isArray(ordersData)) {
       return [];
     }
@@ -372,9 +374,9 @@ class ApiService {
         subtotal: parseFloat(apiOrder.total?.toString() || '0'),
         total: parseFloat(apiOrder.total?.toString() || '0'),
         status: statusValue as OrderStatus,
-        estimatedPickupTime: apiOrder.estimated_pickup_time || 
-                            apiOrder.estimatedPickupTime ||
-                            new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+        estimatedPickupTime: apiOrder.estimated_pickup_time ||
+          apiOrder.estimatedPickupTime ||
+          new Date(Date.now() + 15 * 60 * 1000).toISOString(),
         createdAt: apiOrder.created_at || apiOrder.createdAt || new Date().toISOString(),
         paymentMethod: apiOrder.payment_method || apiOrder.paymentMethod,
       };
@@ -397,19 +399,22 @@ class ApiService {
         size: {
           id: apiItem.customizations?.size ? generateImagePath(apiItem.customizations.size) : 'medium',
           name: apiItem.customizations?.size || 'Medium',
-          priceModifier: 0
+          priceModifier: 0,
+          enable: true,
         },
         milk: {
           id: 'regular-milk',
           name: apiItem.customizations?.milk || 'Regular Milk',
-          price: 0
+          price: 0,
+          enable: true,
         },
         sweetness: apiItem.customizations?.sweetness || '50%',
         temperature: apiItem.customizations?.temperature || 'Hot',
         addOns: (apiItem.customizations?.extras || []).map((extra: string) => ({
           id: generateImagePath(extra),
           name: extra,
-          price: 0.5
+          price: 0.5,
+          enable: true,
         })),
         quantity: parseInt(apiItem.quantity?.toString() || '1'),
         totalPrice: parseFloat(apiItem.price?.toString() || '0') * parseInt(apiItem.quantity?.toString() || '1')
@@ -422,7 +427,7 @@ class ApiService {
   private transformSingleMenuResponse(response: { data: ApiMenuItemResponse } | ApiMenuItemResponse, customizationConfig?: MenuCustomizationConfig): Menu | null {
     // Handle API response format: {success: true, data: {...}}
     const menuData = 'data' in response ? response.data : response;
-    
+
     if (!menuData || !menuData.id) {
       return null;
     }
@@ -438,7 +443,7 @@ class ApiService {
       syrups?: string[];
       [key: string]: string[] | boolean | undefined;
     }
-    
+
     const normalizedCustomizations: NormalizedCustomizations = {};
     if (menuData.customizations) {
       Object.keys(menuData.customizations).forEach(key => {
@@ -447,8 +452,8 @@ class ApiService {
     }
 
     // Transform dynamic sizes from API
-    const apiSizes = Array.isArray(normalizedCustomizations.sizes) ? normalizedCustomizations.sizes : 
-                    Array.isArray(normalizedCustomizations.size) ? normalizedCustomizations.size : [];
+    const apiSizes = Array.isArray(normalizedCustomizations.sizes) ? normalizedCustomizations.sizes :
+      Array.isArray(normalizedCustomizations.size) ? normalizedCustomizations.size : [];
     const sizes = transformApiSizes(apiSizes).map(size => ({
       ...size,
       id: size.name.toLowerCase()
@@ -456,18 +461,19 @@ class ApiService {
 
     // Transform dynamic add-ons/extras from API
     const apiExtras = Array.isArray(normalizedCustomizations.extras) ? normalizedCustomizations.extras :
-                     Array.isArray(normalizedCustomizations.syrups) ? normalizedCustomizations.syrups : [];
+      Array.isArray(normalizedCustomizations.syrups) ? normalizedCustomizations.syrups : [];
     const addOns = apiExtras.map((extra: string) => ({
       id: generateImagePath(extra),
       name: extra,
-      price: 0.5 // Standard price for all add-ons
+      price: 0.5, // Standard price for all add-ons
+      enable: true,
     }));
 
     // Fallback add-ons if none provided by API
     const fallbackAddOns = [
-      { id: 'extra-shot', name: 'Extra Shot', price: 15.0 },
-      { id: 'whipped-cream', name: 'Whipped Cream', price: 15.0 },
-      { id: 'extra-syrup', name: 'Extra Syrup', price: 0.0 },
+      { id: 'extra-shot', name: 'Extra Shot', price: 15.0, enable: true },
+      { id: 'whipped-cream', name: 'Whipped Cream', price: 15.0, enable: true },
+      { id: 'extra-syrup', name: 'Extra Syrup', price: 0.0, enable: true },
     ];
 
     // Transform dynamic milk options from API with pricing
@@ -475,18 +481,19 @@ class ApiService {
     const milkOptions = apiMilkOptions.map((milk: string) => ({
       id: generateImagePath(milk),
       name: milk.trim(),
-      price: milk.toLowerCase().includes('normal') || milk.toLowerCase().includes('oat') ? 0 : 20
+      price: milk.toLowerCase().includes('normal') || milk.toLowerCase().includes('oat') ? 0 : 20,
+      enable: true,
     }));
 
     // Handle sweetness levels from API
     const sweetnessLevels = Array.isArray(normalizedCustomizations.sweetness) ? normalizedCustomizations.sweetness :
-                           Array.isArray(normalizedCustomizations.sweet) ? normalizedCustomizations.sweet : [];
+      Array.isArray(normalizedCustomizations.sweet) ? normalizedCustomizations.sweet : [];
 
     // Handle temperature options (only Iced is available)
     const temperatureOptions = ['Iced'];
 
-    const customSizes = this.buildSizesFromConfig(customizationConfig);
-    const customMilkOptions = this.buildMilkOptionsFromConfig(customizationConfig);
+    const sizesWithConfig = this.applySizeConfig(sizes, customizationConfig);
+    const milkOptionsWithConfig = this.applyMilkConfig(milkOptions, customizationConfig);
 
     const menu: Menu = {
       id: menuData.id?.toString(),
@@ -495,8 +502,8 @@ class ApiService {
       image: menuData.image_url || `/images/${generateImagePath(menuData.name)}.svg`,
       category: menuData.category?.toLowerCase() || 'specialty',
       basePrice: parseFloat(menuData.base_price?.toString() || '4.50'),
-      sizes: customSizes.length > 0 ? customSizes : sizes,
-      milkOptions: customMilkOptions.length > 0 ? customMilkOptions : milkOptions,
+      sizes: sizesWithConfig,
+      milkOptions: milkOptionsWithConfig,
       sweetnessLevels,
       temperatureOptions,
       addOns: addOns.length > 0 ? addOns : fallbackAddOns,
@@ -506,48 +513,107 @@ class ApiService {
     return menu;
   }
 
-  private buildSizesFromConfig(config?: MenuCustomizationConfig): MenuSize[] {
+  // Apply remote config toggles to API-provided size options without replacing them entirely.
+  private applySizeConfig(apiSizes: MenuSize[], config?: MenuCustomizationConfig): MenuSize[] {
     if (!config || !Array.isArray(config.size) || config.size.length === 0) {
-      return [];
+      return apiSizes;
     }
 
-    return config.size
-      .filter(option => option && option.enable && typeof option.type === 'string')
-      .map((option, index) => {
-        const normalizedType = option.type.toLowerCase();
-        return {
-          id: generateImagePath(normalizedType || `custom-size-${index}`),
-          name: this.formatCustomizationLabel(normalizedType || `size-${index}`),
-          priceModifier: typeof option.price === 'number' && Number.isFinite(option.price) ? option.price : 0,
-        };
-      });
+    const sizeEntries = config.size
+      .filter(option => option && typeof option.type === 'string')
+      .flatMap(option => {
+        const keys = this.getCustomizationTokens(option.type);
+        return keys.map(key => [key, option] as const);
+      })
+      .filter((entry): entry is readonly [string, MenuCustomizationConfig['size'][number]] => Boolean(entry[0]));
+
+    const configMap = new Map(sizeEntries);
+
+    return apiSizes.map(size => {
+      const keys = this.getCustomizationTokens(size.name);
+      const option = keys.map(key => configMap.get(key)).find(Boolean);
+
+      const priceModifier = option && typeof option.price === 'number' && Number.isFinite(option.price)
+        ? option.price
+        : size.priceModifier;
+
+      const enable = option ? option.enable !== false : size.enable !== false;
+
+      return {
+        ...size,
+        priceModifier,
+        enable,
+      };
+    });
   }
 
-  private buildMilkOptionsFromConfig(config?: MenuCustomizationConfig): MilkOption[] {
+  // Apply remote config toggles to API-provided milk options without replacing them entirely.
+  private applyMilkConfig(apiMilkOptions: MilkOption[], config?: MenuCustomizationConfig): MilkOption[] {
     if (!config || !Array.isArray(config.milk) || config.milk.length === 0) {
-      return [];
+      return apiMilkOptions;
     }
 
-    return config.milk
-      .filter(option => option && option.enable && typeof option.type === 'string')
-      .map((option, index) => {
-        const normalizedType = option.type.toLowerCase();
-        return {
-          id: generateImagePath(normalizedType || `milk-${index}`),
-          name: this.formatCustomizationLabel(normalizedType || `milk-${index}`),
-          price: typeof option.price === 'number' && Number.isFinite(option.price) ? option.price : 0,
-        };
-      });
+    const milkEntries = config.milk
+      .filter(option => option && typeof option.type === 'string')
+      .flatMap(option => {
+        const keys = this.getCustomizationTokens(option.type);
+        return keys.map(key => [key, option] as const);
+      })
+      .filter((entry): entry is readonly [string, MenuCustomizationConfig['milk'][number]] => Boolean(entry[0]));
+
+    const configMap = new Map(milkEntries);
+
+    return apiMilkOptions.map(milk => {
+      const keys = this.getCustomizationTokens(milk.name);
+      const option = keys.map(key => configMap.get(key)).find(Boolean);
+
+      const price = option && typeof option.price === 'number' && Number.isFinite(option.price)
+        ? option.price
+        : milk.price;
+
+      const enable = option ? option.enable !== false : milk.enable !== false;
+
+      return {
+        ...milk,
+        price,
+        enable,
+      };
+    });
   }
 
-  private formatCustomizationLabel(value: string): string {
-    if (!value) return '';
-    return value
-      .split(/[\s_-]+/)
-      .filter(Boolean)
-      .map(part => part.charAt(0).toUpperCase() + part.slice(1))
-      .join(' ');
+  private getCustomizationTokens(value: string): string[] {
+    if (!value) return [];
+
+    const rawTokens = value
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter(Boolean);
+
+    const filteredTokens = rawTokens.filter(token => {
+      if (!token) return false;
+      if (token === 'size' || token === 'milk' || token === 'option') return false;
+      if (token === 'oz' || token === 'ml') return false;
+      if (/^\d+$/.test(token)) return false;
+      return true;
+    });
+
+    const keys = new Set<string>();
+    const joined = filteredTokens.join('');
+    if (joined) {
+      keys.add(joined);
+    }
+    filteredTokens.forEach(token => {
+      keys.add(token);
+      ['milk', 'size', 'option'].forEach(suffix => {
+        if (token.endsWith(suffix) && token.length > suffix.length) {
+          keys.add(token.slice(0, -suffix.length));
+        }
+      });
+    });
+
+    return Array.from(keys);
   }
+
 }
 
 export const apiService = new ApiService();

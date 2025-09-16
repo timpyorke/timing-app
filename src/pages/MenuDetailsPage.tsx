@@ -31,12 +31,15 @@ const MenuDetailsPage: React.FC = () => {
 
       if (menuItemData) {
         setMenuItem(menuItemData);
-        setSelectedSize(menuItemData.sizes[0] || null);
-        setSelectedMilk(menuItemData.milkOptions?.[0] || null);
+        const firstEnabledSize = menuItemData.sizes.find((size) => size.enable);
+        setSelectedSize(firstEnabledSize || null);
+        const firstEnabledMilk = menuItemData.milkOptions?.find((milk) => milk.enable);
+        setSelectedMilk(firstEnabledMilk || null);
         setSelectedSweetness(menuItemData.sweetnessLevels[0] || '');
         // Default to first option (Iced)
         const defaultTemp = menuItemData.temperatureOptions[0] || '';
         setSelectedTemperature(defaultTemp);
+        setSelectedAddOns([]);
       } else {
         console.error('Menu item not found');
         setMenuItem(null);
@@ -66,12 +69,15 @@ const MenuDetailsPage: React.FC = () => {
     if (!menuItem || !selectedSize) return 0;
 
     const basePrice = menuItem.basePrice + selectedSize.priceModifier;
-    const milkPrice = selectedMilk?.price || 0;
-    const addOnsPrice = selectedAddOns.reduce((sum, addOn) => sum + addOn.price, 0);
+    const milkPrice = selectedMilk && selectedMilk.enable ? selectedMilk.price : 0;
+    const addOnsPrice = selectedAddOns
+      .filter(addOn => addOn.enable)
+      .reduce((sum, addOn) => sum + addOn.price, 0);
     return (basePrice + milkPrice + addOnsPrice) * quantity;
   };
 
   const handleAddOnToggle = (addOn: MenuAddOn) => {
+    if (!addOn.enable) return;
     setSelectedAddOns(prev => {
       const exists = prev.find(item => item.id === addOn.id);
       if (exists) {
@@ -83,7 +89,7 @@ const MenuDetailsPage: React.FC = () => {
   };
 
   const handleAddToCart = () => {
-    if (!menuItem || !selectedSize) return;
+    if (!menuItem || !selectedSize || !selectedSize.enable) return;
 
     const cartItem: CartItem = {
       id: generateId(),
@@ -91,10 +97,12 @@ const MenuDetailsPage: React.FC = () => {
       menuName: menuItem.name,
       imageUrl: menuItem.image,
       size: selectedSize,
-      milk: selectedMilk || { id: 'none', name: 'None', price: 0 },
+      milk: selectedMilk && selectedMilk.enable
+        ? selectedMilk
+        : { id: 'none', name: 'None', price: 0, enable: true },
       sweetness: selectedSweetness,
       temperature: selectedTemperature,
-      addOns: selectedAddOns,
+      addOns: selectedAddOns.filter(addOn => addOn.enable),
       quantity,
       totalPrice: calculateTotalPrice(),
     };
@@ -167,14 +175,19 @@ const MenuDetailsPage: React.FC = () => {
               <h3 className="font-semibold mb-3">{t('menuDetails.size')}</h3>
               <div className="grid grid-cols-1 gap-2">
                 {menuItem.sizes.map((size) => (
-                  <label key={size.id} className="cursor-pointer">
+                  <label
+                    key={size.id}
+                    className={`cursor-pointer flex items-center gap-3 p-3 rounded-lg border border-base-300 ${selectedSize?.id === size.id ? 'border-primary bg-primary/10' : 'hover:border-primary/50'
+                      } ${!size.enable ? 'opacity-60 cursor-not-allowed' : ''}`}
+                  >
                     <input
                       type="radio"
                       name="size"
                       value={size.id}
                       checked={selectedSize?.id === size.id}
-                      onChange={() => setSelectedSize(size)}
-                      className="radio radio-primary mr-3"
+                      onChange={() => size.enable && setSelectedSize(size)}
+                      className="radio radio-primary"
+                      disabled={size.name === 'large' || !size.enable}
                     />
                     <span className="flex-1">{size.name}</span>
                     {size.priceModifier > 0 && (
@@ -195,9 +208,10 @@ const MenuDetailsPage: React.FC = () => {
                 {menuItem.milkOptions.map((milk) => (
                   <button
                     key={milk.id}
-                    onClick={() => setSelectedMilk(milk)}
-                    className={`btn btn-outline btn-sm ${selectedMilk?.id === milk.id ? 'btn-active' : ''
+                    onClick={() => milk.enable && setSelectedMilk(milk)}
+                    className={`btn btn-outline btn-sm ${selectedMilk?.id === milk.id ? 'btn-active' : ''} ${!milk.enable ? 'btn-disabled opacity-60 cursor-not-allowed' : ''
                       }`}
+                    disabled={!milk.enable || milk.name === 'oat'}
                   >
                     {milk.name}
                     {milk.price > 0 && (
@@ -251,13 +265,18 @@ const MenuDetailsPage: React.FC = () => {
             <h3 className="font-semibold mb-3">{t('menuDetails.addOns')}</h3>
             <div className="space-y-2">
               {menuItem.addOns.map((addOn) => (
-                <label key={addOn.id} className="cursor-pointer flex items-center justify-between p-2 rounded-lg hover:bg-base-200">
+                <label
+                  key={addOn.id}
+                  className={`cursor-pointer flex items-center justify-between p-2 rounded-lg hover:bg-base-200 ${!addOn.enable ? 'opacity-60 cursor-not-allowed' : ''
+                    }`}
+                >
                   <div className="flex items-center">
                     <input
                       type="checkbox"
                       checked={selectedAddOns.some(item => item.id === addOn.id)}
                       onChange={() => handleAddOnToggle(addOn)}
                       className="checkbox checkbox-primary mr-3"
+                      disabled={!addOn.enable}
                     />
                     <span>{addOn.name}</span>
                   </div>
@@ -299,7 +318,7 @@ const MenuDetailsPage: React.FC = () => {
             <button
               onClick={handleAddToCart}
               className="btn btn-primary btn-touch w-full text-lg font-bold shadow-lg"
-              disabled={!selectedSize}
+              disabled={!selectedSize || !selectedSize.enable}
             >
               <ShoppingCart size={20} className="mr-2" />
               {t('menuDetails.addQuantityToCart', { quantity })} • {formatPrice(calculateTotalPrice())}
@@ -332,7 +351,7 @@ const MenuDetailsPage: React.FC = () => {
           <button
             onClick={handleAddToCart}
             className="btn btn-primary btn-touch flex-1 text-lg font-bold shadow-lg"
-            disabled={!selectedSize}
+            disabled={!selectedSize || !selectedSize.enable}
           >
             <ShoppingCart size={20} className="mr-2" />
             {t('menuDetails.addToCart')} • {formatPrice(calculateTotalPrice())}
