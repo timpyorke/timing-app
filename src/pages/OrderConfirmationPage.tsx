@@ -8,7 +8,7 @@ import { useTranslation } from '../i18n/stub';
 
 const OrderConfirmationPage: React.FC = () => {
   const defaultSize: MenuSize = { id: 'medium', name: 'Medium', priceModifier: 0, enable: true };
-  const defaultMilk: MilkOption = { id: 'regular', name: 'Regular Milk', price: 0 };
+  const defaultMilk: MilkOption = { id: 'regular', name: 'Regular Milk', price: 0, enable: true };
 
   const { t } = useTranslation();
   const { orderId } = useParams<{ orderId: string }>();
