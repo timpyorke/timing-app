@@ -57,6 +57,12 @@ const CheckoutPage: React.FC = () => {
     notes: { required: false, is_show: true },
   });
 
+  const scrollToBottom = () => {
+    if (typeof window === 'undefined') return;
+    const target = document.documentElement || document.body;
+    window.scrollTo({ top: target.scrollHeight, behavior: 'smooth' });
+  };
+
   const totalAmount = useMemo(() => getTotalPrice(), [items]);
   const qrPaymentUrl = useMemo(() => {
     // API provided by user (note: 'amont' as given in request)
@@ -365,6 +371,9 @@ const CheckoutPage: React.FC = () => {
                     setAttachmentPreview(url);
                   } else {
                     setAttachmentPreview(null);
+                  }
+                  if (file) {
+                    scrollToBottom();
                   }
                 }}
                 disabled={loading}
