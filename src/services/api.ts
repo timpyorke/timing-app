@@ -271,6 +271,7 @@ class ApiService {
               temperatureOptions: ['Iced'],
               addOns: addOns.length > 0 ? addOns : fallbackAddOns,
               isPopular: item.popular || false,
+              active: this.resolveMenuActiveState(item),
             });
           });
         }
@@ -508,9 +509,33 @@ class ApiService {
       temperatureOptions,
       addOns: addOns.length > 0 ? addOns : fallbackAddOns,
       isPopular: menuData.popular || false,
+      active: this.resolveMenuActiveState(menuData),
     };
 
     return menu;
+  }
+
+  private resolveMenuActiveState(item: ApiMenuItemResponse): boolean {
+    if (typeof item?.active === 'boolean') {
+      return item.active;
+    }
+
+    if (typeof item?.is_active === 'boolean') {
+      return item.is_active;
+    }
+
+    if (typeof item?.is_active === 'number') {
+      return item.is_active !== 0;
+    }
+
+    if (typeof item?.status === 'string') {
+      const normalizedStatus = item.status.toLowerCase();
+      if (['inactive', 'disabled', 'unavailable', 'draft'].includes(normalizedStatus)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   // Apply remote config toggles to API-provided size options without replacing them entirely.

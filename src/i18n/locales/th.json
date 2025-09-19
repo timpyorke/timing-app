@@ -45,7 +45,8 @@
     "hotIced": "ร้อน/เย็น",
     "customize": "ปรับแต่ง",
     "quickAdd": "เพิ่ม",
-    "added": "✓ เพิ่มแล้ว!"
+    "added": "✓ เพิ่มแล้ว!",
+    "unavailable": "เมนูนี้ไม่พร้อมให้บริการ"
   },
   "menuDetails": {
     "size": "ขนาด",

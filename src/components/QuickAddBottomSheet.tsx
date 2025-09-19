@@ -26,6 +26,8 @@ const QuickAddBottomSheet: React.FC<QuickAddBottomSheetProps> = ({
   const [selectedTemperature, setSelectedTemperature] = useState('');
   const [quantity, setQuantity] = useState(1);
 
+  const isMenuInactive = menuItem?.active === false;
+
   React.useEffect(() => {
     if (menuItem && isOpen) {
       const firstEnabledSize = menuItem.sizes.find((size) => size.enable);
@@ -48,7 +50,7 @@ const QuickAddBottomSheet: React.FC<QuickAddBottomSheetProps> = ({
   };
 
   const handleAddToCart = () => {
-    if (!menuItem || !selectedSize || !selectedSize.enable) return;
+    if (!menuItem || isMenuInactive || !selectedSize || !selectedSize.enable) return;
 
     const cartItem: CartItem = {
       id: generateId(),
@@ -104,6 +106,12 @@ const QuickAddBottomSheet: React.FC<QuickAddBottomSheetProps> = ({
             <p className="text-lg font-bold text-primary mt-1">{formatPrice(menuItem.basePrice)}</p>
           </div>
         </div>
+
+        {isMenuInactive && (
+          <div className="mb-4 rounded-md bg-warning/10 px-3 py-2 text-xs font-medium text-warning">
+            {t('menu.unavailable')}
+          </div>
+        )}
 
         {/* Quick Customization Options */}
         <div className="space-y-3">
@@ -196,7 +204,7 @@ const QuickAddBottomSheet: React.FC<QuickAddBottomSheetProps> = ({
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
                 className="btn btn-ghost btn-sm btn-circle"
-                disabled={quantity <= 1}
+                disabled={isMenuInactive || quantity <= 1}
               >
                 <Minus size={14} />
               </button>
@@ -204,6 +212,7 @@ const QuickAddBottomSheet: React.FC<QuickAddBottomSheetProps> = ({
               <button
                 onClick={() => setQuantity(quantity + 1)}
                 className="btn btn-ghost btn-sm btn-circle"
+                disabled={isMenuInactive}
               >
                 <Plus size={14} />
               </button>
@@ -212,8 +221,8 @@ const QuickAddBottomSheet: React.FC<QuickAddBottomSheetProps> = ({
             {/* Add to Cart Button */}
             <button
               onClick={handleAddToCart}
-              className="btn btn-primary flex-1 text-sm font-bold"
-              disabled={!selectedSize || !selectedSize.enable}
+              className={`btn flex-1 text-sm font-bold ${isMenuInactive ? 'btn-disabled pointer-events-none' : 'btn-primary'}`}
+              disabled={isMenuInactive || !selectedSize || !selectedSize.enable}
             >
               <ShoppingCart size={16} className="mr-1" />
               {t('menuDetails.addToCart')} • {formatPrice(calculateTotalPrice())}

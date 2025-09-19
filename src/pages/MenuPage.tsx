@@ -102,6 +102,10 @@ const MenuPage: React.FC = () => {
 
   const handleQuickAddClick = (e: React.MouseEvent, menuItem: Menu) => {
     e.stopPropagation();
+    if (menuItem.active === false) {
+      e.preventDefault?.();
+      return;
+    }
     setSelectedMenuForQuickAdd(menuItem);
     setIsQuickAddOpen(true);
   };
@@ -164,23 +168,37 @@ const MenuPage: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-4">
-          {filteredMenuItems.map((menuItem) => (
-            <div
-              key={menuItem.id}
-              onClick={(e) => handleQuickAddClick(e, menuItem)}
-              className="card-menu p-2 group cursor-pointer hover:shadow-xl transition-all duration-200 relative border border-black rounded-lg hover:border-black"
-            >
-              <div className="flex items-start gap-2 p-1">
-                {/* Image on the left */}
-                <div className="relative flex-shrink-0">
-                  <img
-                    src={menuItem.image}
-                    alt={menuItem.name}
-                    className="w-24 h-24 object-cover object-center rounded-lg group-hover:scale-105 transition-transform duration-200"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/images/placeholder-menu.svg';
-                    }}
-                  />
+          {filteredMenuItems.map((menuItem) => {
+            const isInactive = menuItem.active === false;
+
+            return (
+              <div
+                key={menuItem.id}
+                onClick={(e) => {
+                  if (isInactive) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                  }
+                  handleQuickAddClick(e, menuItem);
+                }}
+                className={`card-menu p-2 group transition-all duration-200 relative border border-black rounded-lg ${isInactive
+                  ? 'cursor-not-allowed opacity-60'
+                  : 'cursor-pointer hover:shadow-xl hover:border-black'
+                  }`}
+                aria-disabled={isInactive}
+              >
+                <div className="flex items-start gap-2 p-1">
+                  {/* Image on the left */}
+                  <div className="relative flex-shrink-0">
+                    <img
+                      src={menuItem.image}
+                      alt={menuItem.name}
+                      className="w-24 h-24 object-cover object-center rounded-lg group-hover:scale-105 transition-transform duration-200"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/images/placeholder-menu.svg';
+                      }}
+                    />
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200 rounded-lg pointer-events-none"></div>
                   {menuItem.isPopular && (
                     <div className="absolute -top-1 -right-1 badge badge-secondary badge-xs p-1">
@@ -219,15 +237,33 @@ const MenuPage: React.FC = () => {
 
                 {/* Circular Add Button - Bottom Right */}
                 <button
-                  onClick={(e) => handleQuickAddClick(e, menuItem)}
-                  className="absolute bottom-3 right-3 btn btn-circle btn-primary btn-sm hover:btn-primary-focus transition-all duration-200"
+                  onClick={(e) => {
+                    if (isInactive) {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      return;
+                    }
+                    handleQuickAddClick(e, menuItem);
+                  }}
+                  className={`absolute bottom-3 right-3 btn btn-circle btn-sm transition-all duration-200 ${isInactive
+                    ? 'btn-disabled pointer-events-none'
+                    : 'btn-primary hover:btn-primary-focus'
+                    }`}
                   aria-label={`Quick add ${menuItem.name} to cart`}
+                  aria-disabled={isInactive}
+                  disabled={isInactive}
                 >
                   <Plus size={14} />
                 </button>
               </div>
+              {isInactive && (
+                <div className="absolute inset-0 rounded-lg bg-base-200/70 backdrop-blur-[1px] flex items-center justify-center text-xs font-semibold text-base-content/80">
+                  {t('menu.unavailable')}
+                </div>
+              )}
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

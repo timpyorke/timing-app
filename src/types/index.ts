@@ -31,6 +31,7 @@ export interface Menu {
   temperatureOptions: string[];
   addOns: MenuAddOn[];
   isPopular?: boolean;
+  active?: boolean;
 }
 
 export interface MenuSize {
@@ -116,6 +117,9 @@ export interface ApiMenuItemResponse {
   base_price: string | number;
   category?: string;
   popular?: boolean;
+  active?: boolean;
+  is_active?: boolean | number;
+  status?: string;
   customizations?: ApiMenuItemCustomizations;
 }
 

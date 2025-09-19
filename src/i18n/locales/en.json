@@ -45,7 +45,8 @@
     "hotIced": "Hot/Iced",
     "customize": "Customize",
     "quickAdd": "Add",
-    "added": "✓ Added!"
+    "added": "✓ Added!",
+    "unavailable": "Currently unavailable"
   },
   "menuDetails": {
     "size": "Size",
